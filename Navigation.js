@@ -11,7 +11,8 @@ const Navigation = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Login" component={Login}
+         options={{ headerShown: false }} />
         <Stack.Screen name="Dashboard" component={Dashboard} />
       </Stack.Navigator>
     </NavigationContainer>
