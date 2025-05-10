@@ -1,48 +1,45 @@
-import React, { useState } from 'react';
-import {View, Text, Image, StyleSheet, TextInput} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-import {CustomSvg} from '../../components';
+import React, { useContext, useState } from 'react';
 import {
-  normalizeHeight,
-  normalizeWidth,
-} from '../../components/Responsivescreen';
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Button,
+} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import { normalizeHeight, normalizeWidth } from '../../components/Responsivescreen';
 import images from '../../assets/images';
 import CompTextInput from '../../components/CompTextInput';
-const Login = () => {
-  console.log('loginnnnnn');
-const [field, setField]= useState({});
+import { ThemeContext } from '../../src/context/ThemeContext';
+
+const Login = ({ navigation }) => {
+  const [field, setField] = useState({});
+  const { isDark, colors } = useContext(ThemeContext);
+
+  const gradientColors = isDark
+    ? ['#381874', '#150534']
+    : ['#FBF8FF', '#DFCEFF']; // adjust light mode gradient
+
+    const patternImage = isDark ? images.SIDEPATTERNDARK : images.SIDEPATTERNLIGHT;
+
   return (
     <LinearGradient
-      colors={['#381874', '#150534']}
-      style={{
-        flex: 1,
-      }}>
-      <Image source={images.SIDEPATTERN} style={styles.sidePattern} />
-      <View
-        style={{
-          marginTop: normalizeHeight(55),
-          marginHorizontal: normalizeWidth(24),
-        }}>
+      colors={gradientColors}
+      style={styles.gradient}>
+      <Image source={patternImage} style={styles.sidePattern} />
+      <View style={styles.container}>
         <Image
           source={images.BACKICON}
-          style={{
-            height: normalizeHeight(24),
-            width: normalizeWidth(24),
-            resizeMode: 'contain',
-          }}
+          style={styles.backIcon}
         />
-        <Text
-          style={{
-            fontSize: 32,
-            color: 'rgba(255, 255, 255, 0.60)',
-            fontWeight: '900',
-          }}>
+        <Text style={[styles.title, { color: isDark ?'rgba(255, 255, 255, 0.60)':'#2A0D54' }]}>
           Let’s Go 🚀
         </Text>
-        <Text style={{fontSize: 14, color: '#EADDFF', fontWeight: '500'}}>
+        <Text style={[styles.subtitle, { color: isDark?'#EADDFF':'#4F378A' }]}>
           The grind starts here !!
         </Text>
-        <View style={{marginTop: normalizeHeight(60)}}>
+
+        <View style={{ marginTop: normalizeHeight(60) }}>
           <CompTextInput
             label={'Org Code *'}
             placeholder="Enter Organisation code"
@@ -52,36 +49,53 @@ const [field, setField]= useState({});
           />
         </View>
 
-        <View style={{marginTop: normalizeHeight(35)}}>
+        <View style={{ marginTop: normalizeHeight(35) }}>
           <CompTextInput
             label={'Student ID *'}
             placeholder="Enter Student ID"
             infoText={true}
-            value={field.orgcode}
+            value={field.studentId}
           />
         </View>
-        
 
-
-        <View>
-          {/* <TextInput 
-  onFocus={ () => this.onFocus() }
-  style={{
-    borderBottomWidth:1,
-    color:"rgba(255, 255, 255, 0.54)",
-    borderColor:"rgba(255, 255, 255, 0.42)"}}/> */}
-        </View>
+        <Button
+          onPress={() => navigation.navigate('Dashboard')}
+          title="Continue"
+          color={colors.primary}
+        />
       </View>
     </LinearGradient>
   );
 };
 
-export default Login;
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   sidePattern: {
     position: 'absolute',
     top: 0,
     left: 0,
     resizeMode: 'contain',
   },
+  container: {
+    marginTop: normalizeHeight(55),
+    marginHorizontal: normalizeWidth(24),
+  },
+  backIcon: {
+    height: normalizeHeight(24),
+    width: normalizeWidth(24),
+    resizeMode: 'contain',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '900',
+  },
+  subtitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginTop: 4,
+  },
 });
+
+export default Login;

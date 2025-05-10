@@ -9,8 +9,9 @@ import {
   Platform,
   TouchableOpacity,
 } from 'react-native';
-import React, {useRef} from 'react';
+import React, {useContext, useRef} from 'react';
 import {normalizeHeight, normalizeWidth} from './Responsivescreen';
+import { ThemeContext } from '../src/context/ThemeContext';
 
 const CompTextInput = props => {
   const {
@@ -26,6 +27,7 @@ const CompTextInput = props => {
     inputstyle,
   } = props;
   const textInRef = useRef(null);
+  const { isDark, colors } = useContext(ThemeContext);
   return (
     <View pointerEvents={!onPress && editable === false ? 'none' : 'auto'}>
       {label ? (
@@ -37,7 +39,7 @@ const CompTextInput = props => {
                   labelstyle
                     ? labelstyle
                     : {
-                        color: '#D6C0FD',
+                        color:isDark? '#D6C0FD':'#200A47',
                         fontSize: 12,
                         fontWeight: '600',
                       }
@@ -67,7 +69,7 @@ const CompTextInput = props => {
                   color: 'rgba(255, 255, 255, 0.87)',
                 },
           ]}
-          placeholderTextColor={'rgba(255, 255, 255, 0.28)'}
+          placeholderTextColor={isDark?'rgba(255, 255, 255, 0.28)':'rgba(0, 0, 0, 0.28)'}
           color={'white'}
           returnKeyType={'done'}
           {...props}
@@ -87,9 +89,12 @@ const CompTextInput = props => {
           {
             paddingLeft: infoText ? normalizeWidth(0) : normalizeWidth(0),
             paddingBottom: normalizeHeight(8),
-            color:
-              infoText ?'rgba(255, 255, 255, 0.54)'
-                : 'red',
+            color: infoText
+            ? isDark
+              ?  'rgba(255, 255, 255, 0.54)'
+              :'rgba(0, 0, 0, 0.54)'
+            : 'red',
+          
             textAlign: infoText  ? 'left' : 'right',
           },
         ]}>
