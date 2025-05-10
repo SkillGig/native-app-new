@@ -1,5 +1,12 @@
-import React, { useState } from 'react';
-import {View, Text, Image, StyleSheet, TextInput} from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {CustomSvg} from '../../components';
 import {
@@ -8,9 +15,13 @@ import {
 } from '../../components/Responsivescreen';
 import images from '../../assets/images';
 import CompTextInput from '../../components/CompTextInput';
+
 const Login = () => {
   console.log('loginnnnnn');
-const [field, setField]= useState({});
+  const [field, setField] = useState({});
+  const handleSubmit = () => {
+    console.log('Submit');
+  };
   return (
     <LinearGradient
       colors={['#381874', '#150534']}
@@ -60,11 +71,28 @@ const [field, setField]= useState({});
             value={field.orgcode}
           />
         </View>
-        
 
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#563593',
+            paddingVertical: normalizeHeight(12),
+            borderRadius: normalizeWidth(12),
+            marginTop: normalizeHeight(260),
+            alignItems: 'center',
+          }}
+          onPress={handleSubmit}>
+          <Text
+            style={{
+              color: '#EADDFF',
+              fontSize: normalizeWidth(16),
+              fontWeight: '700',
+            }}>
+            Submit
+          </Text>
+        </TouchableOpacity>
 
         <View>
-          {/* <TextInput 
+          {/* <TextInput
   onFocus={ () => this.onFocus() }
   style={{
     borderBottomWidth:1,
