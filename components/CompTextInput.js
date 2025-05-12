@@ -65,12 +65,12 @@ const CompTextInput = props => {
                   fontSize: 16,
                   fontWeight: '700',
                   borderBottomWidth: 1,
-                  borderBottomColor: 'white',
-                  color: 'rgba(255, 255, 255, 0.87)',
+                  borderBottomColor:isDark? 'white':'#4F378A',
+                  color: isDark?'rgba(255, 255, 255, 0.87)':'rgba(0, 0, 0, 0.87)',
                 },
           ]}
           placeholderTextColor={isDark?'rgba(255, 255, 255, 0.28)':'rgba(0, 0, 0, 0.28)'}
-          color={'white'}
+          color={isDark?'rgba(255, 255, 255, 0.87)':'rgba(0, 0, 0, 0.87)'}
           returnKeyType={'done'}
           {...props}
         />
@@ -83,12 +83,9 @@ const CompTextInput = props => {
             textAlign: 'right',
             fontSize: 12,
             zIndex: 2,
-            marginTop:normalizeHeight(2),
-            lineHeight:normalizeHeight(18),
           },
           {
             paddingLeft: infoText ? normalizeWidth(0) : normalizeWidth(0),
-            paddingBottom: normalizeHeight(8),
             color: infoText
             ? isDark
               ?  'rgba(255, 255, 255, 0.54)'
@@ -114,6 +111,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     //  paddingBottom: normalizeHeight(4),
+    fontSize: 12,
+    fontWeight: '600',
   },
   note: {
     color: 'rgba(255, 255, 255, 0.42)',

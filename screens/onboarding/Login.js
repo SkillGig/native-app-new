@@ -1,12 +1,14 @@
-import React, { useContext, useState } from 'react';
+import React, {useState,useContext} from 'react';
 import {
   View,
   Text,
   Image,
   StyleSheet,
-  Button,
+  TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import { CustomSvg } from '../../components';
 import { normalizeHeight, normalizeWidth } from '../../components/Responsivescreen';
 import images from '../../assets/images';
 import CompTextInput from '../../components/CompTextInput';
@@ -22,16 +24,19 @@ const Login = ({ navigation }) => {
 
     const patternImage = isDark ? images.SIDEPATTERNDARK : images.SIDEPATTERNLIGHT;
 
+    const handleSubmit=()=>{
+      console.log('submittt')
+      navigation.navigate('VerifyOTP')
+    }
+
   return (
     <LinearGradient
       colors={gradientColors}
       style={styles.gradient}>
       <Image source={patternImage} style={styles.sidePattern} />
       <View style={styles.container}>
-        <Image
-          source={images.BACKICON}
-          style={styles.backIcon}
-        />
+      {isDark? <Image source={images.BACKICON} style={styles.backIcon} />:
+       <Image source={images.BLACKBACKICON} style={styles.backIcon} />}
         <Text style={[styles.title, { color: isDark ?'rgba(255, 255, 255, 0.60)':'#2A0D54' }]}>
           Let’s Go 🚀
         </Text>
@@ -41,7 +46,7 @@ const Login = ({ navigation }) => {
 
         <View style={{ marginTop: normalizeHeight(60) }}>
           <CompTextInput
-            label={'Org Code *'}
+            label={'Organisation Code *'}
             placeholder="Enter Organisation code"
             infoText={true}
             errorMessage={'Enter your organisation code (8 digit)'}
@@ -58,11 +63,33 @@ const Login = ({ navigation }) => {
           />
         </View>
 
-        <Button
-          onPress={() => navigation.navigate('Dashboard')}
-          title="Continue"
-          color={colors.primary}
-        />
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#563593',
+            paddingVertical: normalizeHeight(12),
+            borderRadius: normalizeWidth(12),
+            marginTop: normalizeHeight(260),
+            alignItems: 'center',
+          }}
+          onPress={handleSubmit}>
+          <Text
+            style={{
+              color: '#EADDFF',
+              fontSize: normalizeWidth(16),
+              fontWeight: '700',
+            }}>
+            Submit
+          </Text>
+        </TouchableOpacity>
+
+        <View>
+          {/* <TextInput
+  onFocus={ () => this.onFocus() }
+  style={{
+    borderBottomWidth:1,
+    color:"rgba(255, 255, 255, 0.54)",
+    borderColor:"rgba(255, 255, 255, 0.42)"}}/> */}
+        </View>
       </View>
     </LinearGradient>
   );
