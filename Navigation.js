@@ -9,6 +9,8 @@ import VerifyOTP from './screens/onboarding/VerifyOTP';
 import { ThemeContext } from './src/context/ThemeContext';
 import UnlockedExp from './screens/onboarding/UnlockedExp';
 import InfoCheck from './screens/onboarding/InfoCheck';
+import RequestStatus from './screens/onboarding/RequestStatus';
+import MainDash from './screens/Global/MainDash';
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
@@ -40,6 +42,20 @@ const Navigation = () => {
           component={InfoCheck}
           options={{headerShown: false}}
         />
+        
+
+        <Stack.Screen
+          name="RequestStatus"
+          component={RequestStatus}
+          options={{headerShown: false}}
+        />
+
+<Stack.Screen
+          name="MainDash"
+          component={MainDash}
+          options={{headerShown: false}}
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

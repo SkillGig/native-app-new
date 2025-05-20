@@ -29,11 +29,12 @@ const CmpCheckBox = props => {
     ? 'blue'
     : 'transparent';
   const borderWidth = value ? normalizeWidth(0) : normalizeWidth(1);
-  const borderColor = disabled
-    ? 'white'
-    : value
-    ? 'blue'
-    : 'white';
+   const borderColor = value 
+  ? (isDark ? 'transparent' : 'transparent') 
+  : (isDark ? 'white' : '#5013C0');
+
+
+ 
   return (
     <Pressable
       onPress={() => (disabled || linkPress ? null : onClick())}

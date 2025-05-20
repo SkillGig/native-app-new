@@ -1,30 +1,31 @@
-import React, {useState, useContext, useRef} from 'react';
+import React, { useEffect, useContext } from 'react';
 import {
   View,
   Text,
   Image,
   StyleSheet,
-  TextInput,
-  TouchableOpacity,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {CodeField, CustomSvg} from '../../components';
-import {
-  normalizeHeight,
-  normalizeWidth,
-} from '../../components/Responsivescreen';
+import { normalizeHeight, normalizeWidth } from '../../components/Responsivescreen';
 import images from '../../assets/images';
-import CompTextInput from '../../components/CompTextInput';
-import {ThemeContext} from '../../src/context/ThemeContext';
+import { ThemeContext } from '../../src/context/ThemeContext';
 
-const UnlockedExp = ({navigation}) => {
-  const {isDark, colors} = useContext(ThemeContext);
+const UnlockedExp = ({ navigation }) => {
+  const { isDark, colors } = useContext(ThemeContext);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.replace('MainDash'); // use 'replace' to prevent back navigation
+    }, 3000); // 5 seconds
+
+    return () => clearTimeout(timer); // cleanup on unmount
+  }, [navigation]);
+
   const gradientColors = isDark
     ? ['#381874', '#150534']
-    : ['#FBF8FF', '#DFCEFF']; // adjust light mode gradient
-  const patternImage = isDark
-    ? images.SIDEPATTERNDARK
-    : images.SIDEPATTERNLIGHT;
+    : ['#FBF8FF', '#DFCEFF'];
+  const patternImage = isDark ? images.SIDEPATTERNDARK : images.SIDEPATTERNLIGHT;
+
   return (
     <LinearGradient colors={gradientColors} style={styles.gradient}>
       {!isDark && <Image source={patternImage} style={styles.sidePattern} />}
@@ -36,7 +37,7 @@ const UnlockedExp = ({navigation}) => {
           resizeMode: 'contain',
         }}
       />
-      <View style={{marginTop: normalizeHeight(128), alignItems: 'center'}}>
+      <View style={{ marginTop: normalizeHeight(128), alignItems: 'center' }}>
         <Text
           style={{
             fontSize: 32,
@@ -63,6 +64,7 @@ const UnlockedExp = ({navigation}) => {
 };
 
 export default UnlockedExp;
+
 const styles = StyleSheet.create({
   gradient: {
     flex: 1,
@@ -74,24 +76,5 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     resizeMode: 'contain',
-  },
-
-  backIcon: {
-    height: normalizeHeight(24),
-    width: normalizeWidth(24),
-    resizeMode: 'contain',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '900',
-  },
-  subtitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginTop: 4,
-  },
-  shared: {
-    fontSize: 16,
-    fontWeight: '700',
   },
 });
