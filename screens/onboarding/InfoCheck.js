@@ -151,7 +151,7 @@ const InfoCheck = ({navigation}) => {
 
       <Bottomsheet
         ref={BottomsheetRef}
-        // height={['60%']}
+        height={['60%']}
         enableHeader={true}
         headerText={'Edit your info'}
         footer={'Submit'}
