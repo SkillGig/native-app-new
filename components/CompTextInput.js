@@ -1,4 +1,3 @@
-
 import {
   View,
   Image,
@@ -11,7 +10,7 @@ import {
 } from 'react-native';
 import React, {useContext, useRef} from 'react';
 import {normalizeHeight, normalizeWidth} from './Responsivescreen';
-import { ThemeContext } from '../src/context/ThemeContext';
+import {ThemeContext} from '../src/context/ThemeContext';
 
 const CompTextInput = props => {
   const {
@@ -25,11 +24,14 @@ const CompTextInput = props => {
     infoText = false,
     errorMessage,
     inputstyle,
+    opacity = 1,
   } = props;
   const textInRef = useRef(null);
-  const { isDark, colors } = useContext(ThemeContext);
+  const {isDark, colors} = useContext(ThemeContext);
   return (
-    <View pointerEvents={!onPress && editable === false ? 'none' : 'auto'}>
+    <View
+      pointerEvents={!onPress && editable === false ? 'none' : 'auto'}
+      style={{opacity: opacity}}>
       {label ? (
         <View style={[styles.label, {}]}>
           {label ? (
@@ -39,7 +41,7 @@ const CompTextInput = props => {
                   labelstyle
                     ? labelstyle
                     : {
-                        color:isDark? '#D6C0FD':'#200A47',
+                        color: isDark ? '#D6C0FD' : '#200A47',
                         fontSize: 12,
                         fontWeight: '600',
                       }
@@ -61,16 +63,20 @@ const CompTextInput = props => {
             inputstyle
               ? inputstyle
               : {
-                paddingLeft:normalizeWidth(-4),
+                  paddingLeft: normalizeWidth(-4),
                   fontSize: 16,
                   fontWeight: '700',
                   borderBottomWidth: 1,
-                  borderBottomColor:isDark? 'white':'#4F378A',
-                  color: isDark?'rgba(255, 255, 255, 0.87)':'rgba(0, 0, 0, 0.87)',
+                  borderBottomColor: isDark ? 'white' : '#4F378A',
+                  color: isDark
+                    ? 'rgba(255, 255, 255, 0.87)'
+                    : 'rgba(0, 0, 0, 0.87)',
                 },
           ]}
-          placeholderTextColor={isDark?'rgba(255, 255, 255, 0.28)':'rgba(0, 0, 0, 0.28)'}
-          color={isDark?'rgba(255, 255, 255, 0.87)':'rgba(0, 0, 0, 0.87)'}
+          placeholderTextColor={
+            isDark ? 'rgba(255, 255, 255, 0.28)' : 'rgba(0, 0, 0, 0.28)'
+          }
+          color={isDark ? 'rgba(255, 255, 255, 0.87)' : 'rgba(0, 0, 0, 0.87)'}
           returnKeyType={'done'}
           {...props}
         />
@@ -87,12 +93,12 @@ const CompTextInput = props => {
           {
             paddingLeft: infoText ? normalizeWidth(0) : normalizeWidth(0),
             color: infoText
-            ? isDark
-              ?  'rgba(255, 255, 255, 0.54)'
-              :'rgba(0, 0, 0, 0.54)'
-            : 'red',
-          
-            textAlign: infoText  ? 'left' : 'right',
+              ? isDark
+                ? 'rgba(255, 255, 255, 0.54)'
+                : 'rgba(0, 0, 0, 0.54)'
+              : 'red',
+
+            textAlign: infoText ? 'left' : 'right',
           },
         ]}>
         {errorMessage ? errorMessage : '  '}

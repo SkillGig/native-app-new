@@ -2,316 +2,275 @@ import React, {useState, useContext, useRef} from 'react';
 import {
   View,
   Text,
-  Image,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
-  ScrollView,
   ImageBackground,
+  Image,
+  ScrollView,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {
-  normalizeHeight,
-  normalizeWidth,
-} from '../../components/Responsivescreen';
-import images from '../../assets/images';
 import {ThemeContext} from '../../src/context/ThemeContext';
 import CompTextInput from '../../components/CompTextInput';
 import CmpCheckBox from '../../components/CmpCheckBox';
 import {Bottomsheet} from '../../components';
+import images from '../../assets/images';
+import {
+  normalizeHeight,
+  normalizeWidth,
+} from '../../components/Responsivescreen';
+
 const InfoCheck = ({navigation}) => {
   const [field, setField] = useState({
-    name: 'Priyanka',
-    phone: '9876754321',
+    name: 'Shubhangi Sharma',
+    phone: '9876543210',
     email: 'shubhangisharma@gmail.com',
-    batch: 'B Tech in computer Science',
+    batch: 'B tech in computer Science',
     startDate: 'June 2021',
-    endDate: 'June 2025',
+    endDate: 'July 2025',
   });
 
-  const [isSelected, setSelection] = useState(false);
   const {isDark, colors} = useContext(ThemeContext);
-  const [error, setError] = useState({});
   const BottomsheetRef = useRef(null);
-  const gradientColors = isDark
-    ? ['#381874', '#150534']
-    : ['#FBF8FF', '#DFCEFF']; // adjust light mode gradient
-
   const patternImage = isDark
     ? images.SIDEPATTERNDARK
     : images.SIDEPATTERNLIGHT;
+  const gradientColors = isDark
+    ? ['#381874', '#150534']
+    : ['#FBF8FF', '#DFCEFF'];
 
-  const handleSubmit = () => {
-    navigation.navigate('UnlockedExp');
-    // navigation.navigate('RequestStatus');
-  };
+  const handleSubmit = () => navigation.navigate('UnlockedExp');
 
-  function validateCheckBox(checkBox, key = 'checkBox') {
-    if (checkBox) {
-      setError(prev => ({...prev, [key]: null}));
-      return true;
-    } else {
-      setError(prev => ({...prev, [key]: 'field required'}));
-      return false;
-    }
-  }
+  const handleDiscrepancyPress = () => BottomsheetRef.current?.present();
 
   return (
-    <View style={{ flex: 1 }}>
-  {/* Main content with gradient background */}
-  <LinearGradient colors={gradientColors} style={styles.gradient}>
-    <View style={{ flex: 1 }}>
-      <Image source={patternImage} style={styles.sidePattern} />
-      <View style={styles.container}>
-        {isDark ? (
-          <Image source={images.BACKICON} style={styles.backIcon} />
-        ) : (
-          <Image source={images.BLACKBACKICON} style={styles.backIcon} />
-        )}
+    <View style={styles.root}>
+      <LinearGradient colors={gradientColors} style={styles.gradient}>
+        <Image source={patternImage} style={styles.sidePattern} />
+        <View style={styles.header}>
+          <Image
+            source={isDark ? images.BACKICON : images.BLACKBACKICON}
+            style={styles.backIcon}
+          />
+          <Text style={[styles.title, {color: isDark ? '#FFF' : '#2A0D54'}]}>
+            Quick info check ✅
+          </Text>
+          <Text
+            style={[
+              styles.subtitle,
+              {color: isDark ? 'rgba(255,255,255,0.8)' : '#4F378A'},
+            ]}>
+            If this looks like you, let's lock it in!!
+          </Text>
+        </View>
 
-        <Text
-          style={[
-            styles.title,
-            { color: isDark ? 'rgba(255, 255, 255, 0.60)' : '#2A0D54' },
-          ]}>
-          Quick Info Check ✔️
-        </Text>
-        <Text
-          style={[
-            styles.subtitle,
-            { color: isDark ? 'rgba(255, 255, 255, 0.80)' : '#4F378A' },
-          ]}>
-          If this looks like you, let’s lock it in!!
-        </Text>
-      </View>
-
-      <View style={{ alignItems: 'center' }}>
-        <ImageBackground
-          source={images.INFOCHECKCARD}
-          style={{
-            height: normalizeHeight(552),
-            width: normalizeWidth(303),
-            marginTop: normalizeHeight(22),
-          }}>
-          <View
-            style={{
-              paddingHorizontal: normalizeWidth(26),
-              paddingTop: normalizeHeight(24),
-            }}>
-            <CompTextInput
-              label={'Name'}
-              placeholder="Enter name"
-              value={field.name}
-              labelstyle={{ color: '#D6C0FD' }}
-              inputstyle={{
-                color: isDark ? 'white' : 'rgba(0, 0, 0, 0.38)',
-                borderBottomWidth: 1,
-                borderBottomColor: isDark ? 'white' : 'rgba(0, 0, 0, 0.40)',
-                fontSize: 16,
-                fontWeight: '700',
-              }}
-            />
-
-            <CompTextInput
-              label={'Phone Number'}
-              placeholder="Enter phone number"
-              value={field.phone}
-              labelstyle={{ color: '#D6C0FD' }}
-              inputstyle={{
-                color: isDark ? 'white' : 'rgba(0, 0, 0, 0.38)',
-                borderBottomWidth: 1,
-                borderBottomColor: isDark ? 'white' : 'rgba(0, 0, 0, 0.40)',
-                fontSize: 16,
-                fontWeight: '700',
-              }}
-            />
-
-            <CompTextInput
-              label={'Email'}
-              placeholder="Enter Email"
-              value={field.email}
-              labelstyle={{ color: '#D6C0FD' }}
-              inputstyle={{
-                color: isDark ? 'white' : 'rgba(0, 0, 0, 0.38)',
-                borderBottomWidth: 1,
-                borderBottomColor: isDark ? 'white' : 'rgba(0, 0, 0, 0.40)',
-                fontSize: 16,
-                fontWeight: '700',
-              }}
-            />
-
-            <CompTextInput
-              label={'Batch'}
-              placeholder="Enter your batch"
-              value={field.batch}
-              labelstyle={{ color: '#D6C0FD' }}
-              inputstyle={{
-                color: isDark ? 'white' : 'rgba(0, 0, 0, 0.38)',
-                borderBottomWidth: 1,
-                borderBottomColor: isDark ? 'white' : 'rgba(0, 0, 0, 0.40)',
-                fontSize: 16,
-                fontWeight: '700',
-              }}
-            />
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}>
+        <View style={styles.cardWrapper}>
+          <ImageBackground
+            source={images.INFOCHECKCARD}
+            style={styles.card}
+            imageStyle={styles.cardImage}>
+            <ScrollView contentContainerStyle={styles.cardContent}>
               <CompTextInput
-                inputstyle={{
-                  width: normalizeWidth(110),
-                  fontSize: 16,
-                  fontWeight: '700',
-                  borderBottomWidth: 1,
-                  borderBottomColor: isDark
-                    ? 'white'
-                    : 'rgba(0, 0, 0, 0.40)',
-                  color: isDark
-                    ? 'rgba(255, 255, 255, 0.87)'
-                    : 'rgba(0, 0, 0, 0.40)',
-                }}
-                label={'Start Date'}
-                placeholder="Enter your startDate"
-                value={field.startDate}
-                labelstyle={{ color: '#D6C0FD' }}
+                label="Name"
+                value={field.name}
+                labelstyle={styles.label}
+                inputstyle={styles.input(isDark)}
+                editable={false}
+                opacity={0.75}
               />
               <CompTextInput
-                inputstyle={{
-                  width: normalizeWidth(110),
-                  fontSize: 16,
-                  fontWeight: '700',
-                  borderBottomWidth: 1,
-                  borderBottomColor: isDark
-                    ? 'white'
-                    : 'rgba(0, 0, 0, 0.40)',
-                  color: isDark
-                    ? 'rgba(255, 255, 255, 0.87)'
-                    : 'rgba(0, 0, 0, 0.40)',
-                }}
-                label={'End Date'}
-                placeholder="Enter your endDate"
-                value={field.endDate}
-                labelstyle={{ color: '#D6C0FD' }}
+                label="Phone Number"
+                value={field.phone}
+                labelstyle={styles.label}
+                inputstyle={styles.input(isDark)}
+                editable={false}
+                opacity={0.75}
               />
-            </View>
+              <CompTextInput
+                label="Email"
+                value={field.email}
+                labelstyle={styles.label}
+                inputstyle={styles.input(isDark)}
+                editable={false}
+                opacity={0.75}
+              />
+              <CompTextInput
+                label="Branch"
+                value={field.batch}
+                labelstyle={styles.label}
+                inputstyle={styles.input(isDark)}
+                editable={false}
+                opacity={0.75}
+              />
+              <View style={styles.row}>
+                <CompTextInput
+                  label="Start Date"
+                  value={field.startDate}
+                  labelstyle={styles.label}
+                  inputstyle={styles.inputSmall(isDark)}
+                  editable={false}
+                  opacity={0.75}
+                />
+                <CompTextInput
+                  label="End Date"
+                  value={field.endDate}
+                  labelstyle={styles.label}
+                  inputstyle={styles.inputSmall(isDark)}
+                  editable={false}
+                  opacity={0.75}
+                />
+              </View>
 
-            <TouchableOpacity
-              // onPress={() => BottomsheetRef.current.present()}
-              onPress={()=>{navigation.navigate('RequestStatus')}}
-              style={{ marginTop: normalizeHeight(8) }}>
-              <LinearGradient
-                colors={
-                  isDark ? ['#1C0743', '#090215'] : ['#D3C4EF', '#EEE7F9']
-                }
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={{
-                  borderRadius: 12,
-                  paddingHorizontal: normalizeWidth(12),
-                  paddingVertical: normalizeHeight(8),
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
-                <Text
-                  style={{
-                    color: isDark ? 'white' : 'black',
-                    fontSize: 12,
-                    fontWeight: '600',
-                  }}>
+              <TouchableOpacity
+                onPress={handleDiscrepancyPress}
+                style={styles.discrepancyButton(isDark)}>
+                <Text style={styles.discrepancyText}>
                   Does something feels wrong?
                 </Text>
-                <Text
-                  style={{
-                    color: isDark ? '#B095E3' : '#5013C0',
-                    fontSize: 12,
-                    fontWeight: '600',
-                  }}>
-                  Yes
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
 
-            <CmpCheckBox
-              value={field?.checkBox}
-              onSelect={() => {
-                setField(prev => ({
-                  ...prev,
-                  checkBox: !prev.checkBox,
-                }));
-                validateCheckBox(!field?.checkBox);
-              }}
-              text="I acknowledge the information above belongs to me and is correct."
-            />
+                <Text style={styles.discrepancyYes(isDark)}>Yes</Text>
+              </TouchableOpacity>
+              <View style={styles.checkboxWrapper}>
+                <CmpCheckBox
+                  value={field?.checkBox}
+                  onSelect={() =>
+                    setField(prev => ({...prev, checkBox: !prev.checkBox}))
+                  }
+                  text="I acknowledge the information above belongs to me and correct."
+                />
+              </View>
+            </ScrollView>
+          </ImageBackground>
+        </View>
+
+        <TouchableOpacity
+          onPress={handleSubmit}
+          style={styles.submitButton(isDark)}>
+          <Text style={styles.submitText}>Submit</Text>
+        </TouchableOpacity>
+      </LinearGradient>
+
+      <Bottomsheet
+        ref={BottomsheetRef}
+        // height={['60%']}
+        enableHeader={true}
+        headerText={'Edit your info'}
+        footer={'Submit'}
+        onSubmit={() => console.log('Something')}>
+        <ScrollView>
+          <View
+            style={{
+              padding: 32,
+              backgroundColor: '#1C0743',
+            }}>
+            <Text style={{color: '#fff'}}>Sample Content</Text>
           </View>
-        </ImageBackground>
-      </View>
+          <View
+            style={{
+              padding: 32,
+              backgroundColor: '#1C0743',
+            }}>
+            <Text style={{color: '#fff'}}>Sample Content</Text>
+          </View>
+          <View
+            style={{
+              padding: 32,
+              backgroundColor: '#1C0743',
+            }}>
+            <Text style={{color: '#fff'}}>Sample Content</Text>
+          </View>
+          <View
+            style={{
+              padding: 32,
+              backgroundColor: '#1C0743',
+            }}>
+            <Text style={{color: '#fff'}}>Sample Content</Text>
+          </View>
+          <View
+            style={{
+              padding: 32,
+              backgroundColor: '#1C0743',
+            }}>
+            <Text style={{color: '#fff'}}>Sample Content</Text>
+          </View>
+          <View
+            style={{
+              padding: 32,
+              backgroundColor: '#1C0743',
+            }}>
+            <Text style={{color: '#fff'}}>Sample Content</Text>
+          </View>
+        </ScrollView>
+      </Bottomsheet>
     </View>
-
-    {/* Submit Button */}
-    <TouchableOpacity
-      onPress={handleSubmit}
-      style={{
-        width: normalizeWidth(308),
-        backgroundColor: isDark ? '#815FC4' : '#5013C0',
-        position: 'absolute',
-        bottom: 40,
-        marginHorizontal: normalizeWidth(32),
-        borderRadius: 12,
-        paddingVertical: normalizeHeight(12),
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      <Text style={{ color: 'white', fontSize: 14, fontWeight: '800' }}>
-        Submit
-      </Text>
-    </TouchableOpacity>
-  </LinearGradient>
-
-  {/* Bottomsheet OUTSIDE of LinearGradient */}
-  <Bottomsheet ref={BottomsheetRef} height={['60%']}>
-    <View style={{ padding: 20 }}>
-      <Text style={{ color: 'white' }}>Blur example content</Text>
-    </View>
-  </Bottomsheet>
-</View>
-
   );
 };
 
 export default InfoCheck;
+
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
-  sidePattern: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    resizeMode: 'contain',
-  },
-  container: {
+  root: {flex: 1},
+  gradient: {flex: 1},
+  sidePattern: {position: 'absolute', top: 0, left: 0, resizeMode: 'contain'},
+  header: {
     marginTop: normalizeHeight(55),
     marginHorizontal: normalizeWidth(24),
   },
-  backIcon: {
-    height: normalizeHeight(24),
-    width: normalizeWidth(24),
-    resizeMode: 'contain',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '900',
-  },
-  subtitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginTop: 4,
-  },
-  shared: {
+  backIcon: {height: 24, width: 24, resizeMode: 'contain'},
+  title: {fontSize: 32, fontWeight: '900', marginTop: 12},
+  subtitle: {fontSize: 14, fontWeight: '500', marginTop: 4},
+  cardWrapper: {alignItems: 'center', marginTop: 22},
+  card: {height: normalizeHeight(552), width: normalizeWidth(303)},
+  cardImage: {borderRadius: 20},
+  cardContent: {padding: 20},
+  label: {color: '#D6C0FD'},
+  input: isDark => ({
+    color: isDark ? '#FFF' : 'rgba(0,0,0,0.6)',
+    borderBottomWidth: 1,
+    borderBottomColor: isDark ? '#FFF' : 'rgba(0,0,0,0.4)',
     fontSize: 16,
     fontWeight: '700',
+    marginBottom: 10,
+  }),
+  inputSmall: isDark => ({
+    width: normalizeWidth(110),
+    fontSize: 16,
+    fontWeight: '700',
+    borderBottomWidth: 1,
+    borderBottomColor: isDark ? '#FFF' : 'rgba(0,0,0,0.4)',
+    color: isDark ? '#FFF' : 'rgba(0,0,0,0.4)',
+  }),
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 8,
   },
+  discrepancyButton: isDark => ({
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: isDark ? '#1C0743' : '#EEE7F9',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginTop: 12,
+  }),
+  discrepancyText: {color: '#FFF', fontSize: 12, fontWeight: '600'},
+  discrepancyYes: isDark => ({
+    color: isDark ? '#B095E3' : '#5013C0',
+    fontSize: 12,
+    fontWeight: '600',
+  }),
+  checkboxWrapper: {marginTop: 16},
+  submitButton: isDark => ({
+    width: normalizeWidth(308),
+    backgroundColor: isDark ? '#815FC4' : '#5013C0',
+    position: 'absolute',
+    bottom: 40,
+    marginHorizontal: normalizeWidth(32),
+    borderRadius: 12,
+    paddingVertical: normalizeHeight(12),
+    justifyContent: 'center',
+    alignItems: 'center',
+  }),
+  submitText: {color: 'white', fontSize: 14, fontWeight: '800'},
 });

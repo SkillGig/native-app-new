@@ -31,7 +31,7 @@ const RequestStatus = ({navigation}) => {
   // const status='progress';
   // const status='approved';
   // const status = 'rejected';
-  const status='partial';
+  const status = 'partial';
 
   return (
     <LinearGradient colors={gradientColors} style={styles.gradient}>
@@ -155,13 +155,16 @@ const RequestStatus = ({navigation}) => {
               </Text>
             </View>
 
-           <FooterBtn 
-           textStyle={{ color: 'white',
-           fontSize: normalizeWidth(14),
-           fontWeight: '800',}}
-           style={{width:normalizeWidth(303)}}
-           onPress={()=>{}}
-  label="Continue"/>
+            <FooterBtn
+              textStyle={{
+                color: 'white',
+                fontSize: normalizeWidth(14),
+                fontWeight: '800',
+              }}
+              style={{width: normalizeWidth(303)}}
+              onPress={() => {}}
+              label="Continue"
+            />
           </View>
         ) : status === 'rejected' ? (
           <View style={{alignItems: 'center'}}>
@@ -190,16 +193,20 @@ const RequestStatus = ({navigation}) => {
                 marginTop: normalizeHeight(27),
               }}>
               <Text style={[styles.statusText, {textAlign: 'center'}]}>
-              Your request has been rejected, please check with the admin or raise a request again.
+                Your request has been rejected, please check with the admin or
+                raise a request again.
               </Text>
             </View>
-            <FooterBtn 
-           textStyle={{ color: 'white',
-           fontSize: normalizeWidth(14),
-           fontWeight: '800',}}
-           style={{width:normalizeWidth(303)}}
-           onPress={()=>{}}
-  label="Continue"/>
+            <FooterBtn
+              textStyle={{
+                color: 'white',
+                fontSize: normalizeWidth(14),
+                fontWeight: '800',
+              }}
+              style={{width: normalizeWidth(303)}}
+              onPress={() => {}}
+              label="Continue"
+            />
           </View>
         ) : (
           <View style={{alignItems: 'center'}}>
@@ -228,17 +235,21 @@ const RequestStatus = ({navigation}) => {
                 marginTop: normalizeHeight(27),
               }}>
               <Text style={[styles.statusText, {textAlign: 'center'}]}>
-              Some of your details have been approved, while others were not. Please check the summary below for more info.
+                Some of your details have been approved, while others were not.
+                Please check the summary below for more info.
               </Text>
             </View>
 
-            <FooterBtn 
-           textStyle={{ color: 'white',
-           fontSize: normalizeWidth(14),
-           fontWeight: '800',}}
-           style={{width:normalizeWidth(303)}}
-           onPress={()=>{}}
-  label="Continue"/>
+            <FooterBtn
+              textStyle={{
+                color: 'white',
+                fontSize: normalizeWidth(14),
+                fontWeight: '800',
+              }}
+              style={{width: normalizeWidth(303)}}
+              onPress={() => {}}
+              label="Continue"
+            />
           </View>
         )}
       </View>
