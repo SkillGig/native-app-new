@@ -17,8 +17,53 @@ export const fstyles = StyleSheet.create({
   twentyBold: {
    fontSize: 20,
    fontWeight: '700',
-   color: '#300B73',
+   color:'white'
  },
+ mediumTen: {
+  fontSize: 10,
+  fontWeight: '500',
+  color:'white'
+},
+
+boldTwelwe: {
+  fontSize: 12,
+  fontWeight: '700',
+  color:'white'
+},
+
+twelweRegular: {
+  fontSize: 12,
+  fontWeight: '400',
+  color:'white'
+},
+semiTwelwe: {
+  fontSize: 12,
+  fontWeight: '600',
+  color:'white'
+},
+
+
+boldSixteen: {
+  fontSize: 16,
+  fontWeight: '700',
+  color:'white'
+},
+boldFourteen: {
+  fontSize: 14,
+  fontWeight: '700',
+  color:'white'
+},
+regularSixteen: {
+  fontSize: 16,
+  fontWeight: '400',
+  color:'white'
+},
+heavyTwenty: {
+  fontSize: 20,
+  fontWeight: '900',
+  color:'white'
+},
+
  flexAlign:{
   flexDirection: 'row', alignItems: 'center'
  }

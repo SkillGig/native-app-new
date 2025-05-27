@@ -17,7 +17,13 @@ REQUESTPARTIAL:require('./RequestPartial.png'),
 PARTIALSTATE:require('./PartialState.png'),
 FEMALEAVATAR:require('./FemaleAvatar.png'),
 STOPWATCH:require('./StopWatch.png'),
-NOTIFICATION:require('./Notification.png')
+NOTIFICATION:require('./Notification.png'),
+STREAKICON :require('./StreakIcon.png'),
+YETTOSTARTSTREAK:require('./YetToStartStreak.png'),
+STREAKFAILED:require('./StreakFailed.png'),
+TESTONGOING:require('./TestOngoing.png'),
+COURSEREADING:require('./CourseReading.png'),
+COURSEVIDEO:require('./CourseVideo.png')
 }
 
 export default images;

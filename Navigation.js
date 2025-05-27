@@ -11,6 +11,7 @@ import UnlockedExp from './screens/onboarding/UnlockedExp';
 import InfoCheck from './screens/onboarding/InfoCheck';
 import RequestStatus from './screens/onboarding/RequestStatus';
 import MainDash from './screens/Global/MainDash';
+import StreakCalender from './screens/Global/StreakCalender';
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
@@ -56,6 +57,12 @@ const Navigation = () => {
           options={{headerShown: false}}
         />
 
+
+<Stack.Screen
+          name="StreakCalender"
+          component={StreakCalender}
+          options={{headerShown: false}}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

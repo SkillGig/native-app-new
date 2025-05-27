@@ -27,6 +27,8 @@ const Login = ({ navigation }) => {
     const handleSubmit=()=>{
       console.log('submittt')
       navigation.navigate('VerifyOTP')
+      // navigation.navigate('StreakCalender')
+      
     }
 
   return (
