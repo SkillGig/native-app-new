@@ -23,7 +23,9 @@ YETTOSTARTSTREAK:require('./YetToStartStreak.png'),
 STREAKFAILED:require('./StreakFailed.png'),
 TESTONGOING:require('./TestOngoing.png'),
 COURSEREADING:require('./CourseReading.png'),
-COURSEVIDEO:require('./CourseVideo.png')
+COURSEVIDEO:require('./CourseVideo.png'),
+RIGHTARROW: require('./rightArrow.png'),
+LEFTARROW:require('./leftArrow.png')
 }
 
 export default images;

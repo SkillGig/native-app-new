@@ -26,11 +26,9 @@ const Login = ({ navigation }) => {
 
     const handleSubmit=()=>{
       console.log('submittt')
-      navigation.navigate('VerifyOTP')
-      // navigation.navigate('StreakCalender')
-      
+      // navigation.navigate('VerifyOTP')
+      navigation.navigate('StreakCalender') 
     }
-
   return (
     <LinearGradient
       colors={gradientColors}

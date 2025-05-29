@@ -4,11 +4,6 @@ import { CalendarPicker } from "../../components";
 
 const StreakCalender = (props) => {
 
-
-  const handleDateSelect = (date) => {
-    Alert.alert('Date Selected', date);
-  };
-
   const data = [
     { id: 1, date: '2025-05-20', value: true },
     { id: 2, date: '2025-05-21', value: true },
@@ -18,9 +13,6 @@ const StreakCalender = (props) => {
   ];
   
   return <View style={{flex:1,backgroundColor:"rgba(176, 149, 227, 0.16)"}}>
-   <Text>
-    dfghjk
-   </Text>
    <CalendarPicker dateData={data} />
   </View>
 };
