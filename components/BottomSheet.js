@@ -7,6 +7,7 @@ import {
   useBottomSheetDynamicSnapPoints,
 } from '@gorhom/bottom-sheet';
 import {normalizeHeight, normalizeWidth} from './Responsivescreen';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const Bottomsheet = forwardRef((props, ref) => {
   const {height, children, backdrop, onChange, enableHeader, headerText} =
@@ -50,11 +51,15 @@ const Bottomsheet = forwardRef((props, ref) => {
         {enableHeader && headerText && (
           <Text style={styles.header}>{headerText}</Text>
         )}
-        {children}
+        <ScrollView>{children}</ScrollView>
         {/* {props.footer && ( */}
-        <TouchableOpacity style={styles.footerButton} onPress={props.onSubmit}>
-          <Text style={styles.submitText}>Submit</Text>
-        </TouchableOpacity>
+        <View style={styles.submitButtonBackground}>
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={props.onSubmit}>
+            <Text style={styles.submitText}>Submit</Text>
+          </TouchableOpacity>
+        </View>
         {/* )} */}
       </BottomSheetView>
     </BottomSheetModal>
@@ -104,8 +109,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     borderRadius: normalizeWidth(12),
     position: 'absolute',
-    bottom: 32,
     left: 0,
+    bottom: 32,
     width: '90%',
     alignItems: 'center',
     marginHorizontal: '5%',
@@ -116,6 +121,13 @@ const styles = StyleSheet.create({
     color: '#EADDFF',
     fontSize: normalizeWidth(16),
     fontWeight: '700',
+  },
+  submitButtonBackground: {
+    backgroundColor: '#1C0743',
+    paddingTop: 20,
+    paddingBottom: 80,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(176, 149, 227, 0.40)',
   },
 });
 

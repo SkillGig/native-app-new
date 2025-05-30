@@ -151,54 +151,48 @@ const InfoCheck = ({navigation}) => {
 
       <Bottomsheet
         ref={BottomsheetRef}
-        height={['60%']}
         enableHeader={true}
         headerText={'Edit your info'}
         footer={'Submit'}
         onSubmit={() => console.log('Something')}>
-        <ScrollView>
-          <View
-            style={{
-              padding: 32,
-              backgroundColor: '#1C0743',
-            }}>
-            <Text style={{color: '#fff'}}>Sample Content</Text>
-          </View>
-          <View
-            style={{
-              padding: 32,
-              backgroundColor: '#1C0743',
-            }}>
-            <Text style={{color: '#fff'}}>Sample Content</Text>
-          </View>
-          <View
-            style={{
-              padding: 32,
-              backgroundColor: '#1C0743',
-            }}>
-            <Text style={{color: '#fff'}}>Sample Content</Text>
-          </View>
-          <View
-            style={{
-              padding: 32,
-              backgroundColor: '#1C0743',
-            }}>
-            <Text style={{color: '#fff'}}>Sample Content</Text>
-          </View>
-          <View
-            style={{
-              padding: 32,
-              backgroundColor: '#1C0743',
-            }}>
-            <Text style={{color: '#fff'}}>Sample Content</Text>
-          </View>
-          <View
-            style={{
-              padding: 32,
-              backgroundColor: '#1C0743',
-            }}>
-            <Text style={{color: '#fff'}}>Sample Content</Text>
-          </View>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={styles.bottomSheetScrollView}>
+          <CompTextInput
+            label="Name"
+            value={field.name}
+            labelstyle={styles.label}
+            inputstyle={styles.input(isDark)}
+            editable={true}
+          />
+          <CompTextInput
+            label="Phone Number"
+            value={field.phone}
+            labelstyle={styles.label}
+            inputstyle={styles.input(isDark)}
+            editable={true}
+          />
+          <CompTextInput
+            label="Email"
+            value={field.email}
+            labelstyle={styles.label}
+            inputstyle={styles.input(isDark)}
+            editable={true}
+          />
+          <CompTextInput
+            label="Branch"
+            value={field.batch}
+            labelstyle={styles.label}
+            inputstyle={styles.input(isDark)}
+            editable={true}
+          />
+          <CompTextInput
+            label="Start Date"
+            value={field.startDate}
+            labelstyle={styles.label}
+            inputstyle={styles.input(isDark)}
+            editable={true}
+          />
         </ScrollView>
       </Bottomsheet>
     </View>
@@ -273,4 +267,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   }),
   submitText: {color: 'white', fontSize: 14, fontWeight: '800'},
+  bottomSheetScrollView: {
+    backgroundColor: '#1C0743',
+    flex: 1,
+    paddingHorizontal: 42,
+    paddingVertical: 32,
+  },
 });

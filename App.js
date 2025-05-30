@@ -1,17 +1,17 @@
 import React from 'react';
 import Navigation from './Navigation';
-import { ThemeProvider } from './src/context/ThemeContext';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import {ThemeProvider} from './src/context/ThemeContext';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 
 const App = () => {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <BottomSheetModalProvider>
-        <ThemeProvider>
+    <GestureHandlerRootView style={{flex: 1}}>
+      <ThemeProvider>
+        <BottomSheetModalProvider>
           <Navigation />
-        </ThemeProvider>
-      </BottomSheetModalProvider>
+        </BottomSheetModalProvider>
+      </ThemeProvider>
     </GestureHandlerRootView>
   );
 };
