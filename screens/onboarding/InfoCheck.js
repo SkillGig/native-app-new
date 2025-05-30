@@ -29,6 +29,7 @@ const InfoCheck = ({navigation}) => {
     endDate: 'July 2025',
   });
 
+  navigation.navigate('RequestStatus');
   const {isDark, colors} = useContext(ThemeContext);
   const BottomsheetRef = useRef(null);
   const patternImage = isDark
@@ -154,7 +155,7 @@ const InfoCheck = ({navigation}) => {
         enableHeader={true}
         headerText={'Edit your info'}
         footer={'Submit'}
-        onSubmit={() => console.log('Something')}>
+        onSubmit={() => navigation.navigate('RequestStatus')}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={styles.bottomSheetScrollView}>

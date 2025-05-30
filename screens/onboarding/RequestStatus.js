@@ -1,24 +1,34 @@
-import React, {useState, useContext, useRef} from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
+import React, {useState, useContext, useRef, useEffect} from 'react';
+import {View, Text, Image, StyleSheet, ScrollView} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {CodeField, CustomSvg, FooterBtn} from '../../components';
+import {FooterBtn} from '../../components';
 import {
   normalizeHeight,
   normalizeWidth,
 } from '../../components/Responsivescreen';
 import images from '../../assets/images';
-import CompTextInput from '../../components/CompTextInput';
 import {ThemeContext} from '../../src/context/ThemeContext';
+import PersistentBottomSheet from '../../components/PersistentBottomSheet';
+import CompTextInput from '../../components/CompTextInput';
+
 const RequestStatus = ({navigation}) => {
-  const {isDark, colors} = useContext(ThemeContext);
-  const otpRef = useRef();
+  const {isDark} = useContext(ThemeContext);
+  const sheetRef = useRef(null);
+
+  const [field, setField] = useState({
+    name: 'Shubhangi Sharma',
+    phone: '9876543210',
+    email: 'shubhangisharma@gmail.com',
+    batch: 'B tech in computer Science',
+    startDate: 'June 2021',
+    endDate: 'July 2025',
+  });
+
+  useEffect(() => {
+    // Automatically present the persistent bottom sheet when component mounts
+    sheetRef.current?.present();
+  }, []);
+
   const gradientColors = isDark
     ? ['#381874', '#150534']
     : ['#FBF8FF', '#DFCEFF'];
@@ -27,21 +37,16 @@ const RequestStatus = ({navigation}) => {
     ? images.SIDEPATTERNDARK
     : images.SIDEPATTERNLIGHT;
 
-  // const status = 'submitted';
-  // const status='progress';
-  // const status='approved';
-  // const status = 'rejected';
   const status = 'partial';
 
   return (
     <LinearGradient colors={gradientColors} style={styles.gradient}>
       <Image source={patternImage} style={styles.sidePattern} />
       <View style={styles.container}>
-        {isDark ? (
-          <Image source={images.BACKICON} style={styles.backIcon} />
-        ) : (
-          <Image source={images.BLACKBACKICON} style={styles.backIcon} />
-        )}
+        <Image
+          source={isDark ? images.BACKICON : images.BLACKBACKICON}
+          style={styles.backIcon}
+        />
         <Text
           style={[
             styles.title,
@@ -56,159 +61,8 @@ const RequestStatus = ({navigation}) => {
           ]}>
           We are working on your request
         </Text>
-        {status === 'submitted' ? (
-          <View style={{alignItems: 'center', marginTop: normalizeHeight(30)}}>
-            <Image
-              source={images.REQUESTSUBMITTED}
-              style={{
-                height: normalizeHeight(170),
-                width: normalizeWidth(170),
-                resizeMode: 'contain',
-              }}
-            />
-            <Text style={[styles.status, {marginTop: normalizeHeight(34)}]}>
-              Request Submitted
-            </Text>
-            <View style={{marginTop: normalizeHeight(34)}}>
-              <Image
-                source={images.SUBMITTEDSTATE}
-                style={{
-                  height: normalizeHeight(24),
-                  width: normalizeWidth(190),
-                  resizeMode: 'contain',
-                }}
-              />
-            </View>
-            <View
-              style={{
-                marginHorizontal: normalizeWidth(40),
-                marginTop: normalizeHeight(27),
-              }}>
-              <Text style={[styles.statusText, {textAlign: 'center'}]}>
-                Your request for change of phone number and branch has been
-                submitted successfully. Please wait while we review your
-                details.
-              </Text>
-            </View>
-          </View>
-        ) : status === 'progress' ? (
-          <View style={{alignItems: 'center', marginTop: normalizeHeight(30)}}>
-            <Image
-              source={images.REQUESTINPROCESS}
-              style={{
-                height: normalizeHeight(220),
-                width: normalizeWidth(220),
-                resizeMode: 'contain',
-              }}
-            />
-            <Text style={styles.status}>In Progress</Text>
-            <View style={{marginTop: normalizeHeight(34)}}>
-              <Image
-                source={images.INPROGRESSSTATE}
-                style={{
-                  height: normalizeHeight(24),
-                  width: normalizeWidth(190),
-                  resizeMode: 'contain',
-                }}
-              />
-            </View>
-            <View
-              style={{
-                marginHorizontal: normalizeWidth(40),
-                marginTop: normalizeHeight(27),
-              }}>
-              <Text style={[styles.statusText, {textAlign: 'center'}]}>
-                Your request is currently under review. We’ll notify you once a
-                decision is made.
-              </Text>
-            </View>
-          </View>
-        ) : status === 'approved' ? (
-          <View style={{alignItems: 'center'}}>
-            <Image
-              source={images.REQUESTAPPROVED}
-              style={{
-                height: normalizeHeight(200),
-                width: normalizeWidth(200),
-                resizeMode: 'contain',
-              }}
-            />
-            <Text style={[styles.status]}>Approved</Text>
-            <View style={{marginTop: normalizeHeight(34)}}>
-              <Image
-                source={images.APPROVEDSTATE}
-                style={{
-                  height: normalizeHeight(24),
-                  width: normalizeWidth(190),
-                  resizeMode: 'contain',
-                }}
-              />
-            </View>
-            <View
-              style={{
-                marginHorizontal: normalizeWidth(40),
-                marginTop: normalizeHeight(27),
-              }}>
-              <Text style={[styles.statusText, {textAlign: 'center'}]}>
-                Great news! Your request has been approved. You’ll be redirected
-                shortly.
-              </Text>
-            </View>
 
-            <FooterBtn
-              textStyle={{
-                color: 'white',
-                fontSize: normalizeWidth(14),
-                fontWeight: '800',
-              }}
-              style={{width: normalizeWidth(303)}}
-              onPress={() => {}}
-              label="Continue"
-            />
-          </View>
-        ) : status === 'rejected' ? (
-          <View style={{alignItems: 'center'}}>
-            <Image
-              source={images.REQUESTREJECTED}
-              style={{
-                height: normalizeHeight(200),
-                width: normalizeWidth(200),
-                resizeMode: 'contain',
-              }}
-            />
-            <Text style={[styles.status]}>Rejected</Text>
-            <View style={{marginTop: normalizeHeight(34)}}>
-              <Image
-                source={images.REJECTEDSTATE}
-                style={{
-                  height: normalizeHeight(24),
-                  width: normalizeWidth(190),
-                  resizeMode: 'contain',
-                }}
-              />
-            </View>
-            <View
-              style={{
-                marginHorizontal: normalizeWidth(40),
-                marginTop: normalizeHeight(27),
-              }}>
-              <Text style={[styles.statusText, {textAlign: 'center'}]}>
-                Your request has been rejected, please check with the admin or
-                raise a request again.
-              </Text>
-            </View>
-            <FooterBtn
-              textStyle={{
-                color: 'white',
-                fontSize: normalizeWidth(14),
-                fontWeight: '800',
-              }}
-              style={{width: normalizeWidth(303)}}
-              onPress={() => {}}
-              label="Continue"
-            />
-          </View>
-        ) : (
+        {status === 'partial' && (
           <View style={{alignItems: 'center'}}>
             <Image
               source={images.REQUESTPARTIAL}
@@ -218,17 +72,16 @@ const RequestStatus = ({navigation}) => {
                 resizeMode: 'contain',
               }}
             />
-            <Text style={[styles.status]}>Partially Approved</Text>
-            <View style={{marginTop: normalizeHeight(34)}}>
-              <Image
-                source={images.PARTIALSTATE}
-                style={{
-                  height: normalizeHeight(24),
-                  width: normalizeWidth(190),
-                  resizeMode: 'contain',
-                }}
-              />
-            </View>
+            <Text style={styles.status}>Partially Approved</Text>
+            <Image
+              source={images.PARTIALSTATE}
+              style={{
+                height: normalizeHeight(24),
+                width: normalizeWidth(190),
+                resizeMode: 'contain',
+                marginTop: normalizeHeight(34),
+              }}
+            />
             <View
               style={{
                 marginHorizontal: normalizeWidth(40),
@@ -239,7 +92,6 @@ const RequestStatus = ({navigation}) => {
                 Please check the summary below for more info.
               </Text>
             </View>
-
             <FooterBtn
               textStyle={{
                 color: 'white',
@@ -253,11 +105,41 @@ const RequestStatus = ({navigation}) => {
           </View>
         )}
       </View>
+
+      {/* Persistent Bottom Sheet */}
+      <PersistentBottomSheet
+        ref={sheetRef}
+        enableHeader={true}
+        headerText={'Requested Changes(2)'}>
+        <View style={styles.bottomSheetDataContainer}>
+          <CompTextInput
+            label="Name"
+            value={field.name}
+            labelstyle={styles.label}
+            inputstyle={styles.input(isDark)}
+            editable={false}
+            opacity={0.75}
+            type={'status'}
+            status="approved"
+          />
+          <CompTextInput
+            label="Phone Number"
+            value={field.phone}
+            labelstyle={styles.label}
+            inputstyle={styles.input(isDark)}
+            editable={false}
+            opacity={0.75}
+            type={'status'}
+            status="rejected"
+          />
+        </View>
+      </PersistentBottomSheet>
     </LinearGradient>
   );
 };
 
 export default RequestStatus;
+
 const styles = StyleSheet.create({
   gradient: {
     flex: 1,
@@ -286,18 +168,32 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginTop: 4,
   },
-  shared: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
   status: {
     fontSize: 32,
     fontWeight: '900',
     color: 'white',
+    marginTop: normalizeHeight(20),
   },
   statusText: {
     fontSize: 14,
     fontWeight: '600',
     color: 'white',
   },
+  bottomSheetDataContainer: {
+    backgroundColor: '#1C0743',
+    paddingHorizontal: 42,
+    paddingVertical: 32,
+    paddingBottom: 58,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 28,
+  },
+  input: isDark => ({
+    color: isDark ? '#FFF' : 'rgba(0,0,0,0.6)',
+    borderBottomWidth: 1,
+    borderBottomColor: isDark ? '#FFF' : 'rgba(0,0,0,0.4)',
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 10,
+  }),
 });

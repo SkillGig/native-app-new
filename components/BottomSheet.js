@@ -10,8 +10,15 @@ import {normalizeHeight, normalizeWidth} from './Responsivescreen';
 import {ScrollView} from 'react-native-gesture-handler';
 
 const Bottomsheet = forwardRef((props, ref) => {
-  const {height, children, backdrop, onChange, enableHeader, headerText} =
-    props;
+  const {
+    height,
+    children,
+    backdrop,
+    onChange,
+    enableHeader,
+    headerText,
+    onSubmit,
+  } = props;
   const snapPoints = useMemo(() => height, [height]);
 
   const handleSheetChanges = useCallback(
