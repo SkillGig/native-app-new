@@ -1,24 +1,34 @@
-// components/CalendarHeader.js
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import images from '../assets/images';
-import { normalizeHeight, normalizeWidth } from './Responsivescreen';
+import {normalizeHeight, normalizeWidth} from './Responsivescreen';
 
-const CalendarHeader = ({ currentMonth, onMonthChange }) => {
-  const monthName = currentMonth.toLocaleString('default', { month: 'long' });
+const CalendarHeader = ({currentMonth, onMonthChange}) => {
+  const monthName = currentMonth.toLocaleString('default', {month: 'long'});
   const year = currentMonth.getFullYear();
 
   return (
     <View style={styles.header}>
       <TouchableOpacity onPress={() => onMonthChange(-1)}>
-        {/* <Icon name="chevron-back" size={24} color="#fff" /> */}
-        <Image source={images.LEFTARROW} style={{height:normalizeHeight(24),width:normalizeWidth(24),resizeMode:"contain"}}/>
+        <Image
+          source={images.LEFTARROW}
+          style={{
+            height: normalizeHeight(24),
+            width: normalizeWidth(24),
+            resizeMode: 'contain',
+          }}
+        />
       </TouchableOpacity>
       <Text style={styles.monthText}>{`${monthName} ${year}`}</Text>
       <TouchableOpacity onPress={() => onMonthChange(1)}>
-        {/* <Icon name="chevron-forward" size={24} color="#fff" /> */}
-        <Image source={images.RIGHTARROW} style={{height:normalizeHeight(24),width:normalizeWidth(24),resizeMode:"contain"}}/>
+        <Image
+          source={images.RIGHTARROW}
+          style={{
+            height: normalizeHeight(24),
+            width: normalizeWidth(24),
+            resizeMode: 'contain',
+          }}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -27,19 +37,18 @@ const CalendarHeader = ({ currentMonth, onMonthChange }) => {
 const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
-    // justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#1C0743',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 12,
-    justifyContent:"center"
+    justifyContent: 'center',
   },
   monthText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-    marginHorizontal:normalizeWidth(24)
+    marginHorizontal: normalizeWidth(24),
   },
 });
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
@@ -16,8 +16,14 @@ import {
 } from '../../components/Responsivescreen';
 import {fstyles} from '../../styles/FontStyles';
 import LinearGradient from 'react-native-linear-gradient';
+import { Bottomsheet } from '../../components';
 
 const MainDash = ({navigation}) => {
+
+
+  const BottomsheetRef = useRef(null);
+
+  const handleStreakPress = () => BottomsheetRef.current?.present();
   const getGreeting = () => {
     const now = new Date();
     const hours = now.getHours();
@@ -104,6 +110,7 @@ const MainDash = ({navigation}) => {
   ];
 
   return (
+    <>
     <ScrollView
       showsVerticalScrollIndicator={false}
       style={{backgroundColor: '#300B73', flex: 1}}>
@@ -176,7 +183,9 @@ const MainDash = ({navigation}) => {
           style={styles.gradientContainer}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <View style={{alignItems: 'center'}}>
+              <TouchableOpacity style={{alignItems: 'center',backgroundColor:"red"}}
+              onPress={handleStreakPress}
+              >
                 <Image
                   source={images.STREAKICON}
                   style={{
@@ -195,7 +204,7 @@ const MainDash = ({navigation}) => {
                   ]}>
                   2 Days
                 </Text>
-              </View>
+              </TouchableOpacity>
               <View
                 style={{
                   width: normalizeWidth(1),
@@ -981,6 +990,59 @@ const MainDash = ({navigation}) => {
       </LinearGradient> */}
       </LinearGradient>
     </ScrollView>
+    <Bottomsheet
+        ref={BottomsheetRef}
+        height={['60%']}
+        enableHeader={true}
+        headerText={'Edit your info'}
+        footer={'Submit'}
+        onSubmit={() => console.log('Something')}>
+        <ScrollView>
+          <View
+            style={{
+              padding: 32,
+              backgroundColor: '#1C0743',
+            }}>
+            <Text style={{color: '#fff'}}>Sample Content</Text>
+          </View>
+          <View
+            style={{
+              padding: 32,
+              backgroundColor: '#1C0743',
+            }}>
+            <Text style={{color: '#fff'}}>Sample Content</Text>
+          </View>
+          <View
+            style={{
+              padding: 32,
+              backgroundColor: '#1C0743',
+            }}>
+            <Text style={{color: '#fff'}}>Sample Content</Text>
+          </View>
+          <View
+            style={{
+              padding: 32,
+              backgroundColor: '#1C0743',
+            }}>
+            <Text style={{color: '#fff'}}>Sample Content</Text>
+          </View>
+          <View
+            style={{
+              padding: 32,
+              backgroundColor: '#1C0743',
+            }}>
+            <Text style={{color: '#fff'}}>Sample Content</Text>
+          </View>
+          <View
+            style={{
+              padding: 32,
+              backgroundColor: '#1C0743',
+            }}>
+            <Text style={{color: '#fff'}}>Sample Content</Text>
+          </View>
+        </ScrollView>
+      </Bottomsheet>
+</>
   );
 };
 

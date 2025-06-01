@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import LinearGradient from 'react-native-linear-gradient';
 import dayjs from 'dayjs';
 import CalendarHeader from './CalendarHeader';
+
+import { StyleSheet, View, Text } from 'react-native';
 
 const getMarkedDates = (data) => {
   const marked = {};
@@ -28,7 +29,7 @@ const getMarkedDates = (data) => {
             borderWidth: 2,
           },
           text: {
-            color: '#1C0743',
+            color: '#5013C0',
             fontWeight: 'bold',
           },
         },
@@ -57,11 +58,11 @@ const getMarkedDates = (data) => {
       marked[current.date] = {
         customStyles: {
           container: {
-            backgroundColor: 'red',
+            backgroundColor: 'rgba(122, 13, 18, 0.30)',
             borderRadius: 24,
           },
           text: {
-            color: 'white',
+            color: '#FFA59C',
           },
         },
       };
@@ -71,6 +72,8 @@ const getMarkedDates = (data) => {
   return marked;
 };
 
+ const weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
 const CalendarPicker = ({ dateData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -79,29 +82,39 @@ const CalendarPicker = ({ dateData }) => {
     setCurrentDate(newDate);
   };
 
-  const markedDates = getMarkedDates(dateData);
+  const markedDates = getMarkedDates(dateData); // keep your original logic here
 
   return (
     <LinearGradient colors={['#1C0743', '#090215']} style={styles.container}>
       <CalendarHeader currentMonth={currentDate} onMonthChange={changeMonth} />
+
+      {/* Custom weekday header */}
+      <View style={styles.weekdayContainer}>
+        {weekDays.map((day, index) => (
+          <Text key={index} style={styles.weekdayText}>
+            {day}
+          </Text>
+        ))}
+      </View>
+
       <Calendar
-      hideArrows={true}
+        hideArrows
+        hideDayNames // hide default weekday header
+        firstDay={1} // start week on Monday
         current={dayjs(currentDate).format('YYYY-MM-DD')}
         markingType="custom"
         markedDates={markedDates}
-        renderHeader={() => <></>} // hide built-in header
+        renderHeader={() => <></>}
         disableArrowLeft
         disableArrowRight
         theme={{
           calendarBackground: 'transparent',
-          textSectionTitleColor: '#b6c1cd',
-          selectedDayTextColor: '#B095E3',
           textDayFontWeight: '400',
           textDayFontSize: 16,
-          textMonthFontWeight: 'bold',
-          textMonthFontSize: 20,
-          monthTextColor: 'white',
-          dayTextColor: 'white',
+          dayTextColor: '#484646',
+          todayBackgroundColor: '#D3C4EF',
+          todayTextColor: '#5013C0',
+          selectedDayTextColor: '#B095E3',
         }}
       />
     </LinearGradient>
@@ -111,7 +124,19 @@ const CalendarPicker = ({ dateData }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    borderRadius: 16,
+  },
+  weekdayContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 5,
+    paddingHorizontal: 5,
+  },
+  weekdayText: {
+    color: '#A0A0A0',
+    fontSize: 16,
+    fontWeight: '700',
+    width: 32,
+    textAlign: 'center',
   },
 });
 
