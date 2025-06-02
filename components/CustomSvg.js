@@ -1,17 +1,20 @@
-import { SvgXml } from 'react-native-svg';
-import React, { Component } from 'react';
+import {SvgXml} from 'react-native-svg';
+import React, {Component} from 'react';
 
 class CustomSvg extends Component {
   modifySvgColor(svgString, color) {
     if (!color) return svgString;
     let updatedSvg = svgString;
-    updatedSvg = updatedSvg.replace(/stroke=["'](.*?)["']/g, `stroke="${color}"`);
+    updatedSvg = updatedSvg.replace(
+      /stroke=["'](.*?)["']/g,
+      `stroke="${color}"`,
+    );
 
     return updatedSvg;
   }
 
   render() {
-    const { name, color } = this.props;
+    const {name, color} = this.props;
     const modifiedXml = this.modifySvgColor(name, color);
 
     return (
@@ -20,7 +23,7 @@ class CustomSvg extends Component {
         height={this.props.height}
         xml={modifiedXml}
         opacity={this.props.opacity}
-        style={[{ flex: 1 }, this.props.styles]}
+        style={[{flex: 1}, this.props.styles]}
       />
     );
   }

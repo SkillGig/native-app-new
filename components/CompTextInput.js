@@ -23,10 +23,13 @@ const CompTextInput = props => {
     noteLeft,
     infoText = false,
     errorMessage,
+    fieldDesc,
     inputstyle,
     opacity = 1,
     type,
     status,
+    onChangeText,
+    initialValue,
   } = props;
   const textInRef = useRef(null);
   const {isDark, colors} = useContext(ThemeContext);
@@ -80,6 +83,7 @@ const CompTextInput = props => {
               isDark ? 'rgba(255, 255, 255, 0.28)' : 'rgba(0, 0, 0, 0.28)'
             }
             returnKeyType="done"
+            onChangeText={onChangeText}
             {...props}
           />
 
@@ -133,16 +137,17 @@ const CompTextInput = props => {
           },
           {
             paddingLeft: infoText ? normalizeWidth(0) : normalizeWidth(0),
-            color: infoText
-              ? isDark
-                ? 'rgba(255, 255, 255, 0.54)'
-                : 'rgba(0, 0, 0, 0.54)'
-              : 'red',
+            color:
+              infoText && isDark
+                ? errorMessage
+                  ? 'red'
+                  : 'rgba(255, 255, 255, 0.54)'
+                : 'rgba(0, 0, 0, 0.54)',
 
             textAlign: infoText ? 'left' : 'right',
           },
         ]}>
-        {errorMessage ? errorMessage : '  '}
+        {errorMessage ? errorMessage : fieldDesc}
       </Text>
     </View>
   );

@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Calendar } from 'react-native-calendars';
+import {View, StyleSheet} from 'react-native';
+import {Calendar} from 'react-native-calendars';
 
-const getMarkedDates = (data) => {
+const getMarkedDates = data => {
   const marked = {};
   for (let i = 0; i < data.length; i++) {
     const current = data[i];
@@ -10,7 +10,7 @@ const getMarkedDates = (data) => {
     const next = data[i + 1];
     const isStart = !prev || prev.value !== current.value;
     const isEnd = !next || next.value !== current.value;
-console.log(isStart,'startt',isEnd,'enndddd')
+    console.log(isStart, 'startt', isEnd, 'enndddd');
     marked[current.date] = {
       startingDay: isStart,
       endingDay: isEnd,
@@ -21,7 +21,7 @@ console.log(isStart,'startt',isEnd,'enndddd')
   return marked;
 };
 
-const CalendarPicker = ({ dateData }) => {
+const CalendarPicker = ({dateData}) => {
   const markedDates = getMarkedDates(dateData);
 
   return (
