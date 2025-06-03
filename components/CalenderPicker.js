@@ -1,11 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Calendar } from 'react-native-calendars';
 import LinearGradient from 'react-native-linear-gradient';
 import dayjs from 'dayjs';
 import CalendarHeader from './CalendarHeader';
-
 import { StyleSheet, View, Text } from 'react-native';
 
+const weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+// Filters data between Jan 1 and end of selected month
+const getFilteredData = (allData, currentDate) => {
+  const yearStart = dayjs().startOf('year');
+  const monthEnd = dayjs(currentDate).endOf('month');
+
+  return allData.filter(entry => {
+    const entryDate = dayjs(entry.date);
+    return entryDate.isAfter(yearStart.subtract(1, 'day')) && entryDate.isBefore(monthEnd.add(1, 'day'));
+  });
+};
+
+// Builds markedDates based on filtered data
 const getMarkedDates = (data) => {
   const marked = {};
   const today = dayjs().format('YYYY-MM-DD');
@@ -16,7 +29,6 @@ const getMarkedDates = (data) => {
     const next = data[i + 1];
     const isStart = !prev || prev.value !== current.value;
     const isEnd = !next || next.value !== current.value;
-
     const isToday = current.date === today;
 
     if (isToday) {
@@ -72,8 +84,6 @@ const getMarkedDates = (data) => {
   return marked;
 };
 
- const weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-
 const CalendarPicker = ({ dateData }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -82,7 +92,8 @@ const CalendarPicker = ({ dateData }) => {
     setCurrentDate(newDate);
   };
 
-  const markedDates = getMarkedDates(dateData); // keep your original logic here
+  const filteredData = useMemo(() => getFilteredData(dateData, currentDate), [dateData, currentDate]);
+  const markedDates = useMemo(() => getMarkedDates(filteredData), [filteredData]);
 
   return (
     <LinearGradient colors={['#1C0743', '#090215']} style={styles.container}>
@@ -99,7 +110,7 @@ const CalendarPicker = ({ dateData }) => {
 
       <Calendar
         hideArrows
-        hideDayNames // hide default weekday header
+        hideDayNames
         firstDay={1} // start week on Monday
         current={dayjs(currentDate).format('YYYY-MM-DD')}
         markingType="custom"
