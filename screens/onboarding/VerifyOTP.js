@@ -1,175 +1,195 @@
-import React, {useState, useContext, useRef} from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-import {CodeField, CustomSvg} from '../../components';
+import React, {useState, useContext, useRef, useEffect} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {CodeField} from '../../components';
 import {
   normalizeHeight,
   normalizeWidth,
 } from '../../components/Responsivescreen';
-import images from '../../assets/images';
-import CompTextInput from '../../components/CompTextInput';
+import PageLayout from './PageLayout';
 import {ThemeContext} from '../../src/context/ThemeContext';
-const VerifyOTP = ({navigation}) => {
-  const [otpval, setotpval] = useState('');
+import {verifyOTP} from '../../src/api/userOnboardingAPIs';
+import CommonButton from '../../components/CommonButton';
+import Loader from '../../components/Loader';
+
+const RESEND_OTP_TIME = 59;
+
+const VerifyOTP = ({route, navigation}) => {
+  const [otpval, setotpval] = useState('1234');
   const [otpStatus, setOtpStatus] = useState('normal');
-  const {isDark, colors} = useContext(ThemeContext);
+  const [timer, setTimer] = useState(RESEND_OTP_TIME);
+  const [resending, setResending] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const {isDark} = useContext(ThemeContext);
   const otpRef = useRef();
-  console.log(otpval, 'otpppp');
-  const gradientColors = isDark
-    ? ['#381874', '#150534']
-    : ['#FBF8FF', '#DFCEFF']; // adjust light mode gradient
 
-  const patternImage = isDark
-    ? images.SIDEPATTERNDARK
-    : images.SIDEPATTERNLIGHT;
+  const {orgCode, studentId, loginData} = route.params;
 
-    const handleOtpSubmit = () => {
-     if (otpval === '1234') {
-       setOtpStatus('success');
-       navigation.navigate('InfoCheck');
-     } else {
-       setOtpStatus('error');
-     }
-   };
+  console.log('VerifyOTP screen params:', {
+    orgCode,
+    studentId,
+    loginData,
+  });
+
+  // useEffect(() => {
+  //   // Reset OTP value and status when the component mounts
+  //   if (loginData?.generatedOtp) {
+  //     setotpval(loginData.generatedOtp);
+  //     otpRef.current?.clear();
+  //   }
+  // }, [loginData.generatedOtp]);
+
+  useEffect(() => {
+    let interval = null;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer(prev => prev - 1);
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timer]);
+
+  const handleOtpSubmit = async () => {
+    setIsLoading(true);
+    setOtpStatus('normal');
+    try {
+      const payload = {
+        orgCode,
+        studentId,
+        otp: otpval,
+        otpId: loginData?.data?.otpId || '',
+      };
+      const res = await verifyOTP(payload);
+      if (res && !res.error) {
+        setOtpStatus('success');
+        // navigation.navigate('InfoCheck'); // Uncomment if you want to navigate
+        setTimeout(
+          () =>
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'InfoCheck'}],
+            }),
+          700,
+        );
+      } else {
+        setOtpStatus('error');
+      }
+    } catch (err) {
+      setOtpStatus('error');
+      console.log('OTP Verification Error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (timer === 0 && !resending) {
+      setResending(true);
+      // TODO: Call your resend OTP API here if needed
+      setTimer(RESEND_OTP_TIME);
+      setResending(false);
+    }
+  };
 
   return (
-    <LinearGradient colors={gradientColors} style={styles.gradient}>
-      <Image source={patternImage} style={styles.sidePattern} />
-      <View style={styles.container}>
-      {isDark? <Image source={images.BACKICON} style={styles.backIcon} />:
-       <Image source={images.BLACKBACKICON} style={styles.backIcon} />}
-        <Text
-          style={[
-            styles.title,
-            {color: isDark ? 'rgba(255, 255, 255, 0.60)' : '#2A0D54'},
-          ]}>
-          Verify it’s you 🔐
+    <PageLayout
+      heading="Verify it's you 🔐"
+      description="Just an OTP verification"
+      hasBackButton
+      onBackButton={() => navigation.goBack()}>
+      <View
+        style={{
+          marginVertical: normalizeHeight(46),
+          marginLeft: normalizeWidth(4),
+        }}>
+        <Text style={[styles.shared, {color: isDark ? '#EEE7F9' : '#3C0E90'}]}>
+          We've just shared a high security 4 digit code with you on +91
+          xxxxxxxx99
         </Text>
+      </View>
+
+      <CodeField
+        verifyOtp={true}
+        otpData={val => setotpval(val)}
+        ref={otpRef}
+        status={otpStatus}
+        value={loginData?.data.generatedOtp || ''}
+      />
+
+      <View style={{marginTop: normalizeHeight(24)}}>
         <Text
-          style={[
-            styles.subtitle,
-            {color: isDark ? 'rgba(255, 255, 255, 0.80)' : '#4F378A'},
-          ]}>
-          Just an OTP verification
+          style={{
+            fontSize: 12,
+            fontWeight: '600',
+            color: isDark ? 'white' : '#300B73',
+          }}>
+          Didn't Receive the code yet ?{' '}
         </Text>
         <View
           style={{
-            marginVertical: normalizeHeight(46),
-            marginLeft: normalizeWidth(4),
+            flexDirection: 'row',
+            marginTop: normalizeHeight(4),
+            alignItems: 'center',
           }}>
-          <Text
-            style={[styles.shared, {color: isDark ? '#EEE7F9' : '#3C0E90'}]}>
-            We’ve just shared a high security 4 digit code with you on +91
-            xxxxxxxx99
-          </Text>
-        </View>
-
-        <CodeField
-          verifyOtp={true}
-          otpData={val => {
-            setotpval(val);
-          }}
-          ref={otpRef}
-          status={otpStatus} 
-        />
-        <View style={{marginTop: normalizeHeight(24)}}>
-          <Text
-            style={{
-              fontSize: 12,
-              fontWeight: '600',
-              color: isDark ? 'white' : '#300B73',
-            }}>
-            Didn’t Receive the code yet ?{' '}
-          </Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              marginTop: normalizeHeight(4),
-              alignItems: 'center',
-            }}>
+          <TouchableOpacity
+            disabled={timer > 0 || resending}
+            onPress={handleResendOtp}
+            activeOpacity={timer === 0 && !resending ? 0.7 : 1}>
             <Text
               style={{
                 fontSize: 12,
                 fontWeight: '700',
-                color: isDark ? 'white' : 'rgba(0, 0, 0, 0.12)',
+                color:
+                  timer === 0 && !resending
+                    ? isDark
+                      ? '#EEE7F9'
+                      : '#5013C0'
+                    : isDark
+                    ? 'white'
+                    : 'rgba(0, 0, 0, 0.12)',
+                textDecorationLine:
+                  timer === 0 && !resending ? 'underline' : 'none',
               }}>
               Resend OTP
             </Text>
-            <Text
-              style={{
-                fontSize: 12,
-                fontWeight: '700',
-                color: isDark ? 'white' : '#5013C0',
-              }}>
-              {' '}
-              in 00:56
-            </Text>
-          </View>
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: 12,
+              fontWeight: '700',
+              color: isDark ? 'white' : '#5013C0',
+            }}>
+            {timer > 0 ? ` in 00:${timer.toString().padStart(2, '0')}` : ''}
+          </Text>
         </View>
       </View>
 
-      <TouchableOpacity
-        // onPress={() => {
-        //   navigation.navigate('UnlockedExp');
-        // }}
+      <CommonButton
+        name="Submit"
         onPress={handleOtpSubmit}
+        disabled={isLoading}
+        loading={isLoading}
         style={{
           width: normalizeWidth(308),
-          backgroundColor: '#5013C0',
-          position: 'absolute',
-          bottom: 90,
-          marginHorizontal: normalizeWidth(32),
-          borderRadius: 12,
-          paddingVertical: normalizeHeight(12),
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Text style={{color: 'white', fontSize: 14, fontWeight: '800'}}>
-          Submit
-        </Text>
-      </TouchableOpacity>
-    </LinearGradient>
+          marginTop: normalizeHeight(40),
+          alignSelf: 'center',
+        }}
+        textStyle={{
+          fontSize: 14,
+          fontWeight: '800',
+        }}
+      />
+      {isLoading && <Loader />}
+    </PageLayout>
   );
 };
 
-export default VerifyOTP;
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
-  sidePattern: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    resizeMode: 'contain',
-  },
-  container: {
-    marginTop: normalizeHeight(55),
-    marginHorizontal: normalizeWidth(24),
-  },
-  backIcon: {
-    height: normalizeHeight(24),
-    width: normalizeWidth(24),
-    resizeMode: 'contain',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '900',
-  },
-  subtitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginTop: 4,
-  },
   shared: {
     fontSize: 16,
     fontWeight: '700',
   },
 });
+
+export default VerifyOTP;

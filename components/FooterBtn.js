@@ -1,8 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, Text } from 'react-native';
-import { normalizeHeight,normalizeWidth } from './Responsivescreen';
+import {TouchableOpacity, Text} from 'react-native';
+import {normalizeHeight, normalizeWidth} from './Responsivescreen';
 
-const FooterBtn = ({ onPress, label = 'Submit', style = {}, textStyle = {} }) => {
+const FooterBtn = ({onPress, label = 'Submit', style = {}, textStyle = {}}) => {
   return (
     <TouchableOpacity
       style={{

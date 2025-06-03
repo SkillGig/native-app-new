@@ -1,4 +1,4 @@
-import React, {useState, useContext, useRef} from 'react';
+import React, {useState, useContext, useRef, useEffect} from 'react';
 import {
   View,
   Text,
@@ -18,19 +18,28 @@ import {
   normalizeHeight,
   normalizeWidth,
 } from '../../components/Responsivescreen';
+import Loader from '../../components/Loader';
 
 const InfoCheck = ({navigation}) => {
   const [field, setField] = useState({
-    name: 'Shubhangi Sharma',
-    phone: '9876543210',
-    email: 'shubhangisharma@gmail.com',
-    batch: 'B tech in computer Science',
-    startDate: 'June 2021',
-    endDate: 'July 2025',
+    name: {initial: 'Shubhangi Sharma', value: 'Shubhangi Sharma'},
+    phone: {initial: '9876543210', value: '9876543210'},
+    email: {
+      initial: 'shubhangisharma@gmail.com',
+      value: 'shubhangisharma@gmail.com',
+    },
+    batch: {
+      initial: 'B tech in computer Science',
+      value: 'B tech in computer Science',
+    },
+    startDate: {initial: 'June 2021', value: 'June 2021'},
+    endDate: {initial: 'July 2025', value: 'July 2025'},
   });
 
-  navigation.navigate('RequestStatus');
+  const [isFormDirty, setIsFormDirty] = useState(false);
+
   const {isDark, colors} = useContext(ThemeContext);
+
   const BottomsheetRef = useRef(null);
   const patternImage = isDark
     ? images.SIDEPATTERNDARK
@@ -42,6 +51,16 @@ const InfoCheck = ({navigation}) => {
   const handleSubmit = () => navigation.navigate('UnlockedExp');
 
   const handleDiscrepancyPress = () => BottomsheetRef.current?.present();
+
+  useEffect(
+    () =>
+      setIsFormDirty(
+        Object.values(field).some(
+          fieldData => fieldData.value !== fieldData.initial,
+        ),
+      ),
+    [field],
+  );
 
   return (
     <View style={styles.root}>
@@ -72,7 +91,7 @@ const InfoCheck = ({navigation}) => {
             <ScrollView contentContainerStyle={styles.cardContent}>
               <CompTextInput
                 label="Name"
-                value={field.name}
+                value={field.name.value}
                 labelstyle={styles.label}
                 inputstyle={styles.input(isDark)}
                 editable={false}
@@ -80,7 +99,7 @@ const InfoCheck = ({navigation}) => {
               />
               <CompTextInput
                 label="Phone Number"
-                value={field.phone}
+                value={field.phone.value}
                 labelstyle={styles.label}
                 inputstyle={styles.input(isDark)}
                 editable={false}
@@ -88,7 +107,7 @@ const InfoCheck = ({navigation}) => {
               />
               <CompTextInput
                 label="Email"
-                value={field.email}
+                value={field.email.value}
                 labelstyle={styles.label}
                 inputstyle={styles.input(isDark)}
                 editable={false}
@@ -96,7 +115,7 @@ const InfoCheck = ({navigation}) => {
               />
               <CompTextInput
                 label="Branch"
-                value={field.batch}
+                value={field.batch.value}
                 labelstyle={styles.label}
                 inputstyle={styles.input(isDark)}
                 editable={false}
@@ -105,7 +124,7 @@ const InfoCheck = ({navigation}) => {
               <View style={styles.row}>
                 <CompTextInput
                   label="Start Date"
-                  value={field.startDate}
+                  value={field.startDate.value}
                   labelstyle={styles.label}
                   inputstyle={styles.inputSmall(isDark)}
                   editable={false}
@@ -113,7 +132,7 @@ const InfoCheck = ({navigation}) => {
                 />
                 <CompTextInput
                   label="End Date"
-                  value={field.endDate}
+                  value={field.endDate.value}
                   labelstyle={styles.label}
                   inputstyle={styles.inputSmall(isDark)}
                   editable={false}
@@ -140,12 +159,13 @@ const InfoCheck = ({navigation}) => {
                 />
               </View>
             </ScrollView>
+            {/* <Loader /> */}
           </ImageBackground>
         </View>
 
         <TouchableOpacity
           onPress={handleSubmit}
-          style={styles.submitButton(isDark)}>
+          style={styles.submitButton(isDark, !field?.checkBox)}>
           <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>
       </LinearGradient>
@@ -155,41 +175,71 @@ const InfoCheck = ({navigation}) => {
         enableHeader={true}
         headerText={'Edit your info'}
         footer={'Submit'}
-        onSubmit={() => navigation.navigate('RequestStatus')}>
+        // isSubmitButtonActive={yestoupdate}
+        onSubmit={() => {
+          BottomsheetRef.current?.dismiss();
+          navigation.navigate('RequestStatus');
+        }}
+        isSubmitButtonActive={isFormDirty}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={styles.bottomSheetScrollView}>
           <CompTextInput
             label="Name"
-            value={field.name}
+            type="name"
+            value={field.name.value}
+            initialValue={field.name.initial}
+            onChangeText={text =>
+              setField(prev => ({...prev, name: {...prev.name, value: text}}))
+            }
             labelstyle={styles.label}
             inputstyle={styles.input(isDark)}
             editable={true}
           />
           <CompTextInput
             label="Phone Number"
-            value={field.phone}
+            type="phone"
+            value={field.phone.value}
+            initialValue={field.name.initial}
+            onChangeText={text =>
+              setField(prev => ({...prev, phone: {...prev.phone, value: text}}))
+            }
             labelstyle={styles.label}
             inputstyle={styles.input(isDark)}
             editable={true}
           />
           <CompTextInput
             label="Email"
-            value={field.email}
+            type="email"
+            value={field.email.value}
+            initialValue={field.name.initial}
+            onChangeText={text =>
+              setField(prev => ({...prev, email: {...prev.email, value: text}}))
+            }
             labelstyle={styles.label}
             inputstyle={styles.input(isDark)}
             editable={true}
           />
           <CompTextInput
             label="Branch"
-            value={field.batch}
+            type="text"
+            value={field.batch.value}
+            initialValue={field.name.initial}
+            onChangeText={text =>
+              setField(prev => ({...prev, batch: {...prev.batch, value: text}}))
+            }
             labelstyle={styles.label}
             inputstyle={styles.input(isDark)}
             editable={true}
           />
           <CompTextInput
             label="Start Date"
-            value={field.startDate}
+            type=""
+            value={field.startDate.value}
+            initialValue={field.name.initial}
+            onChangeText={text =>
+              setField(prev => ({...prev, startDate: text}))
+            }
             labelstyle={styles.label}
             inputstyle={styles.input(isDark)}
             editable={true}
@@ -256,9 +306,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   }),
   checkboxWrapper: {marginTop: 16},
-  submitButton: isDark => ({
+  submitButton: (isDark, disabled) => ({
     width: normalizeWidth(308),
-    backgroundColor: isDark ? '#815FC4' : '#5013C0',
+    backgroundColor:
+      isDark && !disabled ? '#815FC4' : disabled ? '#232127' : '#5013C0',
     position: 'absolute',
     bottom: 40,
     marginHorizontal: normalizeWidth(32),

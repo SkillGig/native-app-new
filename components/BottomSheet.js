@@ -1,10 +1,9 @@
 import React, {forwardRef, useMemo, useCallback} from 'react';
-import {View, Text, StyleSheet, Button, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
-  useBottomSheetDynamicSnapPoints,
 } from '@gorhom/bottom-sheet';
 import {normalizeHeight, normalizeWidth} from './Responsivescreen';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -13,11 +12,11 @@ const Bottomsheet = forwardRef((props, ref) => {
   const {
     height,
     children,
-    backdrop,
     onChange,
     enableHeader,
     headerText,
     onSubmit,
+    isSubmitButtonActive,
   } = props;
   const snapPoints = useMemo(() => height, [height]);
 
@@ -62,8 +61,12 @@ const Bottomsheet = forwardRef((props, ref) => {
         {/* {props.footer && ( */}
         <View style={styles.submitButtonBackground}>
           <TouchableOpacity
-            style={styles.footerButton}
-            onPress={props.onSubmit}>
+            style={styles.footerButton(isSubmitButtonActive)}
+            onPress={
+              isSubmitButtonActive
+                ? onSubmit
+                : () => console.log('Update Something')
+            }>
             <Text style={styles.submitText}>Submit</Text>
           </TouchableOpacity>
         </View>
@@ -110,8 +113,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#D1B3FF',
     borderRadius: 2.5,
   },
-  footerButton: {
-    backgroundColor: '#563593',
+  footerButton: isSubmitButtonActive => ({
+    backgroundColor: isSubmitButtonActive ? '#563593' : '#232127',
     paddingVertical: normalizeHeight(12),
     paddingHorizontal: 32,
     borderRadius: normalizeWidth(12),
@@ -121,9 +124,7 @@ const styles = StyleSheet.create({
     width: '90%',
     alignItems: 'center',
     marginHorizontal: '5%',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(176, 149, 227, 0.40)',
-  },
+  }),
   submitText: {
     color: '#EADDFF',
     fontSize: normalizeWidth(16),

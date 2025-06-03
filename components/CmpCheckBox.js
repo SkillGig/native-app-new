@@ -1,10 +1,9 @@
-
-import React, { useContext } from 'react';
-import { Text, Pressable, StyleSheet } from 'react-native';
-import { normalizeWidth,normalizeHeight } from './Responsivescreen';
+import React, {useContext} from 'react';
+import {Text, Pressable, StyleSheet} from 'react-native';
+import {normalizeWidth, normalizeHeight} from './Responsivescreen';
 // import Check from '../assets/images/svgs/Check_w';
 import Check from '../assets/svgs/Check_w';
-import { ThemeContext } from '../src/context/ThemeContext';
+import {ThemeContext} from '../src/context/ThemeContext';
 
 const CmpCheckBox = props => {
   const {
@@ -19,7 +18,7 @@ const CmpCheckBox = props => {
     linkTextStyle,
     extStyles = {},
   } = props;
-  const { isDark, colors } = useContext(ThemeContext);
+  const {isDark, colors} = useContext(ThemeContext);
   const onClick = () => {
     onSelect(!value);
   };
@@ -29,27 +28,29 @@ const CmpCheckBox = props => {
     ? 'blue'
     : 'transparent';
   const borderWidth = value ? normalizeWidth(0) : normalizeWidth(1);
-   const borderColor = value 
-  ? (isDark ? 'transparent' : 'transparent') 
-  : (isDark ? 'white' : '#5013C0');
+  const borderColor = value
+    ? isDark
+      ? 'transparent'
+      : 'transparent'
+    : isDark
+    ? 'white'
+    : '#5013C0';
 
-
- 
   return (
     <Pressable
       onPress={() => (disabled || linkPress ? null : onClick())}
-      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
       style={[styles.main, extStyles]}
       accessible={false}>
       <Pressable
         onPress={() => (disabled ? null : onClick())}
-        style={[styles.box, { backgroundColor, borderColor, borderWidth }]}>
+        style={[styles.box, {backgroundColor, borderColor, borderWidth}]}>
         {disabled ? null : value ? <Check /> : null}
       </Pressable>
-      <Text style={[styles.textStyle, textStyle,{ color: colors.text }, ]}>
+      <Text style={[styles.textStyle, textStyle, {color: colors.text}]}>
         {text}
         <Text
-          hitslop={{ top: 100, bottom: 100, left: 100, right: 100 }}
+          hitslop={{top: 100, bottom: 100, left: 100, right: 100}}
           onPress={() => (linkPress ? linkPress() : null)}
           // style={{color: 'blue'}}
           style={[styles.linkTextStyle, linkTextStyle]}>
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
     fontFamily: '400',
     letterSpacing: normalizeHeight(0.12),
     flexShrink: 1,
-    fontStyle:"italic"
+    fontStyle: 'italic',
     // backgroundColor: "red"
   },
   linkTextStyle: {
