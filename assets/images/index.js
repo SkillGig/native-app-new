@@ -24,6 +24,8 @@ const images = {
   TESTONGOING: require('./TestOngoing.png'),
   COURSEREADING: require('./CourseReading.png'),
   COURSEVIDEO: require('./CourseVideo.png'),
+  RIGHTCIRCLE: require('./RightCircle.png'),
+  WRONGCIRCLE: require('./WrongCircle.png'),
 };
 
 export default images;

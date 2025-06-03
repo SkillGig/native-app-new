@@ -11,6 +11,7 @@ import {
 import React, {useContext, useRef} from 'react';
 import {normalizeHeight, normalizeWidth} from './Responsivescreen';
 import {ThemeContext} from '../src/context/ThemeContext';
+import images from '../assets/images';
 
 const CompTextInput = props => {
   const {
@@ -96,7 +97,13 @@ const CompTextInput = props => {
                     ? 'rgba(255, 255, 255, 0.87)'
                     : 'rgba(0, 0, 0, 0.87)',
                 }}>
-                {status === 'approved' ? 'Right' : 'Wrong'}
+                {status === 'approved' ? (
+                  <Image source={images.RIGHTCIRCLE} />
+                ) : status === 'rejected' ? (
+                  <Image source={images.WRONGCIRCLE} />
+                ) : (
+                  <></>
+                )}
               </Text>
             </View>
           ) : type === 'dropdown' ? (

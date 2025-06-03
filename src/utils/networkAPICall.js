@@ -48,7 +48,7 @@ const networkAPICall = async ({
       headers: authHeaders,
       timeout,
     });
-    return {...response.data};
+    return {...response.data, ...response.headers};
   } catch (error) {
     // If unauthorized and retry is allowed, try to refresh token
     if (

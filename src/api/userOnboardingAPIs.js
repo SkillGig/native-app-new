@@ -81,3 +81,14 @@ export const raiseStudentInfoRequest = async ({
     auth: false,
   });
 };
+
+export const resendOTP = async (payload, platform = 'ios') => {
+  return await networkAPICall({
+    url: authService.resendOTP,
+    method: 'POST',
+    data: payload,
+    headers: {platform},
+    service: 'authService',
+    auth: false,
+  });
+};

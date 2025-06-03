@@ -1,17 +1,15 @@
-import React, { useEffect, useContext } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-} from 'react-native';
+import React, {useEffect, useContext} from 'react';
+import {View, Text, Image, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { normalizeHeight, normalizeWidth } from '../../components/Responsivescreen';
+import {
+  normalizeHeight,
+  normalizeWidth,
+} from '../../components/Responsivescreen';
 import images from '../../assets/images';
-import { ThemeContext } from '../../src/context/ThemeContext';
+import {ThemeContext} from '../../src/context/ThemeContext';
 
-const UnlockedExp = ({ navigation }) => {
-  const { isDark, colors } = useContext(ThemeContext);
+const UnlockedExp = ({navigation}) => {
+  const {isDark, colors} = useContext(ThemeContext);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -24,7 +22,9 @@ const UnlockedExp = ({ navigation }) => {
   const gradientColors = isDark
     ? ['#381874', '#150534']
     : ['#FBF8FF', '#DFCEFF'];
-  const patternImage = isDark ? images.SIDEPATTERNDARK : images.SIDEPATTERNLIGHT;
+  const patternImage = isDark
+    ? images.SIDEPATTERNDARK
+    : images.SIDEPATTERNLIGHT;
 
   return (
     <LinearGradient colors={gradientColors} style={styles.gradient}>
@@ -37,7 +37,7 @@ const UnlockedExp = ({ navigation }) => {
           resizeMode: 'contain',
         }}
       />
-      <View style={{ marginTop: normalizeHeight(128), alignItems: 'center' }}>
+      <View style={{marginTop: normalizeHeight(128), alignItems: 'center'}}>
         <Text
           style={{
             fontSize: 32,
@@ -55,7 +55,7 @@ const UnlockedExp = ({ navigation }) => {
             fontWeight: '600',
             color: isDark ? 'white' : '#300B73',
           }}>
-          You’ve just unlocked premium{'\n'}experience to prep for that{'\n'}
+          You've just unlocked premium{'\n'}experience to prep for that{'\n'}
           Dream Job !!
         </Text>
       </View>

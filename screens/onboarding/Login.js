@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, Platform, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {
   normalizeHeight,
   normalizeWidth,
