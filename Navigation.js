@@ -12,6 +12,8 @@ import InfoCheck from './screens/onboarding/InfoCheck';
 import RequestStatus from './screens/onboarding/RequestStatus';
 import MainDash from './screens/Global/MainDash';
 import StreakCalender from './screens/Global/StreakCalender';
+import RoadMap from './screens/Milestones/RoadMap';
+import AutoScrollCarousel from './screens/Milestones/AutoScrollCarousel';
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
@@ -63,6 +65,21 @@ const Navigation = () => {
           component={StreakCalender}
           options={{headerShown: false}}
         />
+
+
+
+<Stack.Screen
+          name="RoadMap"
+          component={RoadMap}
+          options={{headerShown: false}}
+        />
+
+<Stack.Screen
+          name="AutoScrollCarousel"
+          component={AutoScrollCarousel}
+          options={{headerShown: false}}
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

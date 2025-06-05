@@ -24,6 +24,16 @@ const images = {
   TESTONGOING: require('./TestOngoing.png'),
   COURSEREADING: require('./CourseReading.png'),
   COURSEVIDEO: require('./CourseVideo.png'),
+  NOTIFICATIONRIGHTARROW:require('./NotifiRightArrow.png'),
+  PROFILE:require('./profile.png'),
+  SETTINGS:require('./Settings.png'),
+  LOGOUT:require('./Logout.png'),
+  EXPORT:require('./Export.png'),
+  ROADMAPLINES:require('./RoadmapLines.png'),
+  ROADMAPCENTERBOX:require('./RoadmapCenterBox.png'),
+  ROADMAPLEFTBOX:require('./RoadmapLeftbox.png'),
+  CONFUSED:require('./ConfusedWhatToBe.png'),
+  FEMALEAVATARYELLOW:require('./FemaleAvatarYellow.png')
 };
 
 export default images;

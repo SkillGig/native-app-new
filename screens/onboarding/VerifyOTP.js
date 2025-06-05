@@ -51,6 +51,8 @@ const VerifyOTP = ({route, navigation}) => {
   }, [timer]);
 
   const handleOtpSubmit = async () => {
+    navigation.navigate('InfoCheck');
+    return
     setIsLoading(true);
     setOtpStatus('normal');
     try {

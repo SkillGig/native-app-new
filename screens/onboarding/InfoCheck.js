@@ -88,7 +88,7 @@ const InfoCheck = ({navigation}) => {
             source={images.INFOCHECKCARD}
             style={styles.card}
             imageStyle={styles.cardImage}>
-            <ScrollView contentContainerStyle={styles.cardContent}>
+            <ScrollView contentContainerStyle={styles.cardContent} showsVerticalScrollIndicator={false}>
               <CompTextInput
                 label="Name"
                 value={field.name.value}

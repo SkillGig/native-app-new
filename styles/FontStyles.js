@@ -53,6 +53,11 @@ boldFourteen: {
   fontWeight: '700',
   color:'white'
 },
+semiFourteen: {
+  fontSize: 14,
+  fontWeight: '600',
+  color:'white'
+},
 regularSixteen: {
   fontSize: 16,
   fontWeight: '400',
@@ -60,6 +65,11 @@ regularSixteen: {
 },
 heavyTwenty: {
   fontSize: 20,
+  fontWeight: '900',
+  color:'white'
+},
+heavyTwentyFour: {
+  fontSize: 24,
   fontWeight: '900',
   color:'white'
 },

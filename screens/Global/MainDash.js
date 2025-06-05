@@ -1,13 +1,6 @@
-import React, {useEffect, useRef} from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  FlatList,
-  ScrollView,
-} from 'react-native';
+import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
+import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import images from '../../assets/images';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
@@ -17,19 +10,20 @@ import {
 import {fstyles} from '../../styles/FontStyles';
 import LinearGradient from 'react-native-linear-gradient';
 import {Bottomsheet} from '../../components';
-import { BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
+import {BottomSheetScrollView, BottomSheetView} from '@gorhom/bottom-sheet';
+import PersistentBottomSheet from '../../components/PersistentBottomSheet';
+import {ThemeContext} from '../../src/context/ThemeContext';
 
 const MainDash = ({navigation}) => {
-
- 
   const BottomsheetRef = useRef(null);
-
+  const [notificationView, setNotificationView] = useState(false);
+  const [userinfo,setuserInfo]=useState(true)
   const handleStreakPress = () => BottomsheetRef.current?.present();
-  useEffect(() => {
-    if (BottomsheetRef?.current) {
-      BottomsheetRef?.current.present();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (BottomsheetRef?.current) {
+  //     BottomsheetRef?.current.present();
+  //   }
+  // }, []);
   const getGreeting = () => {
     const now = new Date();
     const hours = now.getHours();
@@ -51,7 +45,7 @@ const MainDash = ({navigation}) => {
       return 'Good Evening 🌝 ';
     }
   };
-  const gradientColors = ['#1C0743', '#090215'];
+  // const gradientColors = ['#1C0743', '#090215'];
 
   const weekStatus = [
     {day: 'Mon', status: 'completed'},
@@ -77,6 +71,51 @@ const MainDash = ({navigation}) => {
       color: '#F44336',
     },
   };
+
+  const notificationData = [
+    {
+      id: 'a1',
+      title: 'Lesson Unlocked',
+      text: 'Andrew Fisk has updates on Figma & it’s basics',
+      leftIcon: images.COURSEREADING,
+    },
+    {
+      id: 'a2',
+      title: 'Lesson Unlocked',
+      text: 'Andrew Fisk has updates on Figma & it’s basics',
+      leftIcon: images.FEMALEAVATAR,
+    },
+    {
+      id: '23',
+      title: 'Lesson Unlocked',
+      text: 'Andrew Fisk has updates on Figma & it’s basics',
+      leftIcon: images.COURSEVIDEO,
+    },
+    {
+      id: 'a8',
+      title: 'Lesson Unlocked',
+      text: 'Andrew Fisk has updates on Figma & it’s basics',
+      leftIcon: images.NOTIFICATION,
+    },
+  ];
+
+  const profileData = [
+    {
+      id: 'a1',
+      option: 'My Details - visible',
+      leftIcon: images.PROFILE,
+    },
+    {
+      id: 'a2',
+      option: 'Notification Settings',
+      leftIcon: images.SETTINGS,
+    },
+    {
+      id: '23',
+      option: 'Log out',
+      leftIcon: images.LOGOUT,
+    },
+  ];
   const today = new Date();
   const dayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const currentDay = dayMap[today.getDay()]; // E.g., 'Wed'
@@ -120,7 +159,7 @@ const MainDash = ({navigation}) => {
       id: '1',
       title: 'All',
     },
-   
+
     {
       id: '22',
       title: 'Design',
@@ -150,10 +189,21 @@ const MainDash = ({navigation}) => {
     },
   ];
 
+  const {isDark} = useContext(ThemeContext);
+
+  const gradientColors = useMemo(
+    () => (isDark ? ['#300B73', '#090215'] : ['#381874', '#150534']),
+    [isDark],
+  );
+
   return (
     <>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
+      <LinearGradient
+        colors={gradientColors}
+        locations={[0, 0.7]}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
+        // style={StyleSheet.absoluteFillObject}
         style={{backgroundColor: '#300B73', flex: 1}}>
         <View
           style={{
@@ -165,9 +215,20 @@ const MainDash = ({navigation}) => {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
+              marginBottom: normalizeHeight(16),
             }}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <TouchableOpacity  onPress={handleStreakPress}>
+            <View style={{flexDirection: 'row', alignItems: 'center',
+            backgroundColor:userinfo ? "rgba(129, 95, 196, 0.30)":'transparent',
+            borderRadius:userinfo? 32:0,
+            width:normalizeWidth(202)
+            }}>
+              <TouchableOpacity 
+              onPress={() => {
+                setuserInfo(prev => !prev);
+                setNotificationView(prev => !prev);
+              }}
+              // onPress={handleStreakPress}
+              >
                 <Image
                   source={images.FEMALEAVATAR}
                   style={{
@@ -203,7 +264,12 @@ const MainDash = ({navigation}) => {
                 />
               </TouchableOpacity>
 
-              <TouchableOpacity style={{marginLeft: normalizeWidth(12)}}>
+              <TouchableOpacity
+                style={{marginLeft: normalizeWidth(12)}}
+                onPress={() => {
+                  setNotificationView(prev => !prev);
+                  setuserInfo(prev => !prev);
+                }}>
                 <Image
                   source={images.NOTIFICATION}
                   style={{
@@ -215,14 +281,157 @@ const MainDash = ({navigation}) => {
               </TouchableOpacity>
             </View>
           </View>
+
+          {notificationView&&
+          <>
+            <View
+              style={{
+                marginTop: normalizeHeight(28),
+                marginBottom: normalizeHeight(24),
+              }}>
+              <Text style={[fstyles.heavyTwentyFour, {color: '#B095E3'}]}>
+                Notifications
+              </Text>
+            </View>
+
+            <FlatList
+              showsHorizontalScrollIndicator={false}
+              data={notificationData}
+              keyExtractor={(item, index) => `_${index}`}
+              renderItem={({item, index}) => {
+                return (
+                  <>
+                    <TouchableOpacity
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginTop: normalizeHeight(12),
+                        paddingHorizontal:normalizeWidth(8)
+                      }}>
+                      <View
+                        style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Image
+                          source={item.leftIcon}
+                          style={{
+                            height: normalizeHeight(24),
+                            width: normalizeWidth(24),
+                            resizeMode: 'contain',
+                          }}
+                        />
+                        <View
+                          style={{marginLeft: normalizeWidth(18), flex: 0.9}}>
+                          <Text
+                            style={[
+                              fstyles.semiTwelwe,
+                              {color: 'rgba(229, 220, 246, 0.40)'},
+                            ]}>
+                            {item.title}
+                          </Text>
+                          <Text
+                            style={[
+                              fstyles.regularSixteen,
+                              {color: '#F6F3FC'},
+                            ]}>
+                            {item.text}
+                          </Text>
+                        </View>
+                      </View>
+                      <Image
+                        source={images.NOTIFICATIONRIGHTARROW}
+                        style={{
+                          height: normalizeHeight(24),
+                          width: normalizeWidth(24),
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    </TouchableOpacity>
+                    <View
+                      style={{
+                        height: normalizeHeight(1),
+                        width: '100%',
+                        backgroundColor: 'rgba(176, 149, 227, 0.40)',
+                        marginTop: normalizeHeight(12),
+                      }}
+                    />
+                  </>
+                );
+              }}
+            />
+          </>}
+
+         {userinfo && <>
+            <View
+              style={{
+                marginTop: normalizeHeight(28),
+                marginBottom: normalizeHeight(24),
+              }}>
+              <Text style={[fstyles.heavyTwentyFour, {color: '#B095E3'}]}>
+                My Profile
+              </Text>
+            </View>
+
+           {profileData.map((each,index)=>{
+            return(
+              <>
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginTop: normalizeHeight(24),
+                  paddingHorizontal:normalizeWidth(8)
+                }}>
+                <View
+                  style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Image
+                    source={each.leftIcon}
+                    style={{
+                      height: normalizeHeight(24),
+                      width: normalizeWidth(24),
+                      resizeMode: 'contain',
+                    }}
+                  />
+                  <View
+                    style={{marginLeft: normalizeWidth(18), flex: 0.9}}>
+                    <Text
+                      style={[
+                        fstyles.regularSixteen,
+                        {color: '#D3C4EF'},
+                      ]}>
+                       {each.option}
+                    </Text>
+                  </View>
+                </View>
+                <Image
+                  source={images.NOTIFICATIONRIGHTARROW}
+                  style={{
+                    height: normalizeHeight(24),
+                    width: normalizeWidth(24),
+                    resizeMode: 'contain',
+                  }}
+                />
+              </TouchableOpacity>
+              <View
+                style={{
+                  height: normalizeHeight(1),
+                  width: '100%',
+                  backgroundColor: 'rgba(176, 149, 227, 0.16)',
+                  marginTop: normalizeHeight(12),
+                }}
+              />
+            </>
+            )
+           })} 
+          
+          </>}
+
+
         </View>
-      </ScrollView>
-      <Bottomsheet
-      opacity={0.2}
-        ref={BottomsheetRef}
-        height={['85%']}
-        >
-        <BottomSheetView>
+      </LinearGradient>
+
+      <Bottomsheet opacity={0} ref={BottomsheetRef} height={['80%']}>
+        <ScrollView>
           <LinearGradient colors={gradientColors} style={styles.gradient}>
             <LinearGradient
               colors={['rgba(48, 11, 115, 0)', '#300B73']}
@@ -339,159 +548,163 @@ const MainDash = ({navigation}) => {
                   ]}>
                   Ongoing Courses
                 </Text>
-                <View style={{height:normalizeHeight(250)}}>
-                <FlatList
-                  showsHorizontalScrollIndicator={false}
-                  data={courseFilter}
-                  horizontal={true}
-                  keyExtractor={(item, index) => `_${index}`}
-                  renderItem={({item, index}) => {
-                    console.log(item, 'item.lengthhhh');
-                    return (
-                      <View
-                        style={{
-                          width: normalizeWidth(208),
-                          marginTop: normalizeHeight(16),
-                          borderRadius: 12,
-                          borderWidth: 1,
-                          borderColor: 'rgba(176, 149, 227, 0.4)',
-                          overflow: 'hidden',
-                          marginRight: index === courseFilter.length - 1 ? 0 : normalizeWidth(20),
-                        }}>
-                        <LinearGradient
-                          colors={[
-                            'rgba(70, 49, 115, 0.3)',
-                            '#463173',
-                            '#463173',
-                            'rgba(70, 49, 115, 0.3)',
-                          ]}
-                          locations={[0, 0.49, 0.59, 1]}
-                          start={{x: 0.5, y: 0}}
-                          end={{x: 0.5, y: 1}}
+                <View style={{height: normalizeHeight(250)}}>
+                  <FlatList
+                    onScrollBeginDrag={() => console.log('Scrolling')}
+                    showsHorizontalScrollIndicator={false}
+                    data={courseFilter}
+                    horizontal={true}
+                    keyExtractor={(item, index) => `_${index}`}
+                    renderItem={({item, index}) => {
+                      console.log(item, 'item.lengthhhh');
+                      return (
+                        <View
                           style={{
-                            paddingVertical: normalizeHeight(8),
-                            paddingHorizontal: normalizeWidth(8),
+                            width: normalizeWidth(208),
+                            marginTop: normalizeHeight(16),
                             borderRadius: 12,
-                            width: '100%',
+                            borderWidth: 1,
+                            borderColor: 'rgba(176, 149, 227, 0.4)',
+                            overflow: 'hidden',
+                            marginRight:
+                              index === courseFilter.length - 1
+                                ? 0
+                                : normalizeWidth(20),
                           }}>
-                          <View>
-                            <Image
-                              source={images.TESTONGOING}
-                              style={{
-                                height: normalizeHeight(78),
-                                width: normalizeWidth(192),
-                                resizeMode: 'contain',
-                              }}
-                            />
-                            <View
-                              style={{
-                                marginTop: normalizeHeight(12),
-                                marginHorizontal: normalizeWidth(4),
-                              }}>
-                              <Text style={fstyles.boldFourteen}>
-                                Adobe Xd unlocked{' '}
-                              </Text>
-                            </View>
-
-                            <View
-                              style={{
-                                marginTop: normalizeHeight(14),
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginHorizontal: normalizeWidth(4),
-                              }}>
+                          <LinearGradient
+                            colors={[
+                              'rgba(70, 49, 115, 0.3)',
+                              '#463173',
+                              '#463173',
+                              'rgba(70, 49, 115, 0.3)',
+                            ]}
+                            locations={[0, 0.49, 0.59, 1]}
+                            start={{x: 0.5, y: 0}}
+                            end={{x: 0.5, y: 1}}
+                            style={{
+                              paddingVertical: normalizeHeight(8),
+                              paddingHorizontal: normalizeWidth(8),
+                              borderRadius: 12,
+                              width: '100%',
+                            }}>
+                            <View>
+                              <Image
+                                source={images.TESTONGOING}
+                                style={{
+                                  height: normalizeHeight(78),
+                                  width: normalizeWidth(192),
+                                  resizeMode: 'contain',
+                                }}
+                              />
                               <View
                                 style={{
-                                  flexDirection: 'row',
-                                  alignItems: 'center',
+                                  marginTop: normalizeHeight(12),
+                                  marginHorizontal: normalizeWidth(4),
                                 }}>
-                                <Image
-                                  source={images.COURSEVIDEO}
-                                  style={{
-                                    height: normalizeHeight(14),
-                                    width: normalizeWidth(14),
-                                    resizeMode: 'contain',
-                                  }}
-                                />
-                                <Text
-                                  style={[
-                                    fstyles.boldTwelwe,
-                                    {marginLeft: normalizeWidth(4)},
-                                  ]}>
-                                  What is UI/UX?
+                                <Text style={fstyles.boldFourteen}>
+                                  Adobe Xd unlocked{' '}
                                 </Text>
                               </View>
+
+                              <View
+                                style={{
+                                  marginTop: normalizeHeight(14),
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  marginHorizontal: normalizeWidth(4),
+                                }}>
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                  }}>
+                                  <Image
+                                    source={images.COURSEVIDEO}
+                                    style={{
+                                      height: normalizeHeight(14),
+                                      width: normalizeWidth(14),
+                                      resizeMode: 'contain',
+                                    }}
+                                  />
+                                  <Text
+                                    style={[
+                                      fstyles.boldTwelwe,
+                                      {marginLeft: normalizeWidth(4)},
+                                    ]}>
+                                    What is UI/UX?
+                                  </Text>
+                                </View>
+                                <Text
+                                  style={[
+                                    fstyles.semiTwelwe,
+                                    {
+                                      marginLeft: normalizeWidth(4),
+                                      color: 'rgba(238, 231, 249, 0.60)',
+                                    },
+                                  ]}>
+                                  2/8
+                                </Text>
+                              </View>
+                              <View>
+                                <Text
+                                  style={[
+                                    fstyles.mediumTen,
+                                    {
+                                      color: 'rgba(238, 231, 249, 0.60)',
+                                      marginHorizontal: normalizeWidth(4),
+                                    },
+                                  ]}>
+                                  12min Remaining
+                                </Text>
+                              </View>
+
+                              <View
+                                style={{
+                                  width: normalizeWidth(184),
+                                  height: normalizeHeight(6),
+                                  backgroundColor: 'rgba(176, 149, 227, 0.16)',
+                                  borderRadius: 6,
+                                  overflow: 'hidden',
+                                  marginTop: normalizeHeight(4),
+                                }}>
+                                <LinearGradient
+                                  colors={['#300B73', '#815FC4']}
+                                  start={{x: 0, y: 0}}
+                                  end={{x: 1, y: 0}}
+                                  style={{
+                                    // width: `${Math.abs(59)}%`,
+                                    width: '59%',
+                                    height: '100%',
+                                    borderRadius: 3,
+                                  }}
+                                />
+                              </View>
+                              <View
+                                style={{
+                                  height: normalizeHeight(1),
+                                  width: '100%',
+                                  backgroundColor: '#B095E366',
+                                  marginTop: normalizeHeight(12),
+                                }}
+                              />
                               <Text
                                 style={[
                                   fstyles.semiTwelwe,
                                   {
-                                    marginLeft: normalizeWidth(4),
-                                    color: 'rgba(238, 231, 249, 0.60)',
+                                    color: '#815FC4',
+                                    marginVertical: normalizeHeight(8),
+                                    textAlign: 'center',
                                   },
                                 ]}>
-                                2/8
+                                Resume Course
                               </Text>
                             </View>
-                            <View>
-                              <Text
-                                style={[
-                                  fstyles.mediumTen,
-                                  {
-                                    color: 'rgba(238, 231, 249, 0.60)',
-                                    marginHorizontal: normalizeWidth(4),
-                                  },
-                                ]}>
-                                12min Remaining
-                              </Text>
-                            </View>
-
-                            <View
-                              style={{
-                                width: normalizeWidth(184),
-                                height: normalizeHeight(6),
-                                backgroundColor: 'rgba(176, 149, 227, 0.16)',
-                                borderRadius: 6,
-                                overflow: 'hidden',
-                                marginTop: normalizeHeight(4),
-                              }}>
-                              <LinearGradient
-                                colors={['#300B73', '#815FC4']}
-                                start={{x: 0, y: 0}}
-                                end={{x: 1, y: 0}}
-                                style={{
-                                  // width: `${Math.abs(59)}%`,
-                                  width: '59%',
-                                  height: '100%',
-                                  borderRadius: 3,
-                                }}
-                              />
-                            </View>
-                            <View
-                              style={{
-                                height: normalizeHeight(1),
-                                width: '100%',
-                                backgroundColor: '#B095E366',
-                                marginTop: normalizeHeight(12),
-                              }}
-                            />
-                            <Text
-                              style={[
-                                fstyles.semiTwelwe,
-                                {
-                                  color: '#815FC4',
-                                  marginVertical: normalizeHeight(8),
-                                  textAlign: 'center',
-                                },
-                              ]}>
-                              Resume Course
-                            </Text>
-                          </View>
-                        </LinearGradient>
-                      </View>
-                    );
-                  }}
-                />
+                          </LinearGradient>
+                        </View>
+                      );
+                    }}
+                  />
                 </View>
               </View>
             </LinearGradient>
@@ -1066,7 +1279,7 @@ const MainDash = ({navigation}) => {
       </View>
       </LinearGradient> */}
           </LinearGradient>
-        </BottomSheetView>
+        </ScrollView>
       </Bottomsheet>
     </>
   );
