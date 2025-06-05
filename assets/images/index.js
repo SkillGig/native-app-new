@@ -26,6 +26,7 @@ const images = {
   COURSEVIDEO: require('./CourseVideo.png'),
   RIGHTCIRCLE: require('./RightCircle.png'),
   WRONGCIRCLE: require('./WrongCircle.png'),
+  LEFTCALENDARARROW: require('./LeftCalendarArrow.png'),
 };
 
 export default images;

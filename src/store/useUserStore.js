@@ -1,5 +1,5 @@
 import {create} from 'zustand';
-import {persist} from 'zustand/middleware';
+import {persist, createJSONStorage} from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const useUserStore = create(
@@ -56,7 +56,6 @@ const useUserStore = create(
             ...newUser,
           },
         })),
-
       logout: () =>
         set({
           user: {
@@ -70,8 +69,9 @@ const useUserStore = create(
         }),
     }),
     {
-      name: 'user-storage',
-      storage: AsyncStorage,
+      name: 'user-storage-v3',
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: state => ({user: state.user}),
     },
   ),
 );

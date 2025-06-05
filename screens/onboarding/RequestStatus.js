@@ -1,4 +1,4 @@
-import React, {useState, useContext, useRef, useEffect} from 'react';
+import React, {useState, useContext, useRef, useEffect, useMemo} from 'react';
 import {View, Text, Image, StyleSheet} from 'react-native';
 import {FooterBtn} from '../../components';
 import {
@@ -16,25 +16,12 @@ const RequestStatus = ({navigation, route}) => {
   const sheetRef = useRef(null);
 
   // Read from route params
-  const {ongoingRequestDetails = []} = route.params || {};
-  const requestDetail = ongoingRequestDetails || {};
+  const {ongoingRequestDetails = [], dataToUpdate = null} = route.params || {};
+  const requestDetail = useMemo(
+    () => ongoingRequestDetails[0] || {},
+    [ongoingRequestDetails],
+  );
 
-  // Parse diffDetails
-  let parsedDiff = [];
-  if (requestDetail.diffDetails) {
-    try {
-      // Handle both single and multiple JSON objects in diffDetails
-      parsedDiff = requestDetail.diffDetails
-        .split('},')
-        .map((entry, idx, arr) =>
-          JSON.parse(idx < arr.length - 1 ? `${entry}}` : entry),
-        );
-    } catch (e) {
-      parsedDiff = [];
-    }
-  }
-
-  // Build fields state from parsedDiff
   const initialFields = {
     name: {value: '', status: 'pending'},
     phone: {value: '', status: 'pending'},
@@ -43,29 +30,57 @@ const RequestStatus = ({navigation, route}) => {
     startDate: {value: '', status: 'pending'},
   };
 
-  parsedDiff.forEach(({fieldName, newValue, fieldStatus}) => {
-    if (initialFields[fieldName]) {
-      initialFields[fieldName].value = newValue;
-      initialFields[fieldName].status =
-        fieldStatus === -1
-          ? 'rejected'
-          : fieldStatus === 1
-          ? 'approved'
-          : 'pending';
-    }
-  });
+  console.log(dataToUpdate, 'Data to Update');
+
+  // Use dataToUpdate if available
+  if (dataToUpdate?.length) {
+    dataToUpdate.forEach(({fieldName, newValue}) => {
+      if (initialFields[fieldName]) {
+        initialFields[fieldName] = {
+          value: newValue,
+          status: 'pending',
+        };
+      }
+    });
+  } else if (requestDetail.diffDetails) {
+    try {
+      const entries = requestDetail.diffDetails
+        .split('},')
+        .map((entry, idx, arr) =>
+          JSON.parse(idx < arr.length - 1 ? `${entry}}` : entry),
+        );
+
+      entries.forEach(({fieldName, newValue, fieldStatus}) => {
+        if (initialFields[fieldName]) {
+          initialFields[fieldName] = {
+            value: newValue,
+            status:
+              fieldStatus === -1
+                ? 'rejected'
+                : fieldStatus === 1
+                ? 'approved'
+                : fieldStatus || 'pending',
+          };
+        }
+      });
+    } catch (e) {}
+  }
 
   const [fields, setFields] = useState(initialFields);
   const [status, setStatus] = useState('');
 
+  // Accept status from route.params for submitted view
+  const statusFromParams = route?.params?.status;
+
   useEffect(() => {
-    console.log('Request Detail:', requestDetail);
-    if (requestDetail.status) {
+    if (requestDetail.status && !statusFromParams) {
       setStatus(requestDetail.status);
+    } else if (statusFromParams) {
+      setStatus(statusFromParams);
     } else {
       setStatus('in-progress'); // Default status if not provided
     }
-  }, [requestDetail.status]);
+  }, [requestDetail, statusFromParams]);
 
   useEffect(() => {
     sheetRef.current?.present();
@@ -74,17 +89,28 @@ const RequestStatus = ({navigation, route}) => {
   // Back button handler for PageLayout
   const handleBackButton = () => {
     sheetRef.current?.dismiss();
-    navigation.reset({
-      index: 0,
-      routes: [{name: 'Login'}],
-    });
+    if (status === 'submitted') {
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Login'}],
+      });
+    } else {
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Login'}],
+      });
+    }
   };
+
+  console.log(fields, 'Parsed Diff Details');
 
   return (
     <PageLayout
       heading="Request Status⏳"
       description={
-        ['approved', 'rejected', 'partially-approved'].includes(status)
+        ['approved', 'rejected', 'partially-approved', 'submitted'].includes(
+          status,
+        )
           ? 'We have an update on your request'
           : 'We are working on your request'
       }
@@ -149,8 +175,9 @@ const RequestStatus = ({navigation, route}) => {
               marginTop: normalizeHeight(27),
             }}>
             <Text style={[styles.statusText, {textAlign: 'center'}]}>
-              Some of your details have been approved, while others were not.
-              Please check the summary below for more info.
+              {status === 'submitted'
+                ? 'Your request has been submitted and is under review. You will be notified once it is processed.'
+                : 'Some of your details have been approved, while others were not. Please check the summary below for more info.'}
             </Text>
           </View>
 
@@ -162,13 +189,20 @@ const RequestStatus = ({navigation, route}) => {
                 fontWeight: '800',
               }}
               style={{width: normalizeWidth(303)}}
-              onPress={() => {}}
+              onPress={() => {
+                sheetRef.current?.dismiss();
+                return navigation.navigate('InfoCheck', {
+                  ...route.params,
+                  ongoingRequestDetails: null,
+                  dataToUpdate: null,
+                });
+              }}
               label="Continue"
             />
           )}
         </View>
       </View>
-
+      {/* Hide bottom sheet for submitted view */}
       <PersistentBottomSheet
         ref={sheetRef}
         enableHeader={true}
@@ -178,7 +212,7 @@ const RequestStatus = ({navigation, route}) => {
         <View style={styles.bottomSheetDataContainer}>
           {Object.entries(fields)
             .filter(([, {value}]) => value !== '')
-            .map(([fieldName, {value, status}]) => (
+            .map(([fieldName, {value, status: fieldStatus}]) => (
               <CompTextInput
                 key={fieldName}
                 label={fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}
@@ -188,7 +222,7 @@ const RequestStatus = ({navigation, route}) => {
                 editable={false}
                 opacity={0.75}
                 type={'status'}
-                status={status}
+                status={fieldStatus}
               />
             ))}
         </View>

@@ -14,8 +14,14 @@ import Loader from '../../components/Loader';
 import {useFocusEffect} from '@react-navigation/native';
 import CommonButton from '../../components/CommonButton';
 
-const Login = ({navigation}) => {
-  const [field, setField] = useState({orgCode: '', studentId: ''});
+const Login = ({navigation, route}) => {
+  const initialOrgCode = route?.params?.orgCode || '';
+  const initialStudentId = route?.params?.studentId || '';
+
+  const [field, setField] = useState({
+    orgCode: initialOrgCode,
+    studentId: initialStudentId,
+  });
   const [orgError, setOrgError] = useState('');
   const [studentIdError, setStudentIdError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -94,6 +100,7 @@ const Login = ({navigation}) => {
             setOrgError('');
           }}
           errorMessage={orgError}
+          editable={true}
         />
       </View>
 
@@ -108,6 +115,7 @@ const Login = ({navigation}) => {
             setStudentIdError('');
           }}
           errorMessage={studentIdError}
+          editable={true}
         />
       </View>
 
@@ -115,7 +123,6 @@ const Login = ({navigation}) => {
         name="Submit"
         onPress={handleSubmit}
         disabled={!isFormValid || loading}
-        loading={loading}
       />
       {loading && <Loader />}
     </PageLayout>

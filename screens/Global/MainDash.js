@@ -16,6 +16,7 @@ import {
 } from '../../components/Responsivescreen';
 import {fstyles} from '../../styles/FontStyles';
 import LinearGradient from 'react-native-linear-gradient';
+import useUserStore from '../../src/store/useUserStore';
 
 const MainDash = ({navigation}) => {
   const getGreeting = () => {
@@ -102,6 +103,11 @@ const MainDash = ({navigation}) => {
       title: 'Animation',
     },
   ];
+
+  const authToken = useUserStore(state => state.user.authToken);
+  const refreshToken = useUserStore(state => state.user.refreshToken);
+
+  console.log(authToken, refreshToken, 'Dashboard Screen Tokens');
 
   return (
     <ScrollView
@@ -960,7 +966,11 @@ const MainDash = ({navigation}) => {
             marginBottom: normalizeHeight(58),
           }}
         />
-        <View style={{marginLeft: normalizeWidth(20),marginBottom:normalizeHeight(23)}}>
+        <View
+          style={{
+            marginLeft: normalizeWidth(20),
+            marginBottom: normalizeHeight(23),
+          }}>
           <Text style={{fontSize: 64, fontWeight: '900', color: '#EEE7F9'}}>
             Learn to Upskill !!
           </Text>

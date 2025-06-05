@@ -10,7 +10,6 @@ import {ThemeContext} from '../../src/context/ThemeContext';
 import {resendOTP, verifyOTP} from '../../src/api/userOnboardingAPIs';
 import CommonButton from '../../components/CommonButton';
 import Loader from '../../components/Loader';
-import useUserStore from '../../src/store/useUserStore';
 
 const RESEND_OTP_TIME = 5;
 
@@ -31,8 +30,6 @@ const VerifyOTP = ({route, navigation}) => {
     studentId,
     loginData,
   });
-
-  const setTokens = useUserStore(state => state.setTokens);
 
   useEffect(() => {
     if (loginData?.data?.otpId) {
@@ -83,8 +80,7 @@ const VerifyOTP = ({route, navigation}) => {
                       orgCode,
                       studentId,
                       studentInfo: res?.data?.studentDetails,
-                      ongoingRequestDetails:
-                        res?.data?.ongoingRequestDetails[0],
+                      ongoingRequestDetails: res?.data?.ongoingRequestDetails,
                     },
                   },
                 ],
@@ -92,12 +88,19 @@ const VerifyOTP = ({route, navigation}) => {
             700,
           );
         } else {
-          setTokens(res.authorization, res['x-refresh-token']);
           setTimeout(
             () =>
               navigation.reset({
                 index: 0,
-                routes: [{name: 'UnlockedExp'}],
+                routes: [
+                  {
+                    name: 'UnlockedExp',
+                    params: {
+                      authToken: res.authorization,
+                      refreshToken: res['x-refresh-token'],
+                    },
+                  },
+                ],
               }),
             700,
           );
@@ -217,7 +220,6 @@ const VerifyOTP = ({route, navigation}) => {
         name="Submit"
         onPress={handleOtpSubmit}
         disabled={isLoading}
-        loading={isLoading}
         style={{
           width: normalizeWidth(308),
           marginTop: normalizeHeight(40),

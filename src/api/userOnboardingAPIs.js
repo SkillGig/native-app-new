@@ -69,14 +69,14 @@ export const generateNewAuthToken = async (refreshToken, platform = 'ios') => {
 
 // 6. Raise Student Info Request (No Auth)
 export const raiseStudentInfoRequest = async ({
-  orgId,
+  orgCode,
   studentId,
   dataToUpdate,
 }) => {
   return await networkAPICall({
     url: authService.raiseStudentInfoRequest,
     method: 'POST',
-    data: {orgId, studentId, dataToUpdate},
+    data: {orgCode, studentId, dataToUpdate},
     service: 'authService',
     auth: false,
   });
