@@ -358,18 +358,79 @@ const RoadMap = () => {
           );
         })}
 
-        <View style={{}}>
-          <Text style={fstyles.semiFourteen}>View Leaderboard</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: normalizeWidth(12),
+            paddingVertical: normalizeHeight(8),
+            width: normalizeWidth(171),
+            justifyContent: 'center',
+            marginHorizontal: normalizeWidth(106),
+            backgroundColor: '#815FC4',
+            borderRadius: 12,
+            marginTop:normalizeHeight(26),
+            marginBottom:normalizeHeight(48)
+          }}>
+          <Text
+            style={{
+              fontSize: 14,
+              fontWeight: '600',
+              color: 'white',
+              marginRight: normalizeWidth(8),
+            }}>
+            View Leaderboard
+          </Text>
           <Image
             source={images.BACKICON}
             style={{
               height: normalizeHeight(16),
               width: normalizeWidth(16),
               resizeMode: 'contain',
-              transform: [{ scaleX: -1 }], 
+              transform: [{scaleX: -1}],
             }}
           />
         </View>
+
+        <View>
+          <Text>Analytics</Text>
+          </View>
+
+          <View style={styles.shadowWrapper}>
+      <View style={styles.baseBackground}>
+        <LinearGradient
+          colors={[
+            'rgba(48, 11, 115, 0.50)', // Background-Dark-Light
+            'rgba(9, 2, 21, 0.50)',    // Background-Dark-Active
+          ]}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.gradientLayer}
+        >
+          <Text style={[fstyles.heavyTwenty,{color:'#B095E3',textAlign:"center"}]}>Analytics</Text>
+          <View style={{backgroundColor:'rgba(129, 95, 196, 0.30)',height:normalizeHeight(1),width:"100%",marginVertical:normalizeHeight(12)}}/>
+
+           <LinearGradient
+        colors={[
+          'rgba(129, 95, 196, 0.26)',
+          'rgba(129, 95, 196, 0.26)',
+        ]}
+        start={{ x: 0.5, y: 1 }}
+        end={{ x: 0.5, y: 0 }}
+        style={styles.cardOne}
+      >
+        <View style={styles.innerOverlay}>
+          <Text style={{ color: '#E5DCF6' , fontSize: 20,
+  fontWeight: '900'}}>10</Text>
+        </View>
+      </LinearGradient>
+          <View style={styles.overlay}>
+          <Text style={[fstyles.heavyTwenty,{color:'#B095E3',}]}>Analytics</Text>
+            
+          </View>
+        </LinearGradient>
+      </View>
+    </View>
       </ScrollView>
     </LinearGradient>
   );
@@ -405,6 +466,47 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: '#B095E3',
     borderRadius: 4,
+  },
+  shadowWrapper: {
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        marginHorizontal:normalizeWidth(18)
+      },
+      android: {
+        elevation: 6,
+        marginHorizontal:normalizeWidth(18)
+      },
+    }),
+    borderRadius: 12,
+  },
+  baseBackground: {
+    backgroundColor: '#0A0A0A',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  gradientLayer: {
+    padding: 16,
+  },
+  overlay: {
+    backgroundColor: 'rgba(129, 95, 196, 0.12)', // Second linear gradient simulation
+    borderRadius: 12,
+    padding: 10,
+    alignItems:"center"
+  },
+  cardOne: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#5013C0',
+    overflow: 'hidden',
+  },
+  innerOverlay: {
+    backgroundColor: 'rgba(10, 10, 10, 0.30)',
+    padding: 16,
+    borderRadius: 12,
   },
 });
 export default RoadMap;
