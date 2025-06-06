@@ -13,6 +13,7 @@ import {Bottomsheet} from '../../components';
 import {BottomSheetScrollView, BottomSheetView} from '@gorhom/bottom-sheet';
 import PersistentBottomSheet from '../../components/PersistentBottomSheet';
 import {ThemeContext} from '../../src/context/ThemeContext';
+import useUserStore from '../../src/store/useUserStore';
 
 const MainDash = ({navigation}) => {
   const BottomsheetRef = useRef(null);
@@ -195,6 +196,10 @@ const MainDash = ({navigation}) => {
     () => (isDark ? ['#300B73', '#090215'] : ['#381874', '#150534']),
     [isDark],
   );
+  const authToken = useUserStore(state => state.user.authToken);
+  const refreshToken = useUserStore(state => state.user.refreshToken);
+
+  console.log(authToken, refreshToken, 'Dashboard Screen Tokens');
 
   return (
     <>
@@ -1268,6 +1273,28 @@ const MainDash = ({navigation}) => {
               </Text>
             </View>
             {/* <LinearGradient
+        <View
+          style={{
+            height: normalizeHeight(1),
+            backgroundColor: '#815FC4',
+            width: '100%',
+            marginTop: normalizeHeight(16),
+            marginBottom: normalizeHeight(58),
+          }}
+        />
+        <View
+          style={{
+            marginLeft: normalizeWidth(20),
+            marginBottom: normalizeHeight(23),
+          }}>
+          <Text style={{fontSize: 64, fontWeight: '900', color: '#EEE7F9'}}>
+            Learn to Upskill !!
+          </Text>
+          <Text style={[fstyles.regularSixteen, {color: '#EEE7F9'}]}>
+            Made with Passion in Tirupati, India 🇮🇳
+          </Text>
+        </View>
+        {/* <LinearGradient
         colors={['rgba(28, 7, 67, 0.00)', '#1C0743']}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}

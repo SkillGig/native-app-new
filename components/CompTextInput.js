@@ -4,13 +4,12 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  Pressable,
-  Platform,
   TouchableOpacity,
 } from 'react-native';
 import React, {useContext, useRef} from 'react';
-import {normalizeHeight, normalizeWidth} from './Responsivescreen';
+import {normalizeWidth} from './Responsivescreen';
 import {ThemeContext} from '../src/context/ThemeContext';
+import images from '../assets/images';
 
 const CompTextInput = props => {
   const {
@@ -29,10 +28,10 @@ const CompTextInput = props => {
     type,
     status,
     onChangeText,
-    initialValue,
   } = props;
   const textInRef = useRef(null);
-  const {isDark, colors} = useContext(ThemeContext);
+  const {isDark} = useContext(ThemeContext);
+
   return (
     <View
       pointerEvents={!onPress && editable === false ? 'none' : 'auto'}
@@ -96,29 +95,13 @@ const CompTextInput = props => {
                     ? 'rgba(255, 255, 255, 0.87)'
                     : 'rgba(0, 0, 0, 0.87)',
                 }}>
-                {status === 'approved' ? 'Right' : 'Wrong'}
-              </Text>
-            </View>
-          ) : type === 'dropdown' ? (
-            <View style={{position: 'absolute', right: 0, paddingRight: 8}}>
-              <Text
-                style={{
-                  color: isDark
-                    ? 'rgba(255, 255, 255, 0.87)'
-                    : 'rgba(0, 0, 0, 0.87)',
-                }}>
-                DropDown
-              </Text>
-            </View>
-          ) : type === 'calendar' ? (
-            <View style={{position: 'absolute', right: 0, paddingRight: 8}}>
-              <Text
-                style={{
-                  color: isDark
-                    ? 'rgba(255, 255, 255, 0.87)'
-                    : 'rgba(0, 0, 0, 0.87)',
-                }}>
-                calendar
+                {status === 'approved' ? (
+                  <Image source={images.RIGHTCIRCLE} />
+                ) : status === 'rejected' ? (
+                  <Image source={images.WRONGCIRCLE} />
+                ) : (
+                  <></>
+                )}
               </Text>
             </View>
           ) : (

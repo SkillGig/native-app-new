@@ -33,7 +33,10 @@ const images = {
   ROADMAPCENTERBOX:require('./RoadmapCenterBox.png'),
   ROADMAPLEFTBOX:require('./RoadmapLeftbox.png'),
   CONFUSED:require('./ConfusedWhatToBe.png'),
-  FEMALEAVATARYELLOW:require('./FemaleAvatarYellow.png')
+  FEMALEAVATARYELLOW:require('./FemaleAvatarYellow.png'),
+  RIGHTCIRCLE: require('./RightCircle.png'),
+  WRONGCIRCLE: require('./WrongCircle.png'),
+  LEFTCALENDARARROW: require('./LeftCalendarArrow.png'),
 };
 
 export default images;

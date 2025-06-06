@@ -7,18 +7,19 @@ import {
 } from '../../components/Responsivescreen';
 import PageLayout from './PageLayout';
 import {ThemeContext} from '../../src/context/ThemeContext';
-import {verifyOTP} from '../../src/api/userOnboardingAPIs';
+import {resendOTP, verifyOTP} from '../../src/api/userOnboardingAPIs';
 import CommonButton from '../../components/CommonButton';
 import Loader from '../../components/Loader';
 
-const RESEND_OTP_TIME = 59;
+const RESEND_OTP_TIME = 5;
 
 const VerifyOTP = ({route, navigation}) => {
-  const [otpval, setotpval] = useState('1234');
+  const [otpval, setotpval] = useState('');
   const [otpStatus, setOtpStatus] = useState('normal');
   const [timer, setTimer] = useState(RESEND_OTP_TIME);
   const [resending, setResending] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [otpId, setOtpId] = useState('');
   const {isDark} = useContext(ThemeContext);
   const otpRef = useRef();
 
@@ -30,13 +31,11 @@ const VerifyOTP = ({route, navigation}) => {
     loginData,
   });
 
-  // useEffect(() => {
-  //   // Reset OTP value and status when the component mounts
-  //   if (loginData?.generatedOtp) {
-  //     setotpval(loginData.generatedOtp);
-  //     otpRef.current?.clear();
-  //   }
-  // }, [loginData.generatedOtp]);
+  useEffect(() => {
+    if (loginData?.data?.otpId) {
+      setOtpId(loginData.data.otpId);
+    }
+  }, [loginData?.data?.otpId]);
 
   useEffect(() => {
     let interval = null;
@@ -60,20 +59,54 @@ const VerifyOTP = ({route, navigation}) => {
         orgCode,
         studentId,
         otp: otpval,
-        otpId: loginData?.data?.otpId || '',
+        otpId: otpId,
       };
       const res = await verifyOTP(payload);
+      console.log(res, 'OTP Verification Response');
       if (res && !res.error) {
         setOtpStatus('success');
         // navigation.navigate('InfoCheck'); // Uncomment if you want to navigate
-        setTimeout(
-          () =>
-            navigation.reset({
-              index: 0,
-              routes: [{name: 'InfoCheck'}],
-            }),
-          700,
-        );
+        console.log('OTP Verification Response:', res);
+        if (res?.data?.isNewUser) {
+          setTimeout(
+            () =>
+              navigation.reset({
+                index: 1,
+                routes: [
+                  {
+                    name:
+                      res?.data?.ongoingRequestDetails?.length > 0
+                        ? 'RequestStatus'
+                        : 'InfoCheck',
+                    params: {
+                      orgCode,
+                      studentId,
+                      studentInfo: res?.data?.studentDetails,
+                      ongoingRequestDetails: res?.data?.ongoingRequestDetails,
+                    },
+                  },
+                ],
+              }),
+            700,
+          );
+        } else {
+          setTimeout(
+            () =>
+              navigation.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: 'UnlockedExp',
+                    params: {
+                      authToken: res.authorization,
+                      refreshToken: res['x-refresh-token'],
+                    },
+                  },
+                ],
+              }),
+            700,
+          );
+        }
       } else {
         setOtpStatus('error');
       }
@@ -88,9 +121,27 @@ const VerifyOTP = ({route, navigation}) => {
   const handleResendOtp = async () => {
     if (timer === 0 && !resending) {
       setResending(true);
-      // TODO: Call your resend OTP API here if needed
-      setTimer(RESEND_OTP_TIME);
-      setResending(false);
+      try {
+        // Call the resend OTP API (loginWithOrgAndStudentId)
+        const resendRes = await resendOTP({
+          orgCode,
+          studentId,
+        });
+
+        console.log(resendRes, 'Resend OTP Response');
+        // Read the new otpId and generatedOtp from the response and update state
+        if (resendRes?.data?.otpId) {
+          setOtpId(resendRes.data.otpId);
+        }
+        if (resendRes?.data?.generatedOtp) {
+          loginData.data.generatedOtp = resendRes.data.generatedOtp; // Update the loginData directly
+        }
+      } catch (err) {
+        console.log('Resend OTP Error:', err);
+      } finally {
+        setTimer(RESEND_OTP_TIME);
+        setResending(false);
+      }
     }
   };
 
@@ -107,7 +158,7 @@ const VerifyOTP = ({route, navigation}) => {
         }}>
         <Text style={[styles.shared, {color: isDark ? '#EEE7F9' : '#3C0E90'}]}>
           We've just shared a high security 4 digit code with you on +91
-          xxxxxxxx99
+          {loginData?.data?.maskedPhone}
         </Text>
       </View>
 
@@ -171,7 +222,6 @@ const VerifyOTP = ({route, navigation}) => {
         name="Submit"
         onPress={handleOtpSubmit}
         disabled={isLoading}
-        loading={isLoading}
         style={{
           width: normalizeWidth(308),
           marginTop: normalizeHeight(40),
