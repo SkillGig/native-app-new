@@ -29,7 +29,7 @@ const Login = ({navigation}) => {
   );
 
   const handleSubmit = async () => {
-    return navigation.navigate('RoadMap');
+    // return navigation.navigate('RoadMap');
 
     setOrgError('');
     setStudentIdError('');
