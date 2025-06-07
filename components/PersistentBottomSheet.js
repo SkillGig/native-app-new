@@ -9,13 +9,13 @@ import {
 const screenWidth = Dimensions.get('window').width;
 
 const PersistentBottomSheet = forwardRef((props, ref) => {
-  const {children, onChange, enableHeader, headerText,providedSnapPoints} = props;
+  const {children, onChange, enableHeader, headerText, providedSnapPoints} =
+    props;
 
   // const snapPoints = useMemo(() => ['15%'], []);
   const snapPoints = useMemo(() => {
     return providedSnapPoints?.length ? providedSnapPoints : ['15%'];
   }, [providedSnapPoints]);
-  
 
   const handleSheetChanges = useCallback(
     index => {

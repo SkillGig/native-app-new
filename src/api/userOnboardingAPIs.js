@@ -1,5 +1,5 @@
 import networkAPICall from '../utils/networkAPICall';
-import {authService} from '../config/apiEndPoints';
+import {authService, userService} from '../config/apiEndPoints';
 
 // 1. Find Org with Org Code (No Auth)
 export const findOrgWithOrgCode = async orgCode => {
@@ -90,5 +90,14 @@ export const resendOTP = async (payload, platform = 'ios') => {
     headers: {platform},
     service: 'authService',
     auth: false,
+  });
+};
+
+export const fetchUserRoadmaps = async () => {
+  return await networkAPICall({
+    url: userService.fetchUserRoadmaps,
+    method: 'GET',
+    service: 'userService',
+    auth: true,
   });
 };

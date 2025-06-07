@@ -28,13 +28,6 @@ import useUserStore from '../../src/store/useUserStore';
 import DropdownSelector from '../../components/DropDownSelector';
 import CalendarSelector from '../../components/CalendarSelector';
 
-const BRANCH_OPTIONS = [
-  {key: 1, value: 'Computer Science'},
-  {key: 2, value: 'Electronics And Communication Engineering'},
-  {key: 3, value: 'Electrical And Electronics Engineering'},
-  {key: 4, value: 'Information Technology'},
-];
-
 const InfoCheck = ({navigation, route}) => {
   // Read studentInfo from route.params
   const studentInfo = route?.params?.studentInfo || {};
@@ -81,6 +74,10 @@ const InfoCheck = ({navigation, route}) => {
 
   const setTokens = useUserStore(state => state.setTokens);
 
+  const setIsUserEnrolledToRoadmap = useUserStore(
+    state => state.setIsUserEnrolledToRoadmap,
+  );
+
   const {isDark} = useContext(ThemeContext);
 
   const BottomsheetRef = useRef(null);
@@ -89,20 +86,7 @@ const InfoCheck = ({navigation, route}) => {
   const orgCode = route?.params?.orgCode;
   const studentId = route?.params?.studentId;
   const ongoingRequestDetails = route?.params?.ongoingRequestDetails || [];
-
-  if (ongoingRequestDetails.length > 0) {
-    return navigation.reset({
-      index: 0,
-      routes: [
-        {
-          name: 'RequestStatus',
-          params: {
-            ...route.params,
-          },
-        },
-      ],
-    });
-  }
+  const branchDetailsOptions = route?.params?.branchDetailsOptions;
 
   const handleSubmit = async () => {
     if (!field?.checkBox) {
@@ -111,15 +95,43 @@ const InfoCheck = ({navigation, route}) => {
     setLoading(true);
     try {
       const res = await registerNewStudent({orgCode, studentId});
-      console.log('Register New Student Response:', res);
+      console.log('Register New Student Response:', res?.data);
       if (res && !res.error && res.authorization && res['x-refresh-token']) {
-        setTokens({
-          authToken: res.authorization,
-          refreshToken: res['x-refresh-token'],
-        });
+        const isUserEnrolledToRoadmap =
+          res?.data?.data?.isUserEnrolledToRoadmap;
+        setIsUserEnrolledToRoadmap(isUserEnrolledToRoadmap);
+        if (!isUserEnrolledToRoadmap) {
+          navigation.reset({
+            index: 0,
+            routes: [
+              {
+                name: 'CareerGoal',
+                params: {
+                  authToken: res.authorization,
+                  refreshToken: res['x-refresh-token'],
+                  availableRoadmaps: res?.data?.data?.availableRoadmaps.map(
+                    roadmap => ({
+                      key: roadmap.roadmapId,
+                      value: roadmap.roadmapName,
+                    }),
+                  ),
+                },
+              },
+            ],
+          });
+          return;
+        }
         navigation.reset({
           index: 0,
-          routes: [{name: 'UnlockedExp'}],
+          routes: [
+            {
+              name: 'UnlockedExp',
+              params: {
+                authToken: res.authorization,
+                refreshToken: res['x-refresh-token'],
+              },
+            },
+          ],
         });
       } else if (res && res.error?.action === 'Login') {
         navigation.reset({
@@ -174,6 +186,20 @@ const InfoCheck = ({navigation, route}) => {
     );
     return () => subscription.remove();
   }, [isBottomSheetOpen]);
+
+  if (ongoingRequestDetails.length > 0) {
+    return navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: 'RequestStatus',
+          params: {
+            ...route.params,
+          },
+        },
+      ],
+    });
+  }
 
   return (
     <PageLayout
@@ -302,8 +328,12 @@ const InfoCheck = ({navigation, route}) => {
             if (bottomSheetField.branch !== field.branch.value) {
               dataToUpdate.push({
                 fieldName: 'branch',
-                oldValue: field.branch.value,
-                newValue: bottomSheetField.branch,
+                oldValue: branchDetailsOptions.find(
+                  option => option.value === field.branch.value,
+                )?.key,
+                newValue: branchDetailsOptions.find(
+                  option => option.value === bottomSheetField.branch,
+                )?.key,
               });
             }
             if (bottomSheetField.startDate !== field.startDate.value) {
@@ -329,7 +359,11 @@ const InfoCheck = ({navigation, route}) => {
                 routes: [
                   {
                     name: 'RequestStatus',
-                    params: {status: 'submitted', dataToUpdate},
+                    params: {
+                      status: 'submitted',
+                      dataToUpdate,
+                      branchDetailsOptions,
+                    },
                   },
                 ],
               });
@@ -382,11 +416,11 @@ const InfoCheck = ({navigation, route}) => {
           />
           <DropdownSelector
             label="Branch"
-            options={BRANCH_OPTIONS}
+            options={branchDetailsOptions}
             onSelectOption={d => {
               setBottomSheetField(prev => ({...prev, branch: d.value}));
             }}
-            selectedOption={BRANCH_OPTIONS.find(
+            selectedOption={branchDetailsOptions.find(
               option => option.value === bottomSheetField.branch,
             )}
           />

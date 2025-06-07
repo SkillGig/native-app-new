@@ -16,7 +16,7 @@ import {
   normalizeWidth,
 } from '../../components/Responsivescreen';
 import useUserStore from '../../src/store/useUserStore';
-import {useNavigation} from '@react-navigation/native';
+// import {useNavigation} from '@react-navigation/native';
 
 const PageLayout = ({
   heading,
@@ -28,9 +28,9 @@ const PageLayout = ({
   delayRedirectToHome = false, // new prop
 }) => {
   const {isDark} = useContext(ThemeContext);
-  const navigation = useNavigation();
-  const authToken = useUserStore(state => state.user.authToken);
-  const refreshToken = useUserStore(state => state.user.refreshToken);
+  // const navigation = useNavigation();
+  // const authToken = useUserStore(state => state.user.authToken);
+  // const refreshToken = useUserStore(state => state.user.refreshToken);
 
   // useEffect(() => {
   //   console.log(authToken, refreshToken, 'PageLayout Tokens');

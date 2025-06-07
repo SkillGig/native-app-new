@@ -12,6 +12,8 @@ const useUserStore = create(
         refreshToken: '',
         userInfo: null,
         orgInfo: null,
+        isUserEnrolledToRoadmap: false,
+        availableRoadmaps: [],
       },
       setTokens: ({authToken, refreshToken}) =>
         set(state => ({
@@ -54,6 +56,20 @@ const useUserStore = create(
           user: {
             ...state.user,
             ...newUser,
+          },
+        })),
+      setIsUserEnrolledToRoadmap: isUserEnrolledToRoadmap =>
+        set(state => ({
+          user: {
+            ...state.user,
+            isUserEnrolledToRoadmap,
+          },
+        })),
+      setAvailableRoadmaps: roadmaps =>
+        set(state => ({
+          user: {
+            ...state.user,
+            availableRoadmaps: roadmaps,
           },
         })),
       logout: () =>

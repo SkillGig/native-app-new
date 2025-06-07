@@ -14,14 +14,13 @@ import {
 
 import {ThemeContext} from '../../src/context/ThemeContext';
 import LinearGradient from 'react-native-linear-gradient';
-import {fstyles} from '../../styles/FontStyles';
-import {
-  normalizeHeight,
-  normalizeWidth,
-} from '../../components/Responsivescreen';
+import {getFontStyles} from '../../styles/FontStyles';
+import { normalizeHeight,normalizeWidth } from '../../components/Responsivescreen';
 import images from '../../assets/images';
 const RoadMap = () => {
-  const {isDark} = useContext(ThemeContext);
+  const {isDark, colors} = useContext(ThemeContext);
+  const fstyles = getFontStyles(isDark, colors);
+
   const gradientColors = useMemo(
     () => (isDark ? ['#300B73', '#090215'] : ['#381874', '#150534']),
     [isDark],

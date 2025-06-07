@@ -1,4 +1,11 @@
-import React, {useState, useContext, useRef, useEffect, useMemo} from 'react';
+import React, {
+  useState,
+  useContext,
+  useRef,
+  useEffect,
+  useMemo,
+  use,
+} from 'react';
 import {View, Text, Image, StyleSheet} from 'react-native';
 import {FooterBtn} from '../../components';
 import {
@@ -15,12 +22,18 @@ const RequestStatus = ({navigation, route}) => {
   const {isDark} = useContext(ThemeContext);
   const sheetRef = useRef(null);
 
+  useEffect(() => {
+    if (sheetRef.current) {
+      sheetRef.current?.present();
+    }
+  }, [sheetRef]);
+
   // Read from route params
-  const {ongoingRequestDetails = [], dataToUpdate = null} = route.params || {};
-  const requestDetail = useMemo(
-    () => ongoingRequestDetails[0] || {},
-    [ongoingRequestDetails],
-  );
+  const {
+    ongoingRequestDetails = [],
+    dataToUpdate = null,
+    branchDetailsOptions,
+  } = route.params || {};
 
   const initialFields = {
     name: {value: '', status: 'pending'},
@@ -30,28 +43,67 @@ const RequestStatus = ({navigation, route}) => {
     startDate: {value: '', status: 'pending'},
   };
 
-  console.log(dataToUpdate, 'Data to Update');
+  console.log(
+    dataToUpdate,
+    branchDetailsOptions,
+    ongoingRequestDetails[0],
+    'Data to Update',
+  );
 
   // Use dataToUpdate if available
   if (dataToUpdate?.length) {
     dataToUpdate.forEach(({fieldName, newValue}) => {
-      if (initialFields[fieldName]) {
+      console.log(fieldName, 'Initial Field Value');
+      if (fieldName === 'branch') {
+        console.log(
+          branchDetailsOptions.find(option => option.key === newValue).value,
+          'Branch Details',
+        );
+        initialFields[fieldName] = {
+          value: branchDetailsOptions.find(option => option.key === newValue)
+            .value,
+          status: 'pending',
+        };
+        console.log(initialFields, 'Initial Fields after Branch Update');
+      } else if (initialFields[fieldName]) {
         initialFields[fieldName] = {
           value: newValue,
           status: 'pending',
         };
       }
     });
-  } else if (requestDetail.diffDetails) {
+  } else if (ongoingRequestDetails[0].diffDetails) {
     try {
-      const entries = requestDetail.diffDetails
+      const entries = ongoingRequestDetails[0].diffDetails
         .split('},')
         .map((entry, idx, arr) =>
           JSON.parse(idx < arr.length - 1 ? `${entry}}` : entry),
         );
 
+      console.log(entries, branchDetailsOptions, 'Parsed Diff Details');
+
       entries.forEach(({fieldName, newValue, fieldStatus}) => {
-        if (initialFields[fieldName]) {
+        console.log(fieldName === 'branch', 'Initial Field Value');
+        if (fieldName === 'branch') {
+          console.log(
+            branchDetailsOptions.find(
+              option => option.key === parseInt(newValue, 10),
+            ),
+            'Branch Details',
+          );
+          initialFields[fieldName] = {
+            value: branchDetailsOptions.find(
+              option => option.key === parseInt(newValue, 10),
+            )?.value,
+            status:
+              fieldStatus === -1
+                ? 'rejected'
+                : fieldStatus === 1
+                ? 'approved'
+                : fieldStatus || 'pending',
+          };
+          console.log(initialFields, 'Initial Fields after Branch Update');
+        } else if (initialFields[fieldName]) {
           initialFields[fieldName] = {
             value: newValue,
             status:
@@ -73,18 +125,14 @@ const RequestStatus = ({navigation, route}) => {
   const statusFromParams = route?.params?.status;
 
   useEffect(() => {
-    if (requestDetail.status && !statusFromParams) {
-      setStatus(requestDetail.status);
+    if (ongoingRequestDetails[0]?.status && !statusFromParams) {
+      setStatus(ongoingRequestDetails[0].status);
     } else if (statusFromParams) {
       setStatus(statusFromParams);
     } else {
       setStatus('in-progress'); // Default status if not provided
     }
-  }, [requestDetail, statusFromParams]);
-
-  useEffect(() => {
-    sheetRef.current?.present();
-  }, []);
+  }, [ongoingRequestDetails, statusFromParams]);
 
   // Back button handler for PageLayout
   const handleBackButton = () => {
