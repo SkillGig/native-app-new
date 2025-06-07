@@ -19,6 +19,7 @@ import NotificationsPanel from '../../components/MainDash/NotificationsPanel';
 import HomeHero from '../../components/MainDash/HomeHero';
 import {ThemeContext} from '../../src/context/ThemeContext';
 import ProfileComponent from '../../components/MainDash/Profile';
+import useUserStore from '../../src/store/useUserStore';
 
 const MainDash = ({navigation}) => {
   const [activeCurrentView, setActiveCurrentView] = useState(null);
@@ -51,6 +52,8 @@ const MainDash = ({navigation}) => {
   const today = new Date();
   const dayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const currentDay = dayMap[today.getDay()];
+
+  const logout = useUserStore(state => state.logout);
 
   const notificationData = [
     {
@@ -94,6 +97,13 @@ const MainDash = ({navigation}) => {
       id: '23',
       option: 'Log out',
       leftIcon: images.LOGOUT,
+      onPress: () => {
+        logout();
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'OnBoarding'}],
+        });
+      },
     },
   ];
 

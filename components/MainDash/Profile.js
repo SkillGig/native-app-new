@@ -51,7 +51,8 @@ const ProfileComponent = ({profileData, setActiveCurrentView}) => {
                 justifyContent: 'space-between',
                 marginTop: normalizeHeight(24),
                 paddingHorizontal: normalizeWidth(8),
-              }}>
+              }}
+              onPress={() => (each.onPress ? each.onPress() : null)}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Image
                   source={each.leftIcon}

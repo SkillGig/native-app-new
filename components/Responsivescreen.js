@@ -1,4 +1,4 @@
-import { Dimensions, PixelRatio } from 'react-native';
+import {Dimensions, PixelRatio} from 'react-native';
 const baseWidth = 375;
 const baseHeight = 812;
 
@@ -101,7 +101,9 @@ const normalizeWidth = width => {
  */
 const heightFromScreenPercent = percent => {
   const value = typeof percent === 'string' ? parseFloat(percent) : percent;
-  return Math.round(PixelRatio.roundToNearestPixel((screenHeight * value) / 100));
+  return Math.round(
+    PixelRatio.roundToNearestPixel((screenHeight * value) / 100),
+  );
 };
 
 export {

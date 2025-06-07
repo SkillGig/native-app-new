@@ -1,4 +1,11 @@
-import React, {useState, useContext, useRef, useEffect, useMemo} from 'react';
+import React, {
+  useState,
+  useContext,
+  useRef,
+  useEffect,
+  useMemo,
+  use,
+} from 'react';
 import {View, Text, Image, StyleSheet} from 'react-native';
 import {FooterBtn} from '../../components';
 import {
@@ -14,6 +21,12 @@ import PageLayout from './PageLayout';
 const RequestStatus = ({navigation, route}) => {
   const {isDark} = useContext(ThemeContext);
   const sheetRef = useRef(null);
+
+  useEffect(() => {
+    if (sheetRef.current) {
+      sheetRef.current?.present();
+    }
+  }, [sheetRef]);
 
   // Read from route params
   const {
@@ -112,7 +125,7 @@ const RequestStatus = ({navigation, route}) => {
   const statusFromParams = route?.params?.status;
 
   useEffect(() => {
-    if (ongoingRequestDetails[0].status && !statusFromParams) {
+    if (ongoingRequestDetails[0]?.status && !statusFromParams) {
       setStatus(ongoingRequestDetails[0].status);
     } else if (statusFromParams) {
       setStatus(statusFromParams);

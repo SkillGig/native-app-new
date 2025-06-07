@@ -14,7 +14,7 @@ import {normalizeHeight, normalizeWidth} from '../Responsivescreen';
 import {getFontStyles} from '../../styles/FontStyles';
 import images from '../../assets/images';
 import {ThemeContext} from '../../src/context/ThemeContext';
-import {PanResponder, Animated} from 'react-native';
+import {Animated} from 'react-native';
 
 const {height: screenHeight} = Dimensions.get('window'); // Get screen height
 
@@ -95,86 +95,91 @@ const HomeHero = ({
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.scrollViewContentContainer}>
+        {/* Streak Section */}
+
         <LinearGradient
-          colors={['#1C0743', '#090215']}
-          locations={[0, 1]}
-          style={styles.gradient}>
-          {/* Streak Section */}
-          <LinearGradient
-            colors={['rgba(48, 11, 115, 0)', '#300B73']}
-            style={styles.gradientContainer}>
-            <View style={styles.streakRow}>
-              <View style={styles.streakLeft}>
-                <TouchableOpacity style={styles.streakButton}>
-                  <Image source={images.STREAKICON} style={styles.streakIcon} />
-                  <Text style={styles.streakText}>2 Days</Text>
-                </TouchableOpacity>
-                <View style={styles.streakDivider} />
-              </View>
-              <View style={styles.streakRight}>
-                <View style={styles.row}>
-                  {weekStatus.map((item, index) => {
-                    const isToday = item.day === currentDay;
-                    return (
-                      <View key={`day-${index}`} style={styles.cell}>
-                        <Text
-                          style={[
-                            fstyles.mediumTen,
-                            {
-                              color: isToday
-                                ? 'white'
-                                : 'rgba(229, 220, 246, 0.40)',
-                              marginBottom: normalizeHeight(8),
-                            },
-                          ]}>
-                          {item.day}
-                        </Text>
-                      </View>
-                    );
-                  })}
-                </View>
-                <View style={styles.row}>
-                  {weekStatus.map((item, index) => {
-                    const isToday = item.day === currentDay;
-                    const {icon} = statusMap[item.status] || {};
-                    return (
-                      <View
-                        key={`icon-${index}`}
+          colors={['rgba(48, 11, 115, 0)', '#300B73']}
+          style={styles.streakContainer}>
+          <View style={styles.streakRow}>
+            <View style={styles.streakLeft}>
+              <TouchableOpacity style={styles.streakButton}>
+                <Image source={images.STREAKICON} style={styles.streakIcon} />
+                <Text style={styles.streakText}>2 Days</Text>
+              </TouchableOpacity>
+              <View style={styles.streakDivider} />
+            </View>
+            <View style={styles.streakRight}>
+              <View style={styles.row}>
+                {weekStatus.map((item, index) => {
+                  const isToday = item.day === currentDay;
+                  const {icon} = statusMap[item.status] || {};
+                  return (
+                    <View key={`day-${index}`} style={styles.streakDatesColumn}>
+                      <Text
                         style={[
-                          styles.cell,
-                          isToday && {
-                            borderWidth: 1,
-                            borderColor: 'white',
-                            borderRadius: 15,
+                          fstyles.mediumTen,
+                          {
+                            color: isToday
+                              ? 'white'
+                              : 'rgba(229, 220, 246, 0.40)',
                           },
                         ]}>
+                        {item.day}
+                      </Text>
+                      {item.status === 'completed' ? (
+                        <LinearGradient
+                          colors={['#FFEDC3', '#FFC29C']}
+                          start={{x: 0, y: 0}}
+                          end={{x: 0, y: 1}}
+                          style={styles.streakImageGradientContainer}>
+                          <Image source={icon} style={styles.streakIconSmall} />
+                        </LinearGradient>
+                      ) : (
                         <Image source={icon} style={styles.streakIconSmall} />
-                      </View>
-                    );
-                  })}
-                </View>
+                      )}
+                    </View>
+                  );
+                })}
+                {/* <View style={styles.row}>
+                {weekStatus.map((item, index) => {
+                  const isToday = item.day === currentDay;
+                  const {icon} = statusMap[item.status] || {};
+                  return (
+                    <View
+                      key={`icon-${index}`}
+                      style={[
+                        styles.cell,
+                        isToday && {
+                          borderWidth: 1,
+                          borderColor: 'white',
+                          borderRadius: 15,
+                        },
+                      ]}>
+                      <Image source={icon} style={styles.streakIconSmall} />
+                    </View>
+                  );
+                })}
+              </View> */}
               </View>
             </View>
-          </LinearGradient>
+          </View>
+        </LinearGradient>
 
-          {/* Ongoing Courses */}
-          <LinearGradient
-            colors={['rgba(48, 11, 115, 0)', 'rgba(48, 11, 115, 0.5)']}
-            style={styles.ongoingCoursesContainer}>
-            <View style={styles.sectionTitleContainer}>
-              <Text style={styles.sectionTitle}>Ongoing Courses</Text>
-            </View>
-            <FlatList
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              data={courseFilter}
-              keyExtractor={(item, index) => `ongoing_${index}`}
-              renderItem={({item, index}) => renderCourseCard(item, index)}
-              contentContainerStyle={styles.horizontalList}
-            />
-          </LinearGradient>
+        <View style={styles.ongoingCoursesContainer}>
+          <Text style={styles.sectionTitle}>Ongoing Courses</Text>
 
-          {/* Explore Courses */}
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={courseFilter}
+            keyExtractor={(item, index) => `ongoing_${index}`}
+            renderItem={({item, index}) => renderCourseCard(item, index)}
+            contentContainerStyle={styles.horizontalList}
+          />
+        </View>
+
+        {/* Explore Courses */}
+        <View style={{backgroundColor: '#090215'}}>
           <View style={styles.sectionTitleContainer}>
             <Text style={fstyles.heavyTwenty}>Explore Courses</Text>
           </View>
@@ -193,30 +198,30 @@ const HomeHero = ({
           </View>
 
           {/* Recommended Courses */}
-          <View style={styles.sectionTitleContainer}>
+          <View style={styles.otherRoadmapCoursesContainer}>
             <Text style={fstyles.boldSixteen}>Recommended Courses for you</Text>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={courseFilter}
+              keyExtractor={(item, index) => `recommended_${index}`}
+              renderItem={({item, index}) => renderCourseCard(item, index)}
+              contentContainerStyle={styles.horizontalList}
+            />
           </View>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={courseFilter}
-            keyExtractor={(item, index) => `recommended_${index}`}
-            renderItem={({item, index}) => renderCourseCard(item, index)}
-            contentContainerStyle={styles.horizontalList}
-          />
 
           {/* All Courses */}
-          <View style={styles.sectionTitleContainer}>
+          <View style={styles.otherRoadmapCoursesContainer}>
             <Text style={fstyles.boldSixteen}>All Courses</Text>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={courseFilter}
+              keyExtractor={(item, index) => `all_${index}`}
+              renderItem={({item, index}) => renderCourseCard(item, index)}
+              contentContainerStyle={styles.horizontalList}
+            />
           </View>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={courseFilter}
-            keyExtractor={(item, index) => `all_${index}`}
-            renderItem={({item, index}) => renderCourseCard(item, index)}
-            contentContainerStyle={styles.horizontalList}
-          />
 
           {/* Footer */}
           <View style={styles.footer}>
@@ -225,7 +230,7 @@ const HomeHero = ({
               Made with Passion in Tirupati, India 🇮🇳
             </Text>
           </View>
-        </LinearGradient>
+        </View>
       </ScrollView>
     </View>
   );
@@ -234,33 +239,31 @@ const HomeHero = ({
 const styles = StyleSheet.create({
   scrollViewContentContainer: {
     flexGrow: 1,
+    marginVertical: normalizeHeight(24),
   },
-  gradient: {
-    flexGrow: 1,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    overflow: 'hidden',
-    minHeight: screenHeight * 0.85,
-    paddingTop: normalizeHeight(24),
-    paddingBottom: normalizeHeight(24),
-  },
-  gradientContainer: {
+  streakContainer: {
     padding: normalizeWidth(16),
-    borderBottomWidth: 1,
-    borderBottomColor: '#372258',
-    paddingBottom: normalizeHeight(20),
+    borderWidth: 1,
+    borderColor: '#372258',
+    borderRadius: 20,
+    marginHorizontal: normalizeWidth(20),
   },
   streakRow: {
+    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   streakLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  streakImageGradientContainer: {
+    borderRadius: 20,
+    padding: normalizeWidth(0),
+  },
   streakButton: {
     alignItems: 'center',
-    backgroundColor: 'red',
   },
   streakIcon: {
     height: normalizeHeight(40),
@@ -289,6 +292,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 8,
   },
+  streakDatesColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: normalizeHeight(8),
+  },
   cell: {
     alignItems: 'center',
   },
@@ -301,10 +311,22 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#372258',
     paddingBottom: normalizeHeight(20),
+    marginTop: normalizeHeight(48),
+    display: 'flex',
+    flexDirection: 'column',
+    gap: normalizeHeight(16),
+    paddingLeft: normalizeWidth(20),
   },
   sectionTitleContainer: {
     marginHorizontal: normalizeWidth(20),
     marginTop: normalizeHeight(20),
+  },
+  otherRoadmapCoursesContainer: {
+    paddingBottom: normalizeHeight(20),
+    display: 'flex',
+    flexDirection: 'column',
+    gap: normalizeHeight(16),
+    paddingLeft: normalizeWidth(20),
   },
   sectionTitle: {
     fontSize: 16,
@@ -326,10 +348,7 @@ const styles = StyleSheet.create({
     height: normalizeHeight(33),
     marginRight: normalizeWidth(5),
   },
-  horizontalList: {
-    marginBottom: normalizeHeight(24),
-    marginLeft: normalizeWidth(20),
-  },
+  horizontalList: {},
   courseCard: {
     width: normalizeWidth(208),
     borderRadius: 12,
@@ -380,7 +399,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginLeft: normalizeWidth(20),
-    marginBottom: normalizeHeight(23),
+    marginBottom: normalizeHeight(120),
     marginTop: normalizeHeight(24),
   },
   footerTitle: {
@@ -404,7 +423,7 @@ const styles = StyleSheet.create({
   dragHandleContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: normalizeHeight(50),
+    height: normalizeHeight(25),
     width: '100%',
   },
   dragHandle: {
