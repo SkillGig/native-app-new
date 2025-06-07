@@ -76,6 +76,9 @@ heavyTwentyFour: {
 
  flexAlign:{
   flexDirection: 'row', alignItems: 'center'
+ },
+ flexAlignJustify:{
+  flexDirection: 'row', alignItems: 'center',justifyContent:"space-between"
  }
 });
 
