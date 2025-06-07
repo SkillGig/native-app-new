@@ -11,10 +11,13 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import images from '../../assets/images';
 import useUserStore from '../../src/store/useUserStore';
+import Loader from '../../components/Loader';
+import {fetchUserRoadmaps} from '../../src/api/userOnboardingAPIs';
 
 const CareerGoalScreen = ({navigation, route}) => {
   const [selected, setSelected] = useState(null);
   const [showSplash, setShowSplash] = useState(true);
+  const [apiResult, setApiResult] = useState(null); // Store API result
 
   const setTokens = useUserStore(state => state.setTokens);
   const setAvailableRoadmaps = useUserStore(
@@ -69,8 +72,28 @@ const CareerGoalScreen = ({navigation, route}) => {
   const textOpacity = useRef(new Animated.Value(1)).current;
   const floatAnim = useRef();
 
+  // Start API fetch as soon as splash starts
   useEffect(() => {
-    // Floating animation for first 3 seconds
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetchUserRoadmaps();
+        if (!cancelled) {
+          setApiResult(res);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setApiResult(null);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Splash and animation logic
+  useEffect(() => {
     floatAnim.current = Animated.loop(
       Animated.sequence([
         Animated.timing(rocketAnim, {
@@ -88,9 +111,7 @@ const CareerGoalScreen = ({navigation, route}) => {
     );
     floatAnim.current.start();
 
-    // Start splash timer
-    const splashTimer = setTimeout(() => setShowSplash(false), 5000);
-    // Start takeoff animation at 3 seconds
+    // After 3s, stop float and play move-up
     const animTimer = setTimeout(() => {
       floatAnim.current && floatAnim.current.stop();
       Animated.parallel([
@@ -109,14 +130,23 @@ const CareerGoalScreen = ({navigation, route}) => {
           duration: 1200,
           useNativeDriver: true,
         }),
-      ]).start();
+      ]).start(() => {
+        // After move-up animation, decide what to do
+        console.log(apiResult, 'API Result in CareerGoalScreen');
+        const selectedRoadmaps = apiResult?.data?.selectedRoadmaps;
+        if (selectedRoadmaps && selectedRoadmaps.length > 0) {
+          setIsUserEnrolledToRoadmap(true);
+          navigation.replace('MainDash');
+        } else {
+          setShowSplash(false); // Show options
+        }
+      });
     }, 3000);
     return () => {
-      clearTimeout(splashTimer);
       clearTimeout(animTimer);
       floatAnim.current && floatAnim.current.stop();
     };
-  }, [rocketAnim, textAnim, textOpacity]);
+  }, [rocketAnim, textAnim, textOpacity, apiResult, navigation]);
 
   const handleSelectOption = item => {
     setSelected(item);
@@ -139,6 +169,25 @@ const CareerGoalScreen = ({navigation, route}) => {
 
   // Determine if the submit button should be disabled
   const isSubmitButtonDisabled = selected === null;
+
+  useEffect(() => {
+    // If availableRoadmaps is empty, fetch user roadmaps
+    if (!isUserEnrolledToRoadmap) {
+      (async () => {
+        try {
+          const res = await fetchUserRoadmaps();
+          const selectedRoadmaps = res?.data?.data?.selectedRoadmaps;
+          if (selectedRoadmaps && selectedRoadmaps.length > 0) {
+            navigation.replace('MainDash');
+            return;
+          }
+          // Optionally set availableRoadmaps here if needed
+        } catch (e) {
+          // Optionally handle error
+        }
+      })();
+    }
+  }, [isUserEnrolledToRoadmap, navigation]);
 
   if (showSplash) {
     return (
