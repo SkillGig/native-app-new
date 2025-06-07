@@ -68,21 +68,29 @@ const OnboardingScreen = ({navigation}) => {
   const translateYAnim = useRef(new Animated.Value(0)).current;
   const authToken = useUserStore(state => state.user.authToken);
   const refreshToken = useUserStore(state => state.user.refreshToken);
+  const isUserEnrolledToRoadmap = useUserStore(
+    state => state.user.isUserEnrolledToRoadmap,
+  );
 
   useEffect(() => {
     // If tokens exist, show Lottie and redirect to Home after 3s
-    // if (authToken && refreshToken) {
-    //   setShowLottie(true);
-    //   setRedirecting(true);
-    //   const timeout = setTimeout(() => {
-    //     navigation.reset({index: 0, routes: [{name: 'MainDash'}]});
-    //   }, 2000);
-    //   return () => clearTimeout(timeout);
-    // } else {
-    const lottieTimeout = setTimeout(() => setShowLottie(false), 3000);
-    return () => clearTimeout(lottieTimeout);
-    // }
-  }, [authToken, refreshToken, navigation]);
+    if (authToken && refreshToken) {
+      setShowLottie(true);
+      setRedirecting(true);
+      const timeout = setTimeout(() => {
+        navigation.reset({
+          index: 0,
+          routes: [
+            {name: !isUserEnrolledToRoadmap ? 'CareerGoal' : 'MainDash'},
+          ],
+        });
+      }, 2000);
+      return () => clearTimeout(timeout);
+    } else {
+      const lottieTimeout = setTimeout(() => setShowLottie(false), 3000);
+      return () => clearTimeout(lottieTimeout);
+    }
+  }, [authToken, refreshToken, navigation, isUserEnrolledToRoadmap]);
 
   useEffect(() => {
     const interval = setInterval(() => {

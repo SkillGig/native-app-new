@@ -1,16 +1,22 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {authService} from '../config/apiEndPoints';
 import backendKeys from '../config/backendKeys';
+import useUserStore from '../store/useUserStore';
 
 const getTokens = async () => {
-  const accessToken = await AsyncStorage.getItem('accessToken');
-  const refreshToken = await AsyncStorage.getItem('refreshToken');
+  // Fetch tokens from Zustand user store
+  const user = useUserStore.getState().user;
+  const accessToken = user.authToken;
+  const refreshToken = user.refreshToken;
   return {accessToken, refreshToken};
 };
 
 const setAccessToken = async token => {
-  await AsyncStorage.setItem('accessToken', token);
+  // Update token in Zustand user store
+  useUserStore.getState().setTokens({
+    authToken: token,
+    refreshToken: useUserStore.getState().user.refreshToken,
+  });
 };
 
 const networkAPICall = async ({
@@ -27,7 +33,7 @@ const networkAPICall = async ({
   const {accessToken, refreshToken} = await getTokens();
   let authHeaders = {...headers};
   if (auth && accessToken) {
-    authHeaders['Authorization'] = `Bearer ${accessToken}`;
+    authHeaders['Authorization'] = `${accessToken}`;
   }
 
   console.log(
@@ -48,15 +54,25 @@ const networkAPICall = async ({
       headers: authHeaders,
       timeout,
     });
+
+    console.log(response, authHeaders, 'Network API Call Response');
+    // If the response has an error with status 401 or 'Invalid token', throw to trigger refresh
+    if (
+      response.data?.error === 'Invalid token' ||
+      response.data?.status === 401 ||
+      response.status === 401
+    ) {
+      throw new Error('Invalid token');
+    }
     return {...response.data, ...response.headers};
   } catch (error) {
     // If unauthorized and retry is allowed, try to refresh token
     if (
-      error.response?.status === 401 &&
+      (error.response?.status === 401 || error.message === 'Invalid token') &&
       retry &&
       refreshToken &&
       url !== authService.generateNewAuthToken &&
-      auth // Only try refresh if auth was required
+      auth
     ) {
       try {
         // Attempt to get a new access token

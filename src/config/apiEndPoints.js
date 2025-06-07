@@ -8,8 +8,9 @@ export const authService = {
   raiseStudentInfoRequest: '/raise-student-info-request',
 };
 export const userService = {
-  getUserProfile: '/user/profile',
-  updateUserProfile: '/user/profile/update',
-  changePassword: '/user/change-password',
-  deleteAccount: '/user/delete-account',
+  fetchUserRoadmaps: '/roadmaps',
+  getUserProfile: '/profile',
+  updateUserProfile: '/profile/update',
+  changePassword: '/change-password',
+  deleteAccount: '/delete-account',
 };

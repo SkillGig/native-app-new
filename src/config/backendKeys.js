@@ -1,7 +1,7 @@
 const keys = {
   development: {
     authService: 'http://192.168.0.100:4001/auth',
-    userService: 'http://localhost:4002/user',
+    userService: 'http://192.168.0.100:4002/user',
   },
   production: {
     authService: 'https://api.skillgig.com/auth',

@@ -50,8 +50,6 @@ const VerifyOTP = ({route, navigation}) => {
   }, [timer]);
 
   const handleOtpSubmit = async () => {
-    navigation.navigate('InfoCheck');
-    return
     setIsLoading(true);
     setOtpStatus('normal');
     try {
@@ -87,6 +85,29 @@ const VerifyOTP = ({route, navigation}) => {
                         option => ({
                           key: option.branchId,
                           value: option.branchName,
+                        }),
+                      ),
+                    },
+                  },
+                ],
+              }),
+            700,
+          );
+        } else if (res?.data?.data?.isUserEnrolledToRoadmap === false) {
+          setTimeout(
+            () =>
+              navigation.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: 'CareerGoal',
+                    params: {
+                      authToken: res.authorization,
+                      refreshToken: res['x-refresh-token'],
+                      availableRoadmaps: res?.data?.data?.availableRoadmaps.map(
+                        roadmap => ({
+                          key: roadmap.roadmapId,
+                          value: roadmap.roadmapName,
                         }),
                       ),
                     },

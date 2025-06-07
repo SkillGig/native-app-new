@@ -13,14 +13,16 @@ import {
 
 import {ThemeContext} from '../../src/context/ThemeContext';
 import LinearGradient from 'react-native-linear-gradient';
-import {fstyles} from '../../styles/FontStyles';
+import {getFontStyles} from '../../styles/FontStyles';
 import {
   normalizeHeight,
   normalizeWidth,
 } from '../../components/Responsivescreen';
 import images from '../../assets/images';
 const RoadMap = () => {
-  const {isDark} = useContext(ThemeContext);
+  const {isDark, colors} = useContext(ThemeContext);
+  const fstyles = getFontStyles(isDark, colors);
+
   const gradientColors = useMemo(
     () => (isDark ? ['#300B73', '#090215'] : ['#381874', '#150534']),
     [isDark],
@@ -369,8 +371,8 @@ const RoadMap = () => {
             marginHorizontal: normalizeWidth(106),
             backgroundColor: '#815FC4',
             borderRadius: 12,
-            marginTop:normalizeHeight(26),
-            marginBottom:normalizeHeight(48)
+            marginTop: normalizeHeight(26),
+            marginBottom: normalizeHeight(48),
           }}>
           <Text
             style={{
@@ -394,43 +396,57 @@ const RoadMap = () => {
 
         <View>
           <Text>Analytics</Text>
-          </View>
-
-          <View style={styles.shadowWrapper}>
-      <View style={styles.baseBackground}>
-        <LinearGradient
-          colors={[
-            'rgba(48, 11, 115, 0.50)', // Background-Dark-Light
-            'rgba(9, 2, 21, 0.50)',    // Background-Dark-Active
-          ]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={styles.gradientLayer}
-        >
-          <Text style={[fstyles.heavyTwenty,{color:'#B095E3',textAlign:"center"}]}>Analytics</Text>
-          <View style={{backgroundColor:'rgba(129, 95, 196, 0.30)',height:normalizeHeight(1),width:"100%",marginVertical:normalizeHeight(12)}}/>
-
-           <LinearGradient
-        colors={[
-          'rgba(129, 95, 196, 0.26)',
-          'rgba(129, 95, 196, 0.26)',
-        ]}
-        start={{ x: 0.5, y: 1 }}
-        end={{ x: 0.5, y: 0 }}
-        style={styles.cardOne}
-      >
-        <View style={styles.innerOverlay}>
-          <Text style={{ color: '#E5DCF6' , fontSize: 20,
-  fontWeight: '900'}}>10</Text>
         </View>
-      </LinearGradient>
-          <View style={styles.overlay}>
-          <Text style={[fstyles.heavyTwenty,{color:'#B095E3',}]}>Analytics</Text>
-            
+
+        <View style={styles.shadowWrapper}>
+          <View style={styles.baseBackground}>
+            <LinearGradient
+              colors={[
+                'rgba(48, 11, 115, 0.50)', // Background-Dark-Light
+                'rgba(9, 2, 21, 0.50)', // Background-Dark-Active
+              ]}
+              start={{x: 0.5, y: 0}}
+              end={{x: 0.5, y: 1}}
+              style={styles.gradientLayer}>
+              <Text
+                style={[
+                  fstyles.heavyTwenty,
+                  {color: '#B095E3', textAlign: 'center'},
+                ]}>
+                Analytics
+              </Text>
+              <View
+                style={{
+                  backgroundColor: 'rgba(129, 95, 196, 0.30)',
+                  height: normalizeHeight(1),
+                  width: '100%',
+                  marginVertical: normalizeHeight(12),
+                }}
+              />
+
+              <LinearGradient
+                colors={[
+                  'rgba(129, 95, 196, 0.26)',
+                  'rgba(129, 95, 196, 0.26)',
+                ]}
+                start={{x: 0.5, y: 1}}
+                end={{x: 0.5, y: 0}}
+                style={styles.cardOne}>
+                <View style={styles.innerOverlay}>
+                  <Text
+                    style={{color: '#E5DCF6', fontSize: 20, fontWeight: '900'}}>
+                    10
+                  </Text>
+                </View>
+              </LinearGradient>
+              <View style={styles.overlay}>
+                <Text style={[fstyles.heavyTwenty, {color: '#B095E3'}]}>
+                  Analytics
+                </Text>
+              </View>
+            </LinearGradient>
           </View>
-        </LinearGradient>
-      </View>
-    </View>
+        </View>
       </ScrollView>
     </LinearGradient>
   );
@@ -471,14 +487,14 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
+        shadowOffset: {width: 0, height: 4},
         shadowOpacity: 0.25,
         shadowRadius: 4,
-        marginHorizontal:normalizeWidth(18)
+        marginHorizontal: normalizeWidth(18),
       },
       android: {
         elevation: 6,
-        marginHorizontal:normalizeWidth(18)
+        marginHorizontal: normalizeWidth(18),
       },
     }),
     borderRadius: 12,
@@ -495,7 +511,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(129, 95, 196, 0.12)', // Second linear gradient simulation
     borderRadius: 12,
     padding: 10,
-    alignItems:"center"
+    alignItems: 'center',
   },
   cardOne: {
     borderRadius: 12,

@@ -21,10 +21,6 @@ const RequestStatus = ({navigation, route}) => {
     dataToUpdate = null,
     branchDetailsOptions,
   } = route.params || {};
-  const requestDetail = useMemo(
-    () => ongoingRequestDetails[0] || {},
-    [ongoingRequestDetails],
-  );
 
   const initialFields = {
     name: {value: '', status: 'pending'},
@@ -34,7 +30,12 @@ const RequestStatus = ({navigation, route}) => {
     startDate: {value: '', status: 'pending'},
   };
 
-  console.log(dataToUpdate, branchDetailsOptions, 'Data to Update');
+  console.log(
+    dataToUpdate,
+    branchDetailsOptions,
+    ongoingRequestDetails[0],
+    'Data to Update',
+  );
 
   // Use dataToUpdate if available
   if (dataToUpdate?.length) {
@@ -58,9 +59,9 @@ const RequestStatus = ({navigation, route}) => {
         };
       }
     });
-  } else if (requestDetail.diffDetails) {
+  } else if (ongoingRequestDetails[0].diffDetails) {
     try {
-      const entries = requestDetail.diffDetails
+      const entries = ongoingRequestDetails[0].diffDetails
         .split('},')
         .map((entry, idx, arr) =>
           JSON.parse(idx < arr.length - 1 ? `${entry}}` : entry),
@@ -111,18 +112,14 @@ const RequestStatus = ({navigation, route}) => {
   const statusFromParams = route?.params?.status;
 
   useEffect(() => {
-    if (requestDetail.status && !statusFromParams) {
-      setStatus(requestDetail.status);
+    if (ongoingRequestDetails[0].status && !statusFromParams) {
+      setStatus(ongoingRequestDetails[0].status);
     } else if (statusFromParams) {
       setStatus(statusFromParams);
     } else {
       setStatus('in-progress'); // Default status if not provided
     }
-  }, [requestDetail, statusFromParams]);
-
-  useEffect(() => {
-    sheetRef.current?.present();
-  }, []);
+  }, [ongoingRequestDetails, statusFromParams]);
 
   // Back button handler for PageLayout
   const handleBackButton = () => {

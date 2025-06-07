@@ -13,6 +13,8 @@ import {
 import {normalizeHeight, normalizeWidth} from './Responsivescreen';
 import {ThemeContext} from '../src/context/ThemeContext';
 import Icon from 'react-native-vector-icons/AntDesign';
+import images from '../assets/images';
+import { Image } from 'react-native-svg';
 
 const DropdownSelector = ({
   options = [],
@@ -88,7 +90,7 @@ const DropdownSelector = ({
             value={selectedOption ? selectedOption.value : ''}
           />
           <View style={{position: 'absolute', right: 0, paddingRight: 8}}>
-            <Text style={{color: '#fff'}}>D</Text>
+            <Image source={images.DROPDOWN}  />
           </View>
         </View>
       </TouchableOpacity>

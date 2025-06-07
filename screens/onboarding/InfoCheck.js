@@ -74,6 +74,10 @@ const InfoCheck = ({navigation, route}) => {
 
   const setTokens = useUserStore(state => state.setTokens);
 
+  const setIsUserEnrolledToRoadmap = useUserStore(
+    state => state.setIsUserEnrolledToRoadmap,
+  );
+
   const {isDark} = useContext(ThemeContext);
 
   const BottomsheetRef = useRef(null);
@@ -84,20 +88,6 @@ const InfoCheck = ({navigation, route}) => {
   const ongoingRequestDetails = route?.params?.ongoingRequestDetails || [];
   const branchDetailsOptions = route?.params?.branchDetailsOptions;
 
-  if (ongoingRequestDetails.length > 0) {
-    return navigation.reset({
-      index: 0,
-      routes: [
-        {
-          name: 'RequestStatus',
-          params: {
-            ...route.params,
-          },
-        },
-      ],
-    });
-  }
-
   const handleSubmit = async () => {
     if (!field?.checkBox) {
       return;
@@ -105,15 +95,43 @@ const InfoCheck = ({navigation, route}) => {
     setLoading(true);
     try {
       const res = await registerNewStudent({orgCode, studentId});
-      console.log('Register New Student Response:', res);
+      console.log('Register New Student Response:', res?.data);
       if (res && !res.error && res.authorization && res['x-refresh-token']) {
-        setTokens({
-          authToken: res.authorization,
-          refreshToken: res['x-refresh-token'],
-        });
+        const isUserEnrolledToRoadmap =
+          res?.data?.data?.isUserEnrolledToRoadmap;
+        setIsUserEnrolledToRoadmap(isUserEnrolledToRoadmap);
+        if (!isUserEnrolledToRoadmap) {
+          navigation.reset({
+            index: 0,
+            routes: [
+              {
+                name: 'CareerGoal',
+                params: {
+                  authToken: res.authorization,
+                  refreshToken: res['x-refresh-token'],
+                  availableRoadmaps: res?.data?.data?.availableRoadmaps.map(
+                    roadmap => ({
+                      key: roadmap.roadmapId,
+                      value: roadmap.roadmapName,
+                    }),
+                  ),
+                },
+              },
+            ],
+          });
+          return;
+        }
         navigation.reset({
           index: 0,
-          routes: [{name: 'UnlockedExp'}],
+          routes: [
+            {
+              name: 'UnlockedExp',
+              params: {
+                authToken: res.authorization,
+                refreshToken: res['x-refresh-token'],
+              },
+            },
+          ],
         });
       } else if (res && res.error?.action === 'Login') {
         navigation.reset({
@@ -168,6 +186,20 @@ const InfoCheck = ({navigation, route}) => {
     );
     return () => subscription.remove();
   }, [isBottomSheetOpen]);
+
+  if (ongoingRequestDetails.length > 0) {
+    return navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: 'RequestStatus',
+          params: {
+            ...route.params,
+          },
+        },
+      ],
+    });
+  }
 
   return (
     <PageLayout
