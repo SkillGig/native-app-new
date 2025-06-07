@@ -18,6 +18,8 @@ import MainDash from './screens/Global/MainDash';
 import StreakCalender from './screens/Global/StreakCalender';
 import RoadMap from './screens/Milestones/RoadMap';
 import AutoScrollCarousel from './screens/Milestones/AutoScrollCarousel';
+import CareerGoalScreen from './screens/onboarding/CareerGoalSelection';
+import RoadmapQuestionsFlow from './screens/onboarding/RoadmapQuestionsFlow';
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
@@ -61,6 +63,12 @@ const Navigation = () => {
         />
 
         <Stack.Screen
+          name="CareerGoal"
+          component={CareerGoalScreen}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
           name="MainDash"
           component={MainDash}
           options={{headerShown: false}}
@@ -71,21 +79,24 @@ const Navigation = () => {
           component={StreakCalender}
           options={{headerShown: false}}
         />
-
-
-
-<Stack.Screen
+        {/* 
+        <Stack.Screen
           name="RoadMap"
           component={RoadMap}
           options={{headerShown: false}}
-        />
+        /> */}
 
-<Stack.Screen
+        <Stack.Screen
           name="AutoScrollCarousel"
           component={AutoScrollCarousel}
           options={{headerShown: false}}
         />
 
+        <Stack.Screen
+          name="RoadmapQuestionsFlow"
+          component={RoadmapQuestionsFlow}
+          options={{headerShown: false}}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

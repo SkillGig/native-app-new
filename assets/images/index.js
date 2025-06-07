@@ -37,6 +37,8 @@ const images = {
   RIGHTCIRCLE: require('./RightCircle.png'),
   WRONGCIRCLE: require('./WrongCircle.png'),
   LEFTCALENDARARROW: require('./LeftCalendarArrow.png'),
+  ROCKET: require('./Rocket.png'),
+  ROADMAPLOADINGSTARS: require('./RoadmapStars.png'),
 };
 
 export default images;

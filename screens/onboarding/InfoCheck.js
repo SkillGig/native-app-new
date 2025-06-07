@@ -28,13 +28,6 @@ import useUserStore from '../../src/store/useUserStore';
 import DropdownSelector from '../../components/DropDownSelector';
 import CalendarSelector from '../../components/CalendarSelector';
 
-const BRANCH_OPTIONS = [
-  {key: 1, value: 'Computer Science'},
-  {key: 2, value: 'Electronics And Communication Engineering'},
-  {key: 3, value: 'Electrical And Electronics Engineering'},
-  {key: 4, value: 'Information Technology'},
-];
-
 const InfoCheck = ({navigation, route}) => {
   // Read studentInfo from route.params
   const studentInfo = route?.params?.studentInfo || {};
@@ -89,6 +82,7 @@ const InfoCheck = ({navigation, route}) => {
   const orgCode = route?.params?.orgCode;
   const studentId = route?.params?.studentId;
   const ongoingRequestDetails = route?.params?.ongoingRequestDetails || [];
+  const branchDetailsOptions = route?.params?.branchDetailsOptions;
 
   if (ongoingRequestDetails.length > 0) {
     return navigation.reset({
@@ -302,8 +296,12 @@ const InfoCheck = ({navigation, route}) => {
             if (bottomSheetField.branch !== field.branch.value) {
               dataToUpdate.push({
                 fieldName: 'branch',
-                oldValue: field.branch.value,
-                newValue: bottomSheetField.branch,
+                oldValue: branchDetailsOptions.find(
+                  option => option.value === field.branch.value,
+                )?.key,
+                newValue: branchDetailsOptions.find(
+                  option => option.value === bottomSheetField.branch,
+                )?.key,
               });
             }
             if (bottomSheetField.startDate !== field.startDate.value) {
@@ -329,7 +327,11 @@ const InfoCheck = ({navigation, route}) => {
                 routes: [
                   {
                     name: 'RequestStatus',
-                    params: {status: 'submitted', dataToUpdate},
+                    params: {
+                      status: 'submitted',
+                      dataToUpdate,
+                      branchDetailsOptions,
+                    },
                   },
                 ],
               });
@@ -382,11 +384,11 @@ const InfoCheck = ({navigation, route}) => {
           />
           <DropdownSelector
             label="Branch"
-            options={BRANCH_OPTIONS}
+            options={branchDetailsOptions}
             onSelectOption={d => {
               setBottomSheetField(prev => ({...prev, branch: d.value}));
             }}
-            selectedOption={BRANCH_OPTIONS.find(
+            selectedOption={branchDetailsOptions.find(
               option => option.value === bottomSheetField.branch,
             )}
           />

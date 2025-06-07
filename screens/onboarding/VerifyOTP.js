@@ -83,6 +83,12 @@ const VerifyOTP = ({route, navigation}) => {
                       studentId,
                       studentInfo: res?.data?.studentDetails,
                       ongoingRequestDetails: res?.data?.ongoingRequestDetails,
+                      branchDetailsOptions: res?.data?.orgBranchDetails.map(
+                        option => ({
+                          key: option.branchId,
+                          value: option.branchName,
+                        }),
+                      ),
                     },
                   },
                 ],

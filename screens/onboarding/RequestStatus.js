@@ -16,7 +16,11 @@ const RequestStatus = ({navigation, route}) => {
   const sheetRef = useRef(null);
 
   // Read from route params
-  const {ongoingRequestDetails = [], dataToUpdate = null} = route.params || {};
+  const {
+    ongoingRequestDetails = [],
+    dataToUpdate = null,
+    branchDetailsOptions,
+  } = route.params || {};
   const requestDetail = useMemo(
     () => ongoingRequestDetails[0] || {},
     [ongoingRequestDetails],
@@ -30,12 +34,24 @@ const RequestStatus = ({navigation, route}) => {
     startDate: {value: '', status: 'pending'},
   };
 
-  console.log(dataToUpdate, 'Data to Update');
+  console.log(dataToUpdate, branchDetailsOptions, 'Data to Update');
 
   // Use dataToUpdate if available
   if (dataToUpdate?.length) {
     dataToUpdate.forEach(({fieldName, newValue}) => {
-      if (initialFields[fieldName]) {
+      console.log(fieldName, 'Initial Field Value');
+      if (fieldName === 'branch') {
+        console.log(
+          branchDetailsOptions.find(option => option.key === newValue).value,
+          'Branch Details',
+        );
+        initialFields[fieldName] = {
+          value: branchDetailsOptions.find(option => option.key === newValue)
+            .value,
+          status: 'pending',
+        };
+        console.log(initialFields, 'Initial Fields after Branch Update');
+      } else if (initialFields[fieldName]) {
         initialFields[fieldName] = {
           value: newValue,
           status: 'pending',
@@ -50,8 +66,30 @@ const RequestStatus = ({navigation, route}) => {
           JSON.parse(idx < arr.length - 1 ? `${entry}}` : entry),
         );
 
+      console.log(entries, branchDetailsOptions, 'Parsed Diff Details');
+
       entries.forEach(({fieldName, newValue, fieldStatus}) => {
-        if (initialFields[fieldName]) {
+        console.log(fieldName === 'branch', 'Initial Field Value');
+        if (fieldName === 'branch') {
+          console.log(
+            branchDetailsOptions.find(
+              option => option.key === parseInt(newValue, 10),
+            ),
+            'Branch Details',
+          );
+          initialFields[fieldName] = {
+            value: branchDetailsOptions.find(
+              option => option.key === parseInt(newValue, 10),
+            )?.value,
+            status:
+              fieldStatus === -1
+                ? 'rejected'
+                : fieldStatus === 1
+                ? 'approved'
+                : fieldStatus || 'pending',
+          };
+          console.log(initialFields, 'Initial Fields after Branch Update');
+        } else if (initialFields[fieldName]) {
           initialFields[fieldName] = {
             value: newValue,
             status:
