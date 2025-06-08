@@ -41,6 +41,18 @@ const images = {
   ROADMAPLOADINGSTARS: require('./RoadmapStars.png'),
   DROPDOWN: require('./DropDown.png'),
   CLOSEICON: require('./Close.png'),
+  SNACKBARSUCCESS: require('./SnackBarSuccess.png'),
+  SNACKBARERROR: require('./SnackBarError.png'),
+  SNACKBARINFO: require('./SnackBarInfo.png'),
+  HOME: require('./Home.png'),
+  MILESTONE: require('./Milestone.png'),
+  CONNECT: require('./Connect.png'),
+  MOCKINTERVIEW: require('./MockInterview.png'),
+  NAVITEMGLOW: require('./NavItemGlow.png'),
+  HOMEACTIVE: require('./HomeActive.png'),
+  MILESTONEACTIVE: require('./MilestoneActive.png'),
+  CONNECTACTIVE: require('./ConnectActive.png'),
+  MOCKINTERVIEWACTIVE: require('./MockInterviewActive.png'),
 };
 
 export default images;

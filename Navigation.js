@@ -79,12 +79,12 @@ const Navigation = () => {
           component={StreakCalender}
           options={{headerShown: false}}
         />
- 
+
         <Stack.Screen
           name="RoadMap"
           component={RoadMap}
           options={{headerShown: false}}
-        /> 
+        />
 
         <Stack.Screen
           name="AutoScrollCarousel"

@@ -2,6 +2,7 @@ import axios from 'axios';
 import {authService} from '../config/apiEndPoints';
 import backendKeys from '../config/backendKeys';
 import useUserStore from '../store/useUserStore';
+import useSnackbarStore from '../store/useSnackbarStore';
 
 const getTokens = async () => {
   // Fetch tokens from Zustand user store
@@ -64,6 +65,15 @@ const networkAPICall = async ({
     ) {
       throw new Error('Invalid token');
     }
+
+    // <-- NEW: Trigger Snackbar notification if present in response
+    if (response.data.notifyUser) {
+      useSnackbarStore.getState().showSnackbar({
+        message: response.data.notifyUser,
+        type: 'info', // or 'success'/'error' based on your API or logic
+      });
+    }
+
     return {...response.data, ...response.headers};
   } catch (error) {
     // If unauthorized and retry is allowed, try to refresh token
@@ -113,3 +123,14 @@ const networkAPICall = async ({
 };
 
 export default networkAPICall;
+
+// Example usage in your API call handler or component:
+// import useSnackbarStore from '../src/store/useSnackbarStore';
+
+// const response = await networkAPICall({...});
+// if (response.notifyUser) {
+//   useSnackbarStore.getState().showSnackbar({
+//     message: response.notifyUser,
+//     type: 'info', // or 'success'/'error' based on your API or logic
+//   });
+// }

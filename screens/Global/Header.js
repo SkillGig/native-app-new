@@ -1,6 +1,9 @@
 import React, {useContext} from 'react';
 import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
-import {normalizeHeight, normalizeWidth} from '../Responsivescreen';
+import {
+  normalizeHeight,
+  normalizeWidth,
+} from '../../components/Responsivescreen';
 import {getFontStyles} from '../../styles/FontStyles';
 import images from '../../assets/images';
 import {ThemeContext} from '../../src/context/ThemeContext';
@@ -38,7 +41,7 @@ const Header = ({activeCurrentView, setActiveCurrentView, snapToCollapsed}) => {
         ]}>
         <TouchableOpacity
           onPress={() => {
-            snapToCollapsed();
+            // if (activeCurrentView === 'profile') snapToCollapsed();
             setActiveCurrentView('profile');
           }}>
           <Image source={images.FEMALEAVATAR} style={styles.avatar} />
@@ -57,7 +60,7 @@ const Header = ({activeCurrentView, setActiveCurrentView, snapToCollapsed}) => {
         <TouchableOpacity
           style={{marginLeft: normalizeWidth(12)}}
           onPress={() => {
-            snapToCollapsed();
+            // if (activeCurrentView === 'notifications') snapToCollapsed();
             setActiveCurrentView('notifications');
           }}>
           <Image source={images.NOTIFICATION} style={styles.icon} />

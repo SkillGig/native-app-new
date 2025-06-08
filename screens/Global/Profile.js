@@ -10,7 +10,7 @@ import images from '../../assets/images';
 import {useContext} from 'react';
 import {ThemeContext} from '../../src/context/ThemeContext';
 
-const ProfileComponent = ({profileData, setActiveCurrentView}) => {
+const ProfileComponent = ({profileData, handleHeaderItemsCollapse}) => {
   const {isDark, colors} = useContext(ThemeContext);
   const fstyles = getFontStyles(isDark, colors);
 
@@ -29,7 +29,7 @@ const ProfileComponent = ({profileData, setActiveCurrentView}) => {
         <Text style={[fstyles.heavyTwentyFour, {color: '#B095E3'}]}>
           My Profile
         </Text>
-        <TouchableOpacity onPress={() => setActiveCurrentView(null)}>
+        <TouchableOpacity onPress={() => handleHeaderItemsCollapse()}>
           <Image
             source={images.CLOSEICON}
             style={{
