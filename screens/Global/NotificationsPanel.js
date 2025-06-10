@@ -7,12 +7,18 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import {normalizeHeight, normalizeWidth} from '../Responsivescreen';
+import {
+  normalizeHeight,
+  normalizeWidth,
+} from '../../components/Responsivescreen';
 import {getFontStyles} from '../../styles/FontStyles';
 import images from '../../assets/images';
 import {ThemeContext} from '../../src/context/ThemeContext';
 
-const NotificationsPanel = ({notificationData, setActiveCurrentView}) => {
+const NotificationsPanel = ({
+  notificationData,
+  handleHeaderItemsCollapse,
+}) => {
   const {isDark, colors} = useContext(ThemeContext);
   const fstyles = getFontStyles(isDark, colors);
   return (
@@ -21,7 +27,7 @@ const NotificationsPanel = ({notificationData, setActiveCurrentView}) => {
         <Text style={[fstyles.heavyTwentyFour, {color: '#B095E3'}]}>
           Notifications
         </Text>
-        <TouchableOpacity onPress={() => setActiveCurrentView(null)}>
+        <TouchableOpacity onPress={() => handleHeaderItemsCollapse()}>
           <Image
             source={images.CLOSEICON}
             style={{
