@@ -20,6 +20,8 @@ import RoadMap from './screens/Milestones/RoadMap';
 import AutoScrollCarousel from './screens/Milestones/AutoScrollCarousel';
 import CareerGoalScreen from './screens/onboarding/CareerGoalSelection';
 import RoadmapQuestionsFlow from './screens/onboarding/RoadmapQuestionsFlow';
+import LeaderBoard from './screens/Milestones/LeaderBoard';
+import CourseContent from './screens/Milestones/CourseContent';
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
@@ -95,6 +97,18 @@ const Navigation = () => {
         <Stack.Screen
           name="RoadmapQuestionsFlow"
           component={RoadmapQuestionsFlow}
+          options={{headerShown: false}}
+        />
+        
+        <Stack.Screen
+          name="LeaderBoard"
+          component={LeaderBoard}
+          options={{headerShown: false}}
+        />
+        
+      <Stack.Screen
+          name="CourseContent"
+          component={CourseContent}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

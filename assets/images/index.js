@@ -41,6 +41,8 @@ const images = {
   ROADMAPLOADINGSTARS: require('./RoadmapStars.png'),
   DROPDOWN: require('./DropDown.png'),
   CLOSEICON: require('./Close.png'),
+  TROPHY:require('./Trophy.png'),
+  HEADERBACKICON:require('./HeaderBackIcon.png')
 };
 
 export default images;
