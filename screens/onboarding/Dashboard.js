@@ -17,7 +17,7 @@ const Dashboard = () => {
       useNativeDriver: false, // color interpolation needs false
       easing: Easing.inOut(Easing.ease),
     }).start();
-  }, [isDark]);
+  }, [animation, isDark]);
 
   // Interpolate background and text color
   const backgroundColor = animation.interpolate({

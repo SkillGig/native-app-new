@@ -30,12 +30,19 @@ const MainDash = ({navigation}) => {
   const snapPoints = useRef(['12%', '87%']).current;
 
   const handleHeaderItemsPress = view => {
-    bottomSheetRef.current?.snapTo(0); // 25% → reveal profile
     setActiveCurrentView(view);
   };
 
+  useEffect(() => {
+    // Reset active view when component mounts
+    if (activeCurrentView !== null) {
+      bottomSheetRef.current?.snapTo(0);
+    } else {
+      bottomSheetRef.current?.snapTo(1);
+    }
+  }, [activeCurrentView]);
+
   const handleHeaderItemsCollapse = () => {
-    bottomSheetRef.current?.snapTo(1); // 100% → collapse
     setActiveCurrentView(null);
   };
 
@@ -221,9 +228,7 @@ const MainDash = ({navigation}) => {
           currentDay={currentDay}
           statusMap={statusMap}
           onSheetChange={index => {
-            if (index === 0 && activeCurrentView !== null) {
-              setActiveCurrentView('profile');
-            } else if (index === 1) {
+            if (index === 1) {
               setActiveCurrentView(null);
             }
           }}
@@ -231,7 +236,7 @@ const MainDash = ({navigation}) => {
         {/* Test Snackbar Button */}
         {/* <Button
           title="Show Test Snackbar"
-          onPress={() => showSnackbar('This is a test snackbar!', 'success')}
+          onPress={() => showSnackbar('This is a test snackbar!', 'info')}
         />
         <Snackbar /> */}
         <BottomNavBar activeKey={activeTab} onTabPress={setActiveTab} />

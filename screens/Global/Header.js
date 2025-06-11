@@ -53,7 +53,11 @@ const Header = ({activeCurrentView, setActiveCurrentView, snapToCollapsed}) => {
       </View>
 
       <View style={styles.iconsContainer}>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            // if (activeCurrentView === 'notifications') snapToCollapsed();
+            setActiveCurrentView('focus-timer');
+          }}>
           <Image source={images.STOPWATCH} style={styles.icon} />
         </TouchableOpacity>
 

@@ -146,7 +146,7 @@ const CareerGoalScreen = ({navigation, route}) => {
       clearTimeout(animTimer);
       floatAnim.current && floatAnim.current.stop();
     };
-  }, [rocketAnim, textAnim, textOpacity, apiResult, navigation]);
+  }, [rocketAnim, textAnim, textOpacity, apiResult, navigation, setIsUserEnrolledToRoadmap]);
 
   const handleSelectOption = item => {
     setSelected(item);
