@@ -7,6 +7,7 @@ import {
   FlatList,
   SafeAreaView,
   Animated,
+  Vibration,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import images from '../../assets/images';
@@ -50,7 +51,7 @@ const CareerGoalScreen = ({navigation, route}) => {
           refreshToken: route.params.refreshToken,
         });
         setAvailableRoadmaps(route.params.availableRoadmaps);
-      } else if (!authToken || !refreshToken || !availableRoadmaps.length) {
+      } else if (!authToken || !refreshToken) {
         navigation.replace('OnBoarding');
       }
     }, 3000); // 5 seconds
@@ -146,9 +147,17 @@ const CareerGoalScreen = ({navigation, route}) => {
       clearTimeout(animTimer);
       floatAnim.current && floatAnim.current.stop();
     };
-  }, [rocketAnim, textAnim, textOpacity, apiResult, navigation, setIsUserEnrolledToRoadmap]);
+  }, [
+    rocketAnim,
+    textAnim,
+    textOpacity,
+    apiResult,
+    navigation,
+    setIsUserEnrolledToRoadmap,
+  ]);
 
   const handleSelectOption = item => {
+    Vibration.vibrate(15); // Vibrate on option select
     setSelected(item);
   };
 

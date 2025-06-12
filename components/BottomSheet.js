@@ -1,5 +1,11 @@
 import React, {forwardRef, useMemo, useCallback} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Vibration,
+} from 'react-native';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -25,19 +31,24 @@ const Bottomsheet = forwardRef((props, ref) => {
       if (onChange) {
         onChange(index);
       }
+      // Vibrate when sheet is opened or closed
+      if (index === 0 || index === -1) {
+        Vibration.vibrate(50);
+      }
     },
     [onChange],
   );
 
+  // Rename inner props to avoid shadowing
   const StyledBackdrop = useCallback(
-    props => (
+    backdropProps => (
       <BottomSheetBackdrop
         appearsOnIndex={0}
         disappearsOnIndex={-1}
         opacity={0.9}
         enableTouchThrough
-        style={{...props.style, backgroundColor: 'rgba(0, 0, 0, 0.5)'}}
-        {...props}
+        style={{...backdropProps.style, backgroundColor: 'rgba(0, 0, 0, 0.5)'}}
+        {...backdropProps}
       />
     ),
     [],

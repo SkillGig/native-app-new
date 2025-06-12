@@ -4,7 +4,13 @@
  */
 
 import React, {useRef, useState, useCallback, useEffect} from 'react';
-import {View, Animated, Button} from 'react-native';
+import {
+  View,
+  Animated,
+  Platform,
+  PermissionsAndroid,
+  Alert,
+} from 'react-native';
 import images from '../../assets/images';
 import {
   heightFromScreenPercent,
@@ -17,9 +23,9 @@ import NotificationsPanel from './NotificationsPanel';
 import ProfileComponent from './Profile';
 import useUserStore from '../../src/store/useUserStore';
 import HomeSlider from './HomeSlider';
-import Snackbar from '../../components/Snackbar';
-import useSnackbarStore from '../../src/store/useSnackbarStore';
 import BottomNavBar from '../../components/BottomNavBar';
+import {requestAndRegisterFcmToken} from '../../src/api/userOnboardingAPIs';
+import messaging from '@react-native-firebase/messaging';
 
 const MainDash = ({navigation}) => {
   const [activeCurrentView, setActiveCurrentView] = useState(null);
@@ -76,7 +82,9 @@ const MainDash = ({navigation}) => {
   const currentDay = dayMap[today.getDay()];
 
   const logout = useUserStore(state => state.logout);
-  const showSnackbar = useSnackbarStore(state => state.showSnackbar);
+  const fcmToken = useUserStore(state => state.fcmToken);
+  const user = useUserStore(state => state.user);
+  const [hasRequestedPermission, setHasRequestedPermission] = useState(false);
 
   const notificationData = [
     {
@@ -186,6 +194,58 @@ const MainDash = ({navigation}) => {
     }
   }, [activeCurrentView, decreaseHeaderHeight, increaseHeaderHeight]);
 
+  useEffect(() => {
+    if (!fcmToken) {
+      requestAndRegisterFcmToken();
+    }
+  }, [fcmToken]);
+
+  useEffect(() => {
+    async function requestNotificationPermissionIfNeeded() {
+      if (Platform.OS === 'android') {
+        if (Platform.Version >= 33) {
+          const granted = await PermissionsAndroid.check(
+            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+          );
+          if (!granted) {
+            const result = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+            );
+            if (result !== PermissionsAndroid.RESULTS.GRANTED) {
+              Alert.alert(
+                'Permission Required',
+                'Please enable notifications in settings to receive important updates.',
+              );
+            }
+          }
+        }
+      } else if (Platform.OS === 'ios') {
+        const authStatus = await messaging().hasPermission();
+        if (
+          authStatus !== messaging.AuthorizationStatus.AUTHORIZED &&
+          authStatus !== messaging.AuthorizationStatus.PROVISIONAL
+        ) {
+          const newStatus = await messaging().requestPermission();
+          if (
+            newStatus !== messaging.AuthorizationStatus.AUTHORIZED &&
+            newStatus !== messaging.AuthorizationStatus.PROVISIONAL
+          ) {
+            Alert.alert(
+              'Permission Required',
+              'Please enable notifications in settings to receive important updates.',
+            );
+          }
+        }
+      }
+    }
+
+    // Only request permission after user is logged in and only once
+    if (user && user.authToken && !hasRequestedPermission) {
+      requestNotificationPermissionIfNeeded();
+      setHasRequestedPermission(true);
+    }
+  }, [user, hasRequestedPermission]);
+
   return (
     <View style={{flex: 1}}>
       <PageLayout>
@@ -233,12 +293,6 @@ const MainDash = ({navigation}) => {
             }
           }}
         />
-        {/* Test Snackbar Button */}
-        {/* <Button
-          title="Show Test Snackbar"
-          onPress={() => showSnackbar('This is a test snackbar!', 'info')}
-        />
-        <Snackbar /> */}
         <BottomNavBar activeKey={activeTab} onTabPress={setActiveTab} />
       </PageLayout>
     </View>

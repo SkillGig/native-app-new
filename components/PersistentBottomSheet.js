@@ -1,5 +1,5 @@
 import React, {forwardRef, useMemo, useCallback} from 'react';
-import {View, Text, StyleSheet, Dimensions} from 'react-native';
+import {View, Text, StyleSheet, Dimensions, Vibration} from 'react-native';
 import {
   BottomSheetBackdrop,
   BottomSheetView,
@@ -20,6 +20,10 @@ const PersistentBottomSheet = forwardRef((props, ref) => {
   const handleSheetChanges = useCallback(
     index => {
       if (onChange) onChange(index);
+      // Vibrate when sheet is opened or closed
+      if (index === 0 || index === -1) {
+        Vibration.vibrate(50);
+      }
     },
     [onChange],
   );

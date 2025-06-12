@@ -1,18 +1,44 @@
 // components/MainDash/ProfileComponent.js
-import React from 'react';
-import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import React, {useContext} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Linking,
+  Platform,
+} from 'react-native';
 import {
   normalizeHeight,
   normalizeWidth,
 } from '../../components/Responsivescreen';
 import {getFontStyles} from '../../styles/FontStyles';
 import images from '../../assets/images';
-import {useContext} from 'react';
 import {ThemeContext} from '../../src/context/ThemeContext';
+
+const openAppNotificationSettings = () => {
+  if (Platform.OS === 'ios') {
+    Linking.openURL('app-settings:');
+  } else {
+    Linking.openSettings();
+  }
+};
 
 const ProfileComponent = ({profileData, handleHeaderItemsCollapse}) => {
   const {isDark, colors} = useContext(ThemeContext);
   const fstyles = getFontStyles(isDark, colors);
+
+  // Patch Notification Settings option to open device notification settings
+  const patchedProfileData = profileData.map(each => {
+    if (each.option === 'Notification Settings') {
+      return {
+        ...each,
+        onPress: openAppNotificationSettings,
+      };
+    }
+    return each;
+  });
 
   return (
     <>
@@ -41,7 +67,7 @@ const ProfileComponent = ({profileData, handleHeaderItemsCollapse}) => {
         </TouchableOpacity>
       </View>
 
-      {profileData.map((each, index) => {
+      {patchedProfileData.map((each, index) => {
         return (
           <React.Fragment key={index}>
             <TouchableOpacity
