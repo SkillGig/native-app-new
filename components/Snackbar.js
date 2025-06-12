@@ -18,6 +18,7 @@ const SNACKBAR_GRADIENTS = {
   success: ['#F8F3FE', '#54DDAF'], // Background-Light-Normal to Success-Light
   info: ['#F8F3FE', '#FBDD8E'], // Background-Light-Normal to Alert-Light (warning)
   error: ['#F8F3FE', '#FF9A94'], // Background-Light-Normal to Error-Light
+  badge: ['#F8F3FE', '#54DDAF'], // Background-Light-Normal to Badge-Light
 };
 
 const SNACKBAR_ICONS = {
@@ -103,9 +104,9 @@ const Snackbar = () => {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 48,
-    left: 0,
-    right: 0,
+    bottom: 88, // Increased to sit above BottomNavBar (was 48)
+    left: '5%',
+    right: '5%',
     alignItems: 'center',
     zIndex: 9999,
     elevation: 20,

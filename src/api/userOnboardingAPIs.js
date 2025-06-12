@@ -109,8 +109,12 @@ export const fetchUserRoadmaps = async () => {
   });
 };
 
-export const requestAndRegisterFcmToken = async () => {
+export const requestAndRegisterFcmToken = async (fcmTokenFromStore = null) => {
   // Request permission
+  if (fcmTokenFromStore) {
+    return false; // If token is already provided, return it
+  }
+  let fcmToken = fcmTokenFromStore;
   const authStatus = await messaging().requestPermission();
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -121,9 +125,9 @@ export const requestAndRegisterFcmToken = async () => {
   }
 
   // Get FCM token
-  const fcmToken = await messaging().getToken();
   if (!fcmToken) {
-    return null;
+    // If no token provided, fetch a new one
+    fcmToken = await messaging().getToken();
   }
 
   // Store locally (Zustand)
@@ -143,10 +147,19 @@ export const requestAndRegisterFcmToken = async () => {
       },
       auth: true,
       service: 'notificationsService',
-    });
+    }).then(() => fcmToken);
   } catch (e) {
     // Optionally handle error
   }
 
   return fcmToken;
+};
+
+export const getUserConfig = async () => {
+  return await networkAPICall({
+    url: userService.userConfig,
+    method: 'GET',
+    service: 'userService',
+    auth: true,
+  });
 };

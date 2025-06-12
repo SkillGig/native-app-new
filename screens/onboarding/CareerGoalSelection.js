@@ -36,8 +36,6 @@ const CareerGoalScreen = ({navigation, route}) => {
     state => state.setIsUserEnrolledToRoadmap,
   );
 
-  console.log(availableRoadmaps, 'the available roadmaps');
-
   useEffect(() => {
     const timer = setTimeout(() => {
       // Set tokens from params (if present) before navigating

@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from 'react';
+import React, {useRef, useEffect, useMemo} from 'react';
 import {
   View,
   TouchableOpacity,
@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import images from '../assets/images';
+import useUserStore from '../src/store/useUserStore';
 
 const NAV_ITEMS = [
   {
@@ -38,22 +39,30 @@ const NAV_ITEMS = [
 ];
 
 const BottomNavBar = ({activeKey, onTabPress}) => {
+  const userConfig = useUserStore(state => state.userConfig);
   // Animated values for each tab (first 3)
-  const opacityArr = [
-    useRef(new Animated.Value(activeKey === 'home' ? 1 : 0.5)).current,
-    useRef(new Animated.Value(activeKey === 'milestone' ? 1 : 0.5)).current,
-    useRef(new Animated.Value(activeKey === 'connect' ? 1 : 0.5)).current,
-  ];
-  const labelYArr = [
-    useRef(new Animated.Value(activeKey === 'home' ? 4 : 8)).current,
-    useRef(new Animated.Value(activeKey === 'milestone' ? 4 : 8)).current,
-    useRef(new Animated.Value(activeKey === 'connect' ? 4 : 8)).current,
-  ];
-  const glowYArr = [
-    useRef(new Animated.Value(activeKey === 'home' ? 0 : 16)).current,
-    useRef(new Animated.Value(activeKey === 'milestone' ? 0 : 16)).current,
-    useRef(new Animated.Value(activeKey === 'connect' ? 0 : 16)).current,
-  ];
+  const homeOpacity = useRef(new Animated.Value(activeKey === 'home' ? 1 : 0.5)).current;
+  const milestoneOpacity = useRef(new Animated.Value(activeKey === 'milestone' ? 1 : 0.5)).current;
+  const connectOpacity = useRef(new Animated.Value(activeKey === 'connect' ? 1 : 0.5)).current;
+  const opacityArr = useMemo(() => [homeOpacity, milestoneOpacity, connectOpacity], [homeOpacity, milestoneOpacity, connectOpacity]);
+
+  const homeLabelY = useRef(new Animated.Value(activeKey === 'home' ? 4 : 8)).current;
+  const milestoneLabelY = useRef(new Animated.Value(activeKey === 'milestone' ? 4 : 8)).current;
+  const connectLabelY = useRef(new Animated.Value(activeKey === 'connect' ? 4 : 8)).current;
+  const labelYArr = useMemo(() => [homeLabelY, milestoneLabelY, connectLabelY], [homeLabelY, milestoneLabelY, connectLabelY]);
+
+  const homeGlowY = useRef(new Animated.Value(activeKey === 'home' ? 0 : 16)).current;
+  const milestoneGlowY = useRef(new Animated.Value(activeKey === 'milestone' ? 0 : 16)).current;
+  const connectGlowY = useRef(new Animated.Value(activeKey === 'connect' ? 0 : 16)).current;
+  const glowYArr = useMemo(() => [homeGlowY, milestoneGlowY, connectGlowY], [homeGlowY, milestoneGlowY, connectGlowY]);
+
+  const homeIconWH = useRef(new Animated.Value(activeKey === 'home' ? 32 : 20)).current;
+  const milestoneIconWH = useRef(new Animated.Value(activeKey === 'milestone' ? 32 : 20)).current;
+  const connectIconWH = useRef(new Animated.Value(activeKey === 'connect' ? 32 : 20)).current;
+  const iconWHArr = useMemo(() => [homeIconWH, milestoneIconWH, connectIconWH], [homeIconWH, milestoneIconWH, connectIconWH]);
+
+  // Animated value for mock interview icon size
+  const mockIconWH = useRef(new Animated.Value(activeKey === 'mockinterview' ? 40 : 28)).current;
 
   useEffect(() => {
     ['home', 'milestone', 'connect'].forEach((key, idx) => {
@@ -74,9 +83,19 @@ const BottomNavBar = ({activeKey, onTabPress}) => {
           duration: isActive ? 700 : 220,
           useNativeDriver: true,
         }),
+        Animated.timing(iconWHArr[idx], {
+          toValue: isActive ? 32 : 20,
+          duration: 220,
+          useNativeDriver: false,
+        }),
       ]).start();
     });
-  }, [activeKey, opacityArr, labelYArr, glowYArr]);
+    Animated.timing(mockIconWH, {
+      toValue: activeKey === 'mockinterview' ? 40 : 28,
+      duration: 220,
+      useNativeDriver: false,
+    }).start();
+  }, [activeKey, opacityArr, labelYArr, glowYArr, iconWHArr, mockIconWH]);
 
   return (
     <View style={styles.outerContainer}>
@@ -89,6 +108,12 @@ const BottomNavBar = ({activeKey, onTabPress}) => {
           style={styles.pillBg}>
           {[NAV_ITEMS[0], NAV_ITEMS[1], NAV_ITEMS[2]].map((item, idx) => {
             const isActive = activeKey === item.key;
+            if (item.key === 'milestone' && !userConfig.showMilestones) {
+              return null;
+            }
+            if (item.key === 'connect' && !userConfig.showConnect) {
+              return null;
+            }
             return (
               <TouchableOpacity
                 key={item.key}
@@ -101,9 +126,16 @@ const BottomNavBar = ({activeKey, onTabPress}) => {
                     isActive && styles.pillIconCircleActive,
                     {opacity: opacityArr[idx]},
                   ]}>
-                  <Image
+                  <Animated.Image
                     source={isActive ? item.activeIcon : item.icon}
-                    style={[styles.pillIcon, isActive && styles.activePillIcon]}
+                    style={[
+                      styles.pillIcon,
+                      isActive && styles.activePillIcon,
+                      {
+                        width: iconWHArr[idx],
+                        height: iconWHArr[idx],
+                      },
+                    ]}
                     resizeMode="contain"
                   />
                 </Animated.View>
@@ -144,33 +176,31 @@ const BottomNavBar = ({activeKey, onTabPress}) => {
           })}
         </LinearGradient>
         {/* Floating circular button */}
-        <TouchableOpacity
-          style={[
-            styles.mockBtn,
-            activeKey === 'mockinterview' && styles.mockBtnActive,
-          ]}
-          activeOpacity={0.8}
-          onPress={() => onTabPress('mockinterview')}>
-          <Image
-            source={
-              activeKey === 'mockinterview'
-                ? NAV_ITEMS[3].icon
-                : NAV_ITEMS[3].icon
-            }
+        {userConfig.showInterviewPrep && (
+          <TouchableOpacity
             style={[
-              styles.mockIcon,
-              activeKey === 'mockinterview' && styles.mockIconActive,
+              styles.mockBtn,
+              activeKey === 'mockinterview' && styles.mockBtnActive,
             ]}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
+            activeOpacity={0.8}
+            onPress={() => onTabPress('mockinterview')}>
+            <Animated.Image
+              source={NAV_ITEMS[3].icon}
+              style={[
+                styles.mockIcon,
+                activeKey === 'mockinterview' && styles.mockIconActive,
+                { width: mockIconWH, height: mockIconWH },
+              ]}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
 };
 
 const PILL_HEIGHT = 64; // slightly taller than before
-const PILL_WIDTH = 280; // slight increase
 const PILL_RADIUS = 32;
 const PILL_BTN_WIDTH = 90;
 
@@ -197,13 +227,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
     gap: 12,
+    paddingHorizontal: 16,
   },
   pillBg: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderRadius: PILL_RADIUS,
-    width: PILL_WIDTH,
     height: PILL_HEIGHT,
     backgroundColor: 'rgba(87,47,139,0.8)',
     borderWidth: 1.2,
@@ -245,6 +275,8 @@ const styles = StyleSheet.create({
   },
   activePillIcon: {
     tintColor: '#fff',
+    width: 32,
+    height: 32,
   },
   pillLabel: {
     fontSize: 10, // slightly smaller per screenshot

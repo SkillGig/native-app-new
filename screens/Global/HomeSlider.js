@@ -25,13 +25,14 @@ import images from '../../assets/images';
 import {getFontStyles} from '../../styles/FontStyles';
 import {ThemeContext} from '../../src/context/ThemeContext';
 import DailyStreak from './DailyStreak';
+import useUserStore from '../../src/store/useUserStore';
 
 const {height: SCREEN_HEIGHT} = Dimensions.get('window');
 
 const HomeSlider = forwardRef(
   (
     {
-      snapPoints = ['13%', '87%'],
+      snapPoints = ['14%', '87%'],
       onSheetChange,
       courseFilter = [],
       exploreCoursesFilter = [],
@@ -52,6 +53,8 @@ const HomeSlider = forwardRef(
     const initialIndex = safeSnapPoints.length > 1 ? 1 : 0;
     const [currentSnapIndex, setCurrentSnapIndex] =
       React.useState(initialIndex);
+
+    const userConfig = useUserStore(state => state.userConfig);
 
     const handleSheetChanges = useCallback(
       index => {
@@ -131,11 +134,13 @@ const HomeSlider = forwardRef(
 
     const renderHeader = () => (
       <View>
-        <DailyStreak
-          weekStatus={weekStatus}
-          currentDay={currentDay}
-          statusMap={statusMap}
-        />
+        {userConfig.showUserStreaks && (
+          <DailyStreak
+            weekStatus={weekStatus}
+            currentDay={currentDay}
+            statusMap={statusMap}
+          />
+        )}
         {/* Ongoing Courses */}
         <Text style={styles.sectionTitle}>Ongoing Courses</Text>
         <FlatList
@@ -194,9 +199,12 @@ const HomeSlider = forwardRef(
             contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 8}}
           />
           <View style={styles.footer}>
-            <Text style={styles.footerTitle}>Learn to Upskill !!</Text>
+            <Text style={styles.footerTitle}>
+              {userConfig.brandingTitle ?? 'Learn to UpSkill !!'}
+            </Text>
             <Text style={[fstyles.regularSixteen, {color: '#EEE7F9'}]}>
-              Made with Passion in Tirupati, India 🇮🇳
+              {userConfig.brandingMessage ??
+                'Made with Passion in Tirupati, India 🇮🇳'}
             </Text>
           </View>
         </View>
@@ -229,6 +237,7 @@ const HomeSlider = forwardRef(
           keyExtractor={() => ''}
           renderItem={null}
           ListHeaderComponent={renderHeader}
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             minHeight: SCREEN_HEIGHT * 0.85,
             paddingBottom: 90,

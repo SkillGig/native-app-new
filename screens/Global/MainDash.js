@@ -26,6 +26,10 @@ import HomeSlider from './HomeSlider';
 import BottomNavBar from '../../components/BottomNavBar';
 import {requestAndRegisterFcmToken} from '../../src/api/userOnboardingAPIs';
 import messaging from '@react-native-firebase/messaging';
+import Loader from '../../components/Loader';
+import {getUserConfig} from '../../src/api/userOnboardingAPIs';
+import useSnackbarStore from '../../src/store/useSnackbarStore';
+import {connectNotificationSocket} from '../../src/api/notificationSocket';
 
 const MainDash = ({navigation}) => {
   const [activeCurrentView, setActiveCurrentView] = useState(null);
@@ -33,7 +37,7 @@ const MainDash = ({navigation}) => {
 
   const bottomSheetRef = useRef(null);
 
-  const snapPoints = useRef(['12%', '87%']).current;
+  const snapPoints = useRef(['13%', '87%']).current;
 
   const handleHeaderItemsPress = view => {
     setActiveCurrentView(view);
@@ -84,7 +88,11 @@ const MainDash = ({navigation}) => {
   const logout = useUserStore(state => state.logout);
   const fcmToken = useUserStore(state => state.fcmToken);
   const user = useUserStore(state => state.user);
-  const [hasRequestedPermission, setHasRequestedPermission] = useState(false);
+  const setUserConfig = useUserStore(state => state.setUserConfig);
+  const [loading, setLoading] = useState(false);
+  const showSnackbar = useSnackbarStore(state => state.showSnackbar);
+  const setFcmToken = useUserStore(state => state.setFcmToken);
+  const userConfig = useUserStore(state => state.userConfig);
 
   const notificationData = [
     {
@@ -195,10 +203,19 @@ const MainDash = ({navigation}) => {
   }, [activeCurrentView, decreaseHeaderHeight, increaseHeaderHeight]);
 
   useEffect(() => {
-    if (!fcmToken) {
-      requestAndRegisterFcmToken();
-    }
-  }, [fcmToken]);
+    const requestAndRegisterFcmTokenForDevice = async () => {
+      if (!useUserStore.getState().user?.authToken) {
+        const newFcmToken = await requestAndRegisterFcmToken(fcmToken);
+        if (newFcmToken) {
+          setFcmToken(newFcmToken);
+        }
+      }
+    };
+
+    requestAndRegisterFcmTokenForDevice();
+  }, [fcmToken, setFcmToken]);
+
+  const permissionRequestedRef = useRef(false);
 
   useEffect(() => {
     async function requestNotificationPermissionIfNeeded() {
@@ -238,16 +255,62 @@ const MainDash = ({navigation}) => {
         }
       }
     }
-
-    // Only request permission after user is logged in and only once
-    if (user && user.authToken && !hasRequestedPermission) {
+    // Only request permission after user is logged in and only once per session
+    if (user && user.authToken && !permissionRequestedRef.current) {
       requestNotificationPermissionIfNeeded();
-      setHasRequestedPermission(true);
+      permissionRequestedRef.current = true;
     }
-  }, [user, hasRequestedPermission]);
+  }, [user]);
+
+  // Fetch userConfig on mount (or after login)
+  useEffect(() => {
+    async function fetchUserConfig() {
+      if (user && user.authToken) {
+        setLoading(true);
+        try {
+          const res = await getUserConfig();
+          console.log(res, 'User Config Response');
+          if (res?.data?.config) {
+            setUserConfig(res.data.config);
+          } else {
+            showSnackbar({
+              message: 'Invalid user. Please log in again.',
+              type: 'error',
+            });
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'OnBoarding'}],
+            });
+          }
+        } catch (e) {
+          showSnackbar({
+            message: 'Invalid user. Please log in again.',
+            type: 'error',
+          });
+          navigation.reset({
+            index: 0,
+            routes: [{name: 'OnBoarding'}],
+          });
+        } finally {
+          setLoading(false);
+        }
+      }
+    }
+    fetchUserConfig();
+  }, [user, setUserConfig, showSnackbar, navigation]);
+
+  // Connect to notification WebSocket room if userId is present and socket is not connected
+  useEffect(() => {
+    if (userConfig) {
+      connectNotificationSocket();
+    }
+  }, [userConfig]);
+
+  // Feature toggles from userConfigData
 
   return (
     <View style={{flex: 1}}>
+      {loading && <Loader />}
       <PageLayout>
         <Animated.View
           style={{
@@ -258,7 +321,6 @@ const MainDash = ({navigation}) => {
           <Header
             activeCurrentView={activeCurrentView}
             setActiveCurrentView={view => handleHeaderItemsPress(view)}
-            snapToCollapsed={() => handleHeaderItemsCollapse()}
           />
 
           {activeCurrentView === 'notifications' && (
@@ -275,9 +337,10 @@ const MainDash = ({navigation}) => {
           )}
         </Animated.View>
 
+        {/* Example: show/hide HomeSlider based on featureToggles.showUserRoadmap */}
         <HomeSlider
           ref={bottomSheetRef}
-          initialIndex={2} // Full open
+          initialIndex={2}
           snapPoints={snapPoints}
           courseFilter={courseFilter}
           exploreCoursesFilter={exploreCoursesFilter}
@@ -293,6 +356,7 @@ const MainDash = ({navigation}) => {
             }
           }}
         />
+        {/* ...other features can be toggled similarly using featureToggles keys */}
         <BottomNavBar activeKey={activeTab} onTabPress={setActiveTab} />
       </PageLayout>
     </View>
