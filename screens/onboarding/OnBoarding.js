@@ -139,7 +139,7 @@ const OnboardingScreen = ({navigation}) => {
   }, [animating, currentIndex, fadeAnim, translateYAnim]);
 
   const handleContinue = () => {
-    navigation.navigate('MainDash');
+    navigation.navigate('OngoingCourses');
   };
 
   const hasHydrated = useUserStore.persist?.hasHydrated?.();

@@ -55,6 +55,15 @@ const images = {
   MILESTONEACTIVE: require('./MilestoneActive.png'),
   CONNECTACTIVE: require('./ConnectActive.png'),
   MOCKINTERVIEWACTIVE: require('./MockInterviewActive.png'),
+  CLOCK:require('./clock.png'),
+FAVOURITES:require('./FavoritesIcon.png'),
+SHAREICON:require('./shareImg.png'),
+COURSEBACKGROUND:require('./CourseBackground.png'),
+RATINGSTAR:require('./star.png'),
+TUTORIMAGE:require('./tutarImage.png'),
+YELLOWLOCK:require('./YellowLock.png'),
+LINESSTAR:require('./LinesStar.png'),
+TICKWHITECIRCLE:('./tickWhiteCircle.png')
 };
 
 export default images;

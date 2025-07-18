@@ -22,6 +22,9 @@ import CareerGoalScreen from './screens/onboarding/CareerGoalSelection';
 import RoadmapQuestionsFlow from './screens/onboarding/RoadmapQuestionsFlow';
 import LeaderBoard from './screens/Milestones/LeaderBoard';
 import CourseContent from './screens/Milestones/CourseContent';
+import ExploreCourses from './screens/VideoSection/ExploreCourses';
+import CourseScreening from './screens/VideoSection/CourseScreening';
+import OngoingCourses from './screens/VideoSection/OngoingCourses';
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
@@ -109,6 +112,23 @@ const Navigation = () => {
       <Stack.Screen
           name="CourseContent"
           component={CourseContent}
+          options={{headerShown: false}}
+        />
+      <Stack.Screen
+          name="ExploreCourses"
+          component={ExploreCourses}
+          options={{headerShown: false}}
+        />
+
+     <Stack.Screen
+          name="CourseScreening"
+          component={CourseScreening}
+          options={{headerShown: false}}
+        />
+
+       <Stack.Screen
+          name="OngoingCourses"
+          component={OngoingCourses}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

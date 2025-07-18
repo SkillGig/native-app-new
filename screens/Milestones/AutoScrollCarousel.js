@@ -1,134 +1,208 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {useContext, useState} from 'react';
 import {
   View,
   Text,
-  FlatList,
-  Dimensions,
+  TouchableOpacity,
+  LayoutAnimation,
+  UIManager,
+  Platform,
   StyleSheet,
-  Animated,
-  Image, ImageBackground
+  ScrollView,
+  Image,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import Icon from 'react-native-vector-icons/Feather';
+import {getFontStyles} from '../../styles/FontStyles';
+import {ThemeContext} from '../../src/context/ThemeContext';
+import {
+  normalizeHeight,
+  normalizeWidth,
+} from '../../components/Responsivescreen';
+import images from '../../assets/images';
 
-const AutoScrollCarousel = () => {
-  const width = useMemo(() => Dimensions.get('window').width, []);
-  const AUTO_SCROLL_INTERVAL = 4000;
+// Enable LayoutAnimation for Android
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
-  const data = [
-    { id: '1', title: 'Card 1', color: '#FF6B6B' },
-    { id: '2', title: 'Card 2', color: '#6BCB77' },
-    { id: '3', title: 'Card 3', color: '#4D96FF' },
-  ];
-
-  const flatListRef = useRef(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const progressAnims = useRef(data.map(() => new Animated.Value(0))).current;
-
-  useEffect(() => {
-    animateIndicator(currentIndex);
-
-    const interval = setInterval(() => {
-      const nextIndex = (currentIndex + 1) % data.length;
-      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
-      setCurrentIndex(nextIndex);
-    }, AUTO_SCROLL_INTERVAL);
-
-    return () => clearInterval(interval);
-  }, [currentIndex]);
-
-  const animateIndicator = (index) => {
-    progressAnims.forEach((anim, i) => {
-      anim.stopAnimation();
-      anim.setValue(i < index ? 1 : 0); // completed ones filled, reset others
-    });
-
-    Animated.timing(progressAnims[index], {
-      toValue: 1,
-      duration: AUTO_SCROLL_INTERVAL,
-      useNativeDriver: false,
-    }).start();
-  };
-
-  const onScrollEnd = (e) => {
-    const newIndex = Math.round(e.nativeEvent.contentOffset.x / width);
-    if (newIndex !== currentIndex) {
-      setCurrentIndex(newIndex);
-    }
+const AutoScrollCarousel = ({steps}) => {
+  const [openIndices, setOpenIndices] = useState([]); // ✅ Allow multiple open
+  const {isDark, colors} = useContext(ThemeContext);
+  const fstyles = getFontStyles(isDark, colors);
+  const toggleExpand = index => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setOpenIndices(
+      prev =>
+        prev.includes(index)
+          ? prev.filter(i => i !== index) // Collapse
+          : [...prev, index], // Expand
+    );
   };
 
   return (
-    <View style={[styles.container, { width }]}>
-      <FlatList
-        ref={flatListRef}
-        data={data}
-        keyExtractor={(item) => item.id}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <View style={[styles.card, { backgroundColor: item.color, width }]}>
-            <Text style={styles.cardText}>{item.title}</Text>
-          </View>
-        )}
-        onMomentumScrollEnd={onScrollEnd}
-      />
+    <ScrollView contentContainerStyle={styles.container}>
+      {steps.map((item, index) => {
+        const isOpen = openIndices.includes(index); // ✅ Multiple open check
 
-      {/* Animated progress indicators */}
-      <View style={styles.indicatorContainer}>
-        {progressAnims.map((anim, i) => (
-          <View key={i} style={styles.indicatorBackground}>
-            <Animated.View
-              style={[
-                styles.indicatorFill,
-                {
-                  width: anim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ['0%', '100%'],
-                  }),
-                },
-              ]}
-            />
+        return (
+          <View key={index} style={styles.row}>
+            <View style={styles.progressContainer}>
+              {index !== 0 && <View style={styles.lineTop} />}
+              <View
+                style={[
+                  styles.circle,
+                  item.completed && styles.completedCircle,
+                ]}>
+                {item.completed &&<Image source={images.RIGHTCIRCLE} style={{height:normalizeHeight(24),width:normalizeWidth(24),resizeMode:"contain"}}/>}
+              </View>
+              {index !== steps.length - 1 && <View style={styles.lineBottom} />}
+            </View>
+             <TouchableOpacity
+              style={styles.card}
+              onPress={() => toggleExpand(index)}
+              activeOpacity={0.8}>
+              <LinearGradient
+                colors={['#300B73', '#090215']}
+                start={{x: 0.5, y: 0}}
+                end={{x: 0.5, y: 1}}
+                style={{...StyleSheet.absoluteFillObject, borderRadius: 12}}
+              />
+              <View style={fstyles.flexAlignJustify}>
+                <Text style={fstyles.semiTwelwe}>{item.title}</Text>
+                <Image
+                  source={images.HEADERBACKICON}
+                  style={{
+                    height: normalizeHeight(20),
+                    width: normalizeWidth(20),
+                    resizeMode: 'contain',
+                    transform: [{rotate: isOpen ? '90deg' : '-90deg'}],
+                  }}
+                />
+              </View>
+              <Text
+                  style={[
+                    fstyles.twelweRegular,
+                    {marginVertical: normalizeHeight(4)},
+                  ]}>
+                  {item.description}
+                </Text>
+                {!isOpen && <View style={[fstyles.flexAlign,{marginTop:normalizeHeight(10)}]}>
+                  <Image source={images.COURSEVIDEO} style={{height:normalizeHeight(12),width:normalizeWidth(12),resizeMode:"contain"}}/>
+                  <Text style={[fstyles.mediumTen,{color:'#B095E3',marginLeft:normalizeWidth(4)}]}>2 Courses </Text>
+                  <Text style={[fstyles.mediumTen,{marginHorizontal:normalizeWidth(4)}]}>|</Text>
+                  <Image source={images.COURSEVIDEO} style={{height:normalizeHeight(12),width:normalizeWidth(12),resizeMode:"contain"}}/>
+                  <Text style={[fstyles.mediumTen,{color:'#B095E3',marginLeft:normalizeWidth(4)}]}>2 Courses </Text>
+                </View>}
+              {isOpen && (
+                <>
+                
+                <View style={[fstyles.line,{marginVertical:normalizeHeight(8)}]}/>
+
+                <>
+                <View style={fstyles.flexAlignJustify}>
+                <View>
+                <Text style={fstyles.semiTwelwe}>Course Name A</Text>
+                <Text style={[fstyles.mediumTen,{color:'#D3C4EF',marginTop:normalizeHeight(4)}]}>HTML | CSS | Javascript</Text>
+                </View>
+                <TouchableOpacity style={{backgroundColor:"#815FC44D",paddingVertical:normalizeHeight(4),paddingHorizontal:normalizeWidth(6),borderRadius:4}}>
+                <Text style={[fstyles.mediumTen,{textDecorationLine:"underline"}]}>View Course</Text>
+                </TouchableOpacity>
+                </View>
+                <View style={{marginTop:normalizeHeight(4),marginBottom:normalizeHeight(6),flexDirection:'row',alignItems:"center"}}>
+                  <Image source={images.CLOCK} style={{height:normalizeHeight(12),width:normalizeWidth(12),resizeMode:"contain"}}/>
+                  <Text style={[fstyles.mediumTen,{color:'#B095E3',marginLeft:normalizeWidth(7)}]}>58 mins</Text>
+                </View>
+                </>
+
+                <>
+                <View style={fstyles.flexAlignJustify}>
+                <View>
+                <Text style={fstyles.semiTwelwe}>Course Name B</Text>
+                <Text style={[fstyles.mediumTen,{color:'#D3C4EF',marginTop:normalizeHeight(4)}]}>HTML | CSS | Javascript</Text>
+                </View>
+                <TouchableOpacity style={{backgroundColor:"#815FC44D",paddingVertical:normalizeHeight(4),paddingHorizontal:normalizeWidth(6),borderRadius:4}}>
+                <Text style={[fstyles.mediumTen,{textDecorationLine:"underline"}]}>View Course</Text>
+                </TouchableOpacity>
+                </View>
+                <View style={{marginTop:normalizeHeight(4),marginBottom:normalizeHeight(6),flexDirection:'row',alignItems:"center"}}>
+                  <Image source={images.CLOCK} style={{height:normalizeHeight(12),width:normalizeWidth(12),resizeMode:"contain"}}/>
+                  <Text style={[fstyles.mediumTen,{color:'#B095E3',marginLeft:normalizeWidth(7)}]}>58 mins</Text>
+                </View>
+                </>
+
+                </>
+              )}
+            </TouchableOpacity>
           </View>
-        ))}
-      </View>
-    </View>
+        );
+      })}
+    </ScrollView>
   );
 };
 
+export default AutoScrollCarousel;
+
 const styles = StyleSheet.create({
   container: {
-    height: 240,
+    padding: 16,
+    paddingBottom: 50,
   },
-  card: {
-    height: 200,
+  row: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  progressContainer: {
+    alignItems: 'center',
+    width: 40,
+    minHeight: 40,
+  },
+  lineTop: {
+    height: 10,
+    borderLeftWidth: 1,
+    borderColor: '#B095E3',
+  },
+  lineBottom: {
+    flex: 1,
+    borderLeftWidth: 1,
+    borderColor: 'white',
+    width: 1,
+  },
+  circle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    // borderColor: 'white',
+    borderColor:"rgba(255,255,255, 0.3)",
+    backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 10,
+    zIndex: 1,
   },
-  cardText: {
-    color: 'white',
-    fontSize: 24,
+  completedCircle: {
+    backgroundColor: '#4caf50',
+    borderColor: '#4caf50',
+  },
+  card: {
+    flex: 1,
+    // backgroundColor: '#f9f9f9',
+    padding: 12,
+    borderRadius: 12,
+    marginLeft: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  title: {
     fontWeight: 'bold',
+    fontSize: 16,
   },
-  indicatorContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-    marginBottom: 20,
-    marginTop: 10,
-  },
-  indicatorBackground: {
-    height: 4,
-    width: 40,
-    backgroundColor: '#ccc',
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  indicatorFill: {
-    height: 4,
-    backgroundColor: '#fff',
-    borderRadius: 4,
+  description: {
+    marginTop: 8,
+    color: '#555',
+    fontSize: 14,
   },
 });
-
-export default AutoScrollCarousel;

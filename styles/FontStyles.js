@@ -49,6 +49,11 @@ export const getFontStyles = (isDark, colors) =>
       fontWeight: '700',
       color: 'white',
     },
+    extraBoldFourteen: {
+      fontSize: 14,
+      fontWeight: '800',
+      color: 'white',
+    },
     semiFourteen: {
       fontSize: 14,
       fontWeight: '600',
@@ -75,5 +80,10 @@ export const getFontStyles = (isDark, colors) =>
     },
     flexAlignJustify:{
       flexDirection: 'row', alignItems: 'center',justifyContent:"space-between"
-     }
+     },
+     line:{
+      height:normalizeHeight(1),
+      backgroundColor:'#D3C4EF',
+      width:"100%"
+     },
   });

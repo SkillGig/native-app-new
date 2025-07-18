@@ -47,7 +47,7 @@ const Header = ({activeCurrentView, setActiveCurrentView, snapToCollapsed}) => {
           <Image source={images.FEMALEAVATAR} style={styles.avatar} />
         </TouchableOpacity>
         <View style={styles.profileTextContainer}>
-          <Text style={fstyles.thirteenMedium}>{getGreeting()}</Text>
+          <Text style={[fstyles.thirteenMedium,{color:'white'}]}>{getGreeting()}</Text>
           <Text style={[fstyles.twentyBold, {color: '#EEE7F9'}]}>Shravani</Text>
         </View>
       </View>
