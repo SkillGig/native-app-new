@@ -2,7 +2,7 @@ import {create} from 'zustand';
 
 const SNACKBAR_DEFAULT = {
   message: '',
-  type: 'info', // 'info' | 'success' | 'error'
+  type: '', // 'info' | 'success' | 'error'
   isVisible: false,
 };
 

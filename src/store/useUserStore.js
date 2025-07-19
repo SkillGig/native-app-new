@@ -14,7 +14,9 @@ const useUserStore = create(
         orgInfo: null,
         isUserEnrolledToRoadmap: false,
         availableRoadmaps: [],
+        fcmToken: '', // Store FCM token
       },
+      userConfig: {}, // Add userConfig to Zustand store
       setTokens: ({authToken, refreshToken}) =>
         set(state => ({
           user: {
@@ -72,6 +74,15 @@ const useUserStore = create(
             availableRoadmaps: roadmaps,
           },
         })),
+      setFcmToken: fcmToken =>
+        set(state => ({
+          user: {
+            ...state.user,
+            fcmToken,
+          },
+        })),
+      setUserConfig: config => set(state => ({userConfig: config})), // Add setUserConfig
+      getUserConfig: () => get().userConfig, // Add getUserConfig
       logout: () =>
         set({
           user: {

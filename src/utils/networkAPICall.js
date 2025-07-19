@@ -77,6 +77,7 @@ const networkAPICall = async ({
     return {...response.data, ...response.headers};
   } catch (error) {
     // If unauthorized and retry is allowed, try to refresh token
+    console.log(error, 'Network API Call Error');
     if (
       (error.response?.status === 401 || error.message === 'Invalid token') &&
       retry &&
@@ -84,6 +85,7 @@ const networkAPICall = async ({
       url !== authService.generateNewAuthToken &&
       auth
     ) {
+      console.log('Attempting to refresh token...');
       try {
         // Attempt to get a new access token
         const refreshResponse = await axios.post(

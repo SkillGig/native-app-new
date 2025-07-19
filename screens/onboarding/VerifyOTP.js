@@ -1,5 +1,13 @@
 import React, {useState, useContext, useRef, useEffect} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Vibration,
+  Platform,
+  Animated,
+} from 'react-native';
 import {CodeField} from '../../components';
 import {
   normalizeHeight,
@@ -22,6 +30,8 @@ const VerifyOTP = ({route, navigation}) => {
   const [otpId, setOtpId] = useState('');
   const {isDark} = useContext(ThemeContext);
   const otpRef = useRef();
+  const [shakeAnim] = useState(new Animated.Value(0)); // For heading nod
+  const [bounceAnim] = useState(new Animated.Value(1)); // For OTP field bounce
 
   const {orgCode, studentId, loginData} = route.params;
 
@@ -45,7 +55,9 @@ const VerifyOTP = ({route, navigation}) => {
       }, 1000);
     }
     return () => {
-      if (interval) clearInterval(interval);
+      if (interval) {
+        clearInterval(interval);
+      }
     };
   }, [timer]);
 
@@ -63,6 +75,21 @@ const VerifyOTP = ({route, navigation}) => {
       console.log(res, 'OTP Verification Response');
       if (res && !res.error) {
         setOtpStatus('success');
+        // Success vibration (longer, more positive)
+        Vibration.vibrate(50);
+        // Bounce animation for OTP fields
+        Animated.sequence([
+          Animated.timing(bounceAnim, {
+            toValue: 1.15,
+            duration: 120,
+            useNativeDriver: true,
+          }),
+          Animated.spring(bounceAnim, {
+            toValue: 1,
+            friction: 4,
+            useNativeDriver: true,
+          }),
+        ]).start();
         // navigation.navigate('InfoCheck'); // Uncomment if you want to navigate
         console.log('OTP Verification Response:', res);
         if (res?.data?.isNewUser) {
@@ -136,9 +163,47 @@ const VerifyOTP = ({route, navigation}) => {
         }
       } else {
         setOtpStatus('error');
+        // Failure vibration (short, sharp)
+        Vibration.vibrate(30);
+        // Shake/nod animation for heading
+        Animated.sequence([
+          Animated.timing(shakeAnim, {
+            toValue: 1,
+            duration: 80,
+            useNativeDriver: true,
+          }),
+          Animated.timing(shakeAnim, {
+            toValue: -1,
+            duration: 80,
+            useNativeDriver: true,
+          }),
+          Animated.timing(shakeAnim, {
+            toValue: 0,
+            duration: 80,
+            useNativeDriver: true,
+          }),
+        ]).start();
       }
     } catch (err) {
       setOtpStatus('error');
+      Vibration.vibrate(30);
+      Animated.sequence([
+        Animated.timing(shakeAnim, {
+          toValue: 1,
+          duration: 80,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shakeAnim, {
+          toValue: -1,
+          duration: 80,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shakeAnim, {
+          toValue: 0,
+          duration: 80,
+          useNativeDriver: true,
+        }),
+      ]).start();
       console.log('OTP Verification Error:', err);
     } finally {
       setIsLoading(false);
@@ -154,7 +219,6 @@ const VerifyOTP = ({route, navigation}) => {
           orgCode,
           studentId,
         });
-
         console.log(resendRes, 'Resend OTP Response');
         // Read the new otpId and generatedOtp from the response and update state
         if (resendRes?.data?.otpId) {
@@ -163,6 +227,8 @@ const VerifyOTP = ({route, navigation}) => {
         if (resendRes?.data?.generatedOtp) {
           loginData.data.generatedOtp = resendRes.data.generatedOtp; // Update the loginData directly
         }
+        // Success vibration for resend
+        Vibration.vibrate(40);
       } catch (err) {
         console.log('Resend OTP Error:', err);
       } finally {
@@ -170,6 +236,13 @@ const VerifyOTP = ({route, navigation}) => {
         setResending(false);
       }
     }
+  };
+
+  // Vibrate on OTP input (only if keyboard doesn't already vibrate)
+  const handleOtpInput = val => {
+    setotpval(val);
+    // Only vibrate if not iOS (iOS keyboard usually vibrates by default)
+    Vibration.vibrate(8);
   };
 
   return (
@@ -191,10 +264,11 @@ const VerifyOTP = ({route, navigation}) => {
 
       <CodeField
         verifyOtp={true}
-        otpData={val => setotpval(val)}
+        otpData={handleOtpInput}
         ref={otpRef}
         status={otpStatus}
         value={loginData?.data.generatedOtp || ''}
+        style={{transform: [{scale: bounceAnim}]}}
       />
 
       <View style={{marginTop: normalizeHeight(24)}}>

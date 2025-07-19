@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Animated,
   SafeAreaView,
+  Vibration,
 } from 'react-native';
 import PageLayout from './PageLayout';
 import LinearGradient from 'react-native-linear-gradient';
@@ -105,6 +106,8 @@ const OnboardingScreen = ({navigation}) => {
     if (animating) {
       return;
     }
+    // Vibrate on slide change
+    Vibration.vibrate(15);
     setAnimating(true);
     Animated.parallel([
       Animated.timing(fadeAnim, {

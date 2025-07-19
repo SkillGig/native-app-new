@@ -12,11 +12,9 @@ import {
   Text,
   Image,
   TouchableOpacity,
+  Vibration,
 } from 'react-native';
-import BottomSheet, {
-  BottomSheetFlatList,
-  BottomSheetScrollView,
-} from '@gorhom/bottom-sheet';
+import BottomSheet, {BottomSheetFlatList} from '@gorhom/bottom-sheet';
 import {FlatList} from 'react-native-gesture-handler';
 import LinearGradient from 'react-native-linear-gradient';
 import {
@@ -27,29 +25,36 @@ import images from '../../assets/images';
 import {getFontStyles} from '../../styles/FontStyles';
 import {ThemeContext} from '../../src/context/ThemeContext';
 import DailyStreak from './DailyStreak';
+import useUserStore from '../../src/store/useUserStore';
 
 const {height: SCREEN_HEIGHT} = Dimensions.get('window');
 
 const HomeSlider = forwardRef(
   (
     {
-      initialIndex = 1, // 1 = 85% (second snap point)
-      children,
-      snapPoints = ['12%', '85%'],
+      snapPoints = ['14%', '87%'],
       onSheetChange,
-      courseFilter,
-      exploreCoursesFilter,
-      courseType,
-      weekStatus,
-      currentDay,
-      statusMap,
+      courseFilter = [],
+      exploreCoursesFilter = [],
+      courseType = [],
+      weekStatus = [],
+      currentDay = '',
+      statusMap = {},
     },
     ref,
   ) => {
     const sheetRef = useRef(null);
     const {isDark, colors} = useContext(ThemeContext);
     const fstyles = getFontStyles(isDark, colors);
-    const [currentSnapIndex, setCurrentSnapIndex] = React.useState(1); // default to 85%
+    // Defensive: ensure snapPoints is always a valid array with at least 1 element
+    const safeSnapPoints =
+      Array.isArray(snapPoints) && snapPoints.length > 0 ? snapPoints : ['87%'];
+    // Defensive: ensure index is always in range
+    const initialIndex = safeSnapPoints.length > 1 ? 1 : 0;
+    const [currentSnapIndex, setCurrentSnapIndex] =
+      React.useState(initialIndex);
+
+    const userConfig = useUserStore(state => state.userConfig);
 
     const handleSheetChanges = useCallback(
       index => {
@@ -57,31 +62,37 @@ const HomeSlider = forwardRef(
           onSheetChange(index);
         }
         setCurrentSnapIndex(index);
-        // Prevent dragging above 87%: if index is not 1 (87%), snap back to 1
+        // Vibrate when sheet is opened or closed
+        if (index === 0 || index === 1) {
+          Vibration.vibrate(50);
+        }
+        // Prevent dragging above max snap: if index is not 1 (max), snap back to 1
         if (index !== 1 && index !== 0) {
           if (sheetRef.current) {
-            sheetRef.current.snapToIndex(1);
+            sheetRef.current.snapToIndex(initialIndex);
           }
         }
       },
-      [onSheetChange],
+      [onSheetChange, initialIndex],
     );
 
     useImperativeHandle(ref, () => ({
       snapTo: index => {
-        sheetRef.current?.snapToIndex(index);
+        if (sheetRef.current && index >= 0 && index < safeSnapPoints.length) {
+          sheetRef.current.snapToIndex(index);
+        }
       },
       close: () => {
         sheetRef.current?.close();
       },
     }));
 
-    // On mount, always snap to 85%
+    // On mount, always snap to initialIndex
     React.useEffect(() => {
       if (sheetRef.current) {
-        sheetRef.current.snapToIndex(1);
+        sheetRef.current.snapToIndex(initialIndex);
       }
-    }, []);
+    }, [initialIndex]);
 
     const renderCourseCard = (item, index) => {
       return (
@@ -123,11 +134,13 @@ const HomeSlider = forwardRef(
 
     const renderHeader = () => (
       <View>
-        <DailyStreak
-          weekStatus={weekStatus}
-          currentDay={currentDay}
-          statusMap={statusMap}
-        />
+        {userConfig.showUserStreaks && (
+          <DailyStreak
+            weekStatus={weekStatus}
+            currentDay={currentDay}
+            statusMap={statusMap}
+          />
+        )}
         {/* Ongoing Courses */}
         <Text style={styles.sectionTitle}>Ongoing Courses</Text>
         <FlatList
@@ -186,9 +199,12 @@ const HomeSlider = forwardRef(
             contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 8}}
           />
           <View style={styles.footer}>
-            <Text style={styles.footerTitle}>Learn to Upskill !!</Text>
+            <Text style={styles.footerTitle}>
+              {userConfig.brandingTitle ?? 'Learn to UpSkill !!'}
+            </Text>
             <Text style={[fstyles.regularSixteen, {color: '#EEE7F9'}]}>
-              Made with Passion in Tirupati, India 🇮🇳
+              {userConfig.brandingMessage ??
+                'Made with Passion in Tirupati, India 🇮🇳'}
             </Text>
           </View>
         </View>
@@ -198,8 +214,8 @@ const HomeSlider = forwardRef(
     return (
       <BottomSheet
         ref={sheetRef}
-        index={1} // always start at 87%
-        snapPoints={['13%', '87%']}
+        index={initialIndex}
+        snapPoints={safeSnapPoints}
         enablePanDownToClose={false}
         enableContentPanningGesture={currentSnapIndex === 0}
         enableHandlePanningGesture={currentSnapIndex === 0}
@@ -221,6 +237,7 @@ const HomeSlider = forwardRef(
           keyExtractor={() => ''}
           renderItem={null}
           ListHeaderComponent={renderHeader}
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             minHeight: SCREEN_HEIGHT * 0.85,
             paddingBottom: 90,

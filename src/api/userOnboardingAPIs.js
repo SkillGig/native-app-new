@@ -1,5 +1,12 @@
 import networkAPICall from '../utils/networkAPICall';
-import {authService, userService} from '../config/apiEndPoints';
+import {
+  authService,
+  userService,
+  notificationsService,
+} from '../config/apiEndPoints';
+import messaging from '@react-native-firebase/messaging';
+import useUserStore from '../store/useUserStore';
+import {Platform} from 'react-native';
 
 // 1. Find Org with Org Code (No Auth)
 export const findOrgWithOrgCode = async orgCode => {
@@ -96,6 +103,61 @@ export const resendOTP = async (payload, platform = 'ios') => {
 export const fetchUserRoadmaps = async () => {
   return await networkAPICall({
     url: userService.fetchUserRoadmaps,
+    method: 'GET',
+    service: 'userService',
+    auth: true,
+  });
+};
+
+export const requestAndRegisterFcmToken = async (fcmTokenFromStore = null) => {
+  // Request permission
+  if (fcmTokenFromStore) {
+    return false; // If token is already provided, return it
+  }
+  let fcmToken = fcmTokenFromStore;
+  const authStatus = await messaging().requestPermission();
+  const enabled =
+    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+  if (!enabled) {
+    return null;
+  }
+
+  // Get FCM token
+  if (!fcmToken) {
+    // If no token provided, fetch a new one
+    fcmToken = await messaging().getToken();
+  }
+
+  // Store locally (Zustand)
+  useUserStore.getState().setFcmToken(fcmToken);
+  // No need to store in AsyncStorage directly, Zustand persist will handle it
+
+  // Register with backend
+  try {
+    await networkAPICall({
+      url: notificationsService.registerToken,
+      method: 'POST',
+      data: {},
+      headers: {
+        'device-token': fcmToken,
+        'user-type': 'app-user',
+        platform: Platform.OS,
+      },
+      auth: true,
+      service: 'notificationsService',
+    }).then(() => fcmToken);
+  } catch (e) {
+    // Optionally handle error
+  }
+
+  return fcmToken;
+};
+
+export const getUserConfig = async () => {
+  return await networkAPICall({
+    url: userService.userConfig,
     method: 'GET',
     service: 'userService',
     auth: true,

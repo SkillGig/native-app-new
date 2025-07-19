@@ -7,10 +7,12 @@ import {
 import {getFontStyles} from '../../styles/FontStyles';
 import images from '../../assets/images';
 import {ThemeContext} from '../../src/context/ThemeContext';
+import useUserStore from '../../src/store/useUserStore';
 
-const Header = ({activeCurrentView, setActiveCurrentView, snapToCollapsed}) => {
+const Header = ({activeCurrentView, setActiveCurrentView}) => {
   const {isDark, colors} = useContext(ThemeContext);
   const fstyles = getFontStyles(isDark, colors);
+  const userConfig = useUserStore(state => state.userConfig);
 
   const getGreeting = () => {
     const now = new Date();
@@ -41,7 +43,6 @@ const Header = ({activeCurrentView, setActiveCurrentView, snapToCollapsed}) => {
         ]}>
         <TouchableOpacity
           onPress={() => {
-            // if (activeCurrentView === 'profile') snapToCollapsed();
             setActiveCurrentView('profile');
           }}>
           <Image source={images.FEMALEAVATAR} style={styles.avatar} />
@@ -53,14 +54,18 @@ const Header = ({activeCurrentView, setActiveCurrentView, snapToCollapsed}) => {
       </View>
 
       <View style={styles.iconsContainer}>
-        <TouchableOpacity>
-          <Image source={images.STOPWATCH} style={styles.icon} />
-        </TouchableOpacity>
-
+        {/* Only show focus timer if enabled in userConfig */}
+        {userConfig?.showFocusTimer === 1 && (
+          <TouchableOpacity
+            onPress={() => {
+              setActiveCurrentView('focus-timer');
+            }}>
+            <Image source={images.STOPWATCH} style={styles.icon} />
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={{marginLeft: normalizeWidth(12)}}
           onPress={() => {
-            // if (activeCurrentView === 'notifications') snapToCollapsed();
             setActiveCurrentView('notifications');
           }}>
           <Image source={images.NOTIFICATION} style={styles.icon} />

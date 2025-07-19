@@ -1,11 +1,4 @@
-import React, {
-  useState,
-  useContext,
-  useRef,
-  useEffect,
-  useMemo,
-  use,
-} from 'react';
+import React, {useState, useContext, useRef, useEffect} from 'react';
 import {View, Text, Image, StyleSheet} from 'react-native';
 import {FooterBtn} from '../../components';
 import {
@@ -21,12 +14,6 @@ import PageLayout from './PageLayout';
 const RequestStatus = ({navigation, route}) => {
   const {isDark} = useContext(ThemeContext);
   const sheetRef = useRef(null);
-
-  useEffect(() => {
-    if (sheetRef.current) {
-      sheetRef.current?.present();
-    }
-  }, [sheetRef]);
 
   // Read from route params
   const {
@@ -150,7 +137,19 @@ const RequestStatus = ({navigation, route}) => {
     }
   };
 
-  console.log(fields, 'Parsed Diff Details');
+  // Open the bottom sheet whenever there are changed fields and not for submitted view
+  useEffect(() => {
+    const changedFields = Object.entries(fields).filter(
+      ([, {value}]) => value !== '',
+    );
+    if (sheetRef.current && changedFields.length > 0) {
+      console.log(sheetRef.current, 'Changed Fields');
+      sheetRef.current.present();
+      setTimeout(() => {
+        sheetRef.current?.present();
+      }, 1000);
+    }
+  }, [fields, status]);
 
   return (
     <PageLayout

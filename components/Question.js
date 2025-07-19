@@ -1,5 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, FlatList} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Vibration,
+} from 'react-native';
 
 const Question = ({
   question,
@@ -13,6 +19,7 @@ const Question = ({
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
   const handleSelect = item => {
+    Vibration.vibrate(15); // Vibrate on option select
     if (multiSelect) {
       if (selected.includes(item)) {
         setSelected(selected.filter(i => i !== item));
