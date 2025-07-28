@@ -25,6 +25,8 @@ import CourseContent from './screens/Milestones/CourseContent';
 import ExploreCourses from './screens/VideoSection/ExploreCourses';
 import CourseScreening from './screens/VideoSection/CourseScreening';
 import OngoingCourses from './screens/VideoSection/OngoingCourses';
+import QuizzesDashboard from './screens/Quizzes/QuizzesDashboard';
+import QuizQuestions from './screens/Quizzes/QuizQuestions';
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
@@ -129,6 +131,20 @@ const Navigation = () => {
        <Stack.Screen
           name="OngoingCourses"
           component={OngoingCourses}
+          options={{headerShown: false}}
+        />
+        
+
+           <Stack.Screen
+          name="QuizzesDashboard"
+          component={QuizzesDashboard}
+          options={{headerShown: false}}
+        />
+        
+
+          <Stack.Screen
+          name="QuizQuestions"
+          component={QuizQuestions}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

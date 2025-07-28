@@ -63,7 +63,10 @@ RATINGSTAR:require('./star.png'),
 TUTORIMAGE:require('./tutarImage.png'),
 YELLOWLOCK:require('./YellowLock.png'),
 LINESSTAR:require('./LinesStar.png'),
-TICKWHITECIRCLE:('./tickWhiteCircle.png')
+TICKWHITECIRCLE:require('./tickWhiteCircle.png'),
+TIMER:require('./Timer.png'),
+MESSAGEICON:require('./messageIcon.png'),
+QUIZZES:require('./Quizzes.png')
 };
 
 export default images;
