@@ -27,6 +27,7 @@ import CourseScreening from './screens/VideoSection/CourseScreening';
 import OngoingCourses from './screens/VideoSection/OngoingCourses';
 import QuizzesDashboard from './screens/Quizzes/QuizzesDashboard';
 import QuizQuestions from './screens/Quizzes/QuizQuestions';
+import QuizSummary from './screens/Quizzes/QuizSummary';
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
@@ -145,6 +146,12 @@ const Navigation = () => {
           <Stack.Screen
           name="QuizQuestions"
           component={QuizQuestions}
+          options={{headerShown: false}}
+        />
+        
+        <Stack.Screen
+          name="QuizSummary"
+          component={QuizSummary}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

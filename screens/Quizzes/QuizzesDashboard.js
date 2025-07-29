@@ -78,7 +78,11 @@ const QuizzesDashboard = (props) => {
             <Text style={[fstyles.semiFourteen, { color: '#EEE7F9', marginLeft: normalizeWidth(16), lineHeight: normalizeHeight(18) }]}>{point}</Text>
           </View>
         ))}
-        <TouchableOpacity style={{ alignItems: "center", position: "absolute", bottom: 40, left: 0, right: 0 }}>
+        <TouchableOpacity 
+        onPress={()=>{
+          props.navigation.navigate('QuizQuestions')
+        }}
+        style={{ alignItems: "center", position: "absolute", bottom: 40, left: 0, right: 0 }}>
           <View style={{
             backgroundColor: "#815FC4",
             height: normalizeHeight(42), width: normalizeWidth(120),

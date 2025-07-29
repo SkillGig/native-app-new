@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Vibration,
+  Image,
 } from 'react-native';
 import {
   BottomSheetBackdrop,
@@ -13,6 +14,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import {normalizeHeight, normalizeWidth} from './Responsivescreen';
 import {ScrollView} from 'react-native-gesture-handler';
+import images from '../assets/images';
 
 const Bottomsheet = forwardRef((props, ref) => {
   const {
@@ -23,6 +25,9 @@ const Bottomsheet = forwardRef((props, ref) => {
     headerText,
     onSubmit,
     isSubmitButtonActive,
+     showIndicator = true,
+      headerLayoutType = 'default', 
+      handleClose
   } = props;
   const snapPoints = useMemo(() => height, [height]);
 
@@ -60,16 +65,25 @@ const Bottomsheet = forwardRef((props, ref) => {
       snapPoints={snapPoints}
       enablePanDownToClose
       backdropComponent={StyledBackdrop}
-      handleIndicatorStyle={styles.handleIndicator}
+      // handleIndicatorStyle={styles.handleIndicator}
+      handleIndicatorStyle={showIndicator ? styles.handleIndicator : { display: 'none' }}
       backgroundStyle={styles.sheetBackground}
       onChange={handleSheetChanges}
       android_keyboardInputMode="adjustResize">
       <BottomSheetView style={styles.sheetContainer}>
-        {enableHeader && headerText && (
-          <Text style={styles.header}>{headerText}</Text>
-        )}
+      {enableHeader && (
+  <View style={headerLayoutType === 'spaced' ? styles.headerSpaced : styles.headerDefault}>
+    <Text style={styles.headerText}>{headerText}</Text>
+    {headerLayoutType === 'spaced' && (
+      <TouchableOpacity onPress={handleClose}> {/* Add handleClose function */}
+        <Image source={images.CLOSEICON} style={styles.crossIcon} />
+      </TouchableOpacity>
+    )}
+  </View>
+)}
+
         <ScrollView>{children}</ScrollView>
-        {/* {props.footer && ( */}
+        {props.footer && (
         <View style={styles.submitButtonBackground}>
           <TouchableOpacity
             style={styles.footerButton(isSubmitButtonActive)}
@@ -81,7 +95,7 @@ const Bottomsheet = forwardRef((props, ref) => {
             <Text style={styles.submitText}>Submit</Text>
           </TouchableOpacity>
         </View>
-        {/* )} */}
+      )} 
       </BottomSheetView>
     </BottomSheetModal>
   );
@@ -147,6 +161,27 @@ const styles = StyleSheet.create({
     paddingBottom: 80,
     borderTopWidth: 1,
     borderTopColor: 'rgba(176, 149, 227, 0.40)',
+  },
+  headerDefault: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  headerSpaced: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom:normalizeHeight(12),
+    paddingHorizontal:normalizeWidth(16),
+  },
+  headerText: {
+    fontSize: 16,
+    fontWeight:"700",
+    color:"white"
+  },
+  crossIcon: {
+    width:normalizeWidth(20),
+    height: normalizeHeight(20),
+    resizeMode:"contain"
   },
 });
 
