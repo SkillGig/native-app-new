@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View, Alert, ScrollView } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import PageLayout from '../onboarding/PageLayout';
@@ -7,6 +7,12 @@ import { normalizeHeight, normalizeWidth } from '../../components/Responsivescre
 import { getFontStyles } from '../../styles/FontStyles';
 import { ThemeContext } from '../../src/context/ThemeContext';
 import { Bottomsheet } from '../../components';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withDelay,
+} from 'react-native-reanimated';
 
 const questions = [
   {
@@ -28,6 +34,7 @@ const questions = [
 ];
 
 const QuizQuestions = (props) => {
+  const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
   const BottomsheetRef = useRef(null);
   const { isDark, colors } = useContext(ThemeContext);
   const fstyles = getFontStyles(isDark, colors);
@@ -76,7 +83,17 @@ const QuizQuestions = (props) => {
   const selectedOption = answers[currentQuestion]?.selectedIndex;
 
   const question = questions[currentQuestion];
+ const animatedWidths = questions.map(() => useSharedValue(0));
 
+  useEffect(() => {
+    answers.forEach((answer, index) => {
+      if (answer?.selectedIndex !== undefined) {
+        animatedWidths[index].value = withTiming(1, { duration: 500 });
+      } else {
+        animatedWidths[index].value = withTiming(0, { duration: 500 });
+      }
+    });
+  }, [answers]);
   return (
     <View style={{ flex: 1 }}>
       <PageLayout
@@ -117,32 +134,35 @@ const QuizQuestions = (props) => {
           <Text style={[fstyles.boldSixteen, { marginTop: normalizeHeight(4) }]}>
             Question {currentQuestion + 1}/{questions.length}
           </Text>
-          <View style={styles.progressContainer}>
-            {questions.map((_, index) => {
-              const isFilled = answers[index]?.selectedIndex !== undefined;
-              return (
-                <>
-                  {isFilled ? (
-                    <LinearGradient
-                      key={index}
-                      colors={['#D3C4EF', '#815FC4']}
-                      start={{ x: 0.5, y: 0 }}
-                      end={{ x: 0.5, y: 1 }}
-                      style={styles.progressStep}
-                    />
-                  ) : (
-                    <View
-                      key={index}
-                      style={[
-                        styles.progressStep,
-                        { backgroundColor: 'rgba(176, 149, 227, 0.16)' },
-                      ]}
-                    />
-                  )}
-                </>
-              );
-            })}
+         <View style={styles.progressContainer}>
+      {questions.map((_, index) => {
+        const isFilled = answers[index]?.selectedIndex !== undefined;
+
+        const animatedStyle = useAnimatedStyle(() => ({
+          width: `${animatedWidths[index].value * 100}%`,
+        }));
+
+        return (
+          <View key={index} style={[styles.progressStep, { overflow: 'hidden' }]}>
+            {isFilled ? (
+              <AnimatedLinearGradient
+                colors={['#D3C4EF', '#815FC4']}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+                style={[StyleSheet.absoluteFill, animatedStyle]}
+              />
+            ) : (
+              <View
+                style={[
+                  StyleSheet.absoluteFill,
+                  { backgroundColor: 'rgba(176, 149, 227, 0.16)' },
+                ]}
+              />
+            )}
           </View>
+        );
+      })}
+    </View>
 
           <Text style={fstyles.heavyTwenty}>{question.text}</Text>
           <Text

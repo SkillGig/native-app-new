@@ -66,7 +66,9 @@ LINESSTAR:require('./LinesStar.png'),
 TICKWHITECIRCLE:require('./tickWhiteCircle.png'),
 TIMER:require('./Timer.png'),
 MESSAGEICON:require('./messageIcon.png'),
-QUIZZES:require('./Quizzes.png')
+QUIZZES:require('./Quizzes.png'),
+TICKGREENCIRCLE:require('./TickGreenCircle.png'),
+QUIZTROPHY:require('./QuizTrophy.png')
 };
 
 export default images;

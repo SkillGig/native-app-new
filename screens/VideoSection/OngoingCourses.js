@@ -1,4 +1,4 @@
-import React, {use, useContext, useMemo, useState} from 'react';
+import React, { use, useContext, useMemo, useState } from 'react';
 import {
   Text,
   View,
@@ -14,13 +14,13 @@ import {
   normalizeHeight,
   normalizeWidth,
 } from '../../components/Responsivescreen';
-import {getFontStyles} from '../../styles/FontStyles';
-import {ThemeContext} from '../../src/context/ThemeContext';
+import { getFontStyles } from '../../styles/FontStyles';
+import { ThemeContext } from '../../src/context/ThemeContext';
 import LinearGradient from 'react-native-linear-gradient';
-import {CircularProgress} from '../Global/DesignComponents';
+import { CircularProgress } from '../Global/DesignComponents';
 const OngoingCourses = props => {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const {isDark, colors} = useContext(ThemeContext);
+  const { isDark, colors } = useContext(ThemeContext);
   const [expandedSectionIds, setExpandedSectionIds] = useState([]);
   const [expandedMap, setExpandedMap] = useState({});
 
@@ -51,7 +51,7 @@ const OngoingCourses = props => {
         <View key={i} style={styles.star}>
           <Image source={images.RATINGSTAR} style={styles.star} />
           <View
-            style={[styles.partialOverlay, {width: `${partialStar * 100}%`}]}>
+            style={[styles.partialOverlay, { width: `${partialStar * 100}%` }]}>
             <Image source={images.RATINGSTAR} style={styles.star} />
           </View>
         </View>,
@@ -62,7 +62,7 @@ const OngoingCourses = props => {
         <Image
           key={i}
           source={images.RATINGSTAR}
-          style={[styles.star, {tintColor: '#ccc'}]}
+          style={[styles.star, { tintColor: '#ccc' }]}
         />,
       );
     }
@@ -126,7 +126,7 @@ const OngoingCourses = props => {
     },
   ];
 
-  const RenderFPList = ({item}) => {
+  const RenderFPList = ({ item }) => {
     return (
       <View
         style={{
@@ -137,7 +137,7 @@ const OngoingCourses = props => {
           borderColor: 'rgba(176, 149, 227, 0.40)',
           marginRight: normalizeWidth(25),
         }}>
-        <Text style={[fstyles.thirteenMedium, {color: 'white'}]}>
+        <Text style={[fstyles.thirteenMedium, { color: 'white' }]}>
           {item.coursename}
         </Text>
       </View>
@@ -279,7 +279,7 @@ const OngoingCourses = props => {
     },
   ];
 
-  const ModulesCard = ({item}) => {
+  const ModulesCard = ({ item }) => {
     const isExpanded = expandedSectionIds.includes(item.id);
     return (
       <View
@@ -307,13 +307,13 @@ const OngoingCourses = props => {
             borderTopRightRadius: 12,
           }}>
           <View>
-            <Text style={[fstyles.mediumTen, {color: '#B095E3'}]}>
+            <Text style={[fstyles.mediumTen, { color: '#B095E3' }]}>
               Section {item.id}
             </Text>
             <Text
               style={[
                 fstyles.semiFourteen,
-                {marginVertical: normalizeHeight(4)},
+                { marginVertical: normalizeHeight(4) },
               ]}>
               {item.title}
             </Text>
@@ -360,7 +360,7 @@ const OngoingCourses = props => {
                 height: normalizeHeight(16),
                 width: normalizeWidth(16),
                 resizeMode: 'contain',
-                transform: [{rotate: '-90deg'}],
+                transform: [{ rotate: '-90deg' }],
               }}
             />
           )}
@@ -374,11 +374,11 @@ const OngoingCourses = props => {
             {item.lessons.map((lesson, index) => (
               <View
                 key={lesson.id}
-                style={[styles.lessonRow, lesson.isLocked && {opacity: 0.5}]}>
+                style={[styles.lessonRow, lesson.isLocked && { opacity: 0.5 }]}>
                 <View style={styles.lessonIndex}>
                   <Text style={styles.lessonIndexText}>{index + 1}</Text>
                 </View>
-                <View style={{flex: 1}}>
+                <View style={{ flex: 1 }}>
                   <Text
                     style={{
                       fontSize: 12,
@@ -446,7 +446,7 @@ const OngoingCourses = props => {
                   </View>
 
                   {lesson.progress > 0 && lesson.progress < 1 && (
-                    <View style={{marginTop: normalizeHeight(6)}}>
+                    <View style={{ marginTop: normalizeHeight(6) }}>
                       <View
                         style={{
                           flexDirection: 'row',
@@ -475,7 +475,7 @@ const OngoingCourses = props => {
                           <Text
                             style={[
                               fstyles.mediumTen,
-                              {color: 'rgba(238, 231, 249, 0.60)'},
+                              { color: 'rgba(238, 231, 249, 0.60)' },
                             ]}>
                             {lesson.remaining}
                           </Text>
@@ -511,7 +511,7 @@ const OngoingCourses = props => {
             <View
               style={[
                 fstyles.line,
-                {backgroundColor: 'rgba(129, 95, 196, 0.30)'},
+                { backgroundColor: 'rgba(129, 95, 196, 0.30)' },
               ]}
             />
           </View>
@@ -542,8 +542,8 @@ const OngoingCourses = props => {
                 'rgba(176, 149, 227, 0.09)',
               ]}
               locations={[0.0885, 0.739]}
-              start={{x: 0, y: 0}}
-              end={{x: 0.91, y: 0.41}}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0.91, y: 0.41 }}
               style={{
                 borderRadius: 12,
                 marginHorizontal: normalizeWidth(12),
@@ -564,7 +564,7 @@ const OngoingCourses = props => {
                     <Text
                       style={[
                         fstyles.mediumTen,
-                        {color: 'rgba(238, 231, 249, 0.60)'},
+                        { color: 'rgba(238, 231, 249, 0.60)' },
                       ]}>
                       {item.test.type} |{' '}
                     </Text>
@@ -575,7 +575,7 @@ const OngoingCourses = props => {
                     <Text
                       style={[
                         fstyles.mediumTen,
-                        {color: 'rgba(238, 231, 249, 0.60)'},
+                        { color: 'rgba(238, 231, 249, 0.60)' },
                       ]}>
                       {item.test.duration} |{' '}
                     </Text>
@@ -583,14 +583,14 @@ const OngoingCourses = props => {
                     <Text
                       style={[
                         fstyles.mediumTen,
-                        {color: 'rgba(238, 231, 249, 0.60)'},
+                        { color: 'rgba(238, 231, 249, 0.60)' },
                       ]}>
                       {item.test.points}
                     </Text>
                   </View>
                 </View>
                 <TouchableOpacity style={styles.ctaButton}>
-                  <Text style={[fstyles.semiTwelwe, {color: '#A19AA9'}]}>
+                  <Text style={[fstyles.semiTwelwe, { color: '#A19AA9' }]}>
                     {item.test.buttonText}
                   </Text>
                 </TouchableOpacity>
@@ -635,7 +635,7 @@ const OngoingCourses = props => {
     },
   ];
 
-  const ResourcesCard = ({item}) => {
+  const ResourcesCard = ({ item }) => {
     return (
       <TouchableOpacity
         style={{
@@ -650,8 +650,8 @@ const OngoingCourses = props => {
         <LinearGradient
           colors={['rgba(211, 196, 239, 0.00)', 'rgba(211, 196, 239, 0.20)']}
           locations={[0.0502, 1]}
-          start={{x: 0, y: 0.5}}
-          end={{x: 1, y: 0.4}}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.4 }}
           style={{
             padding: 16,
             borderRadius: 12,
@@ -665,7 +665,7 @@ const OngoingCourses = props => {
                 resizeMode: 'contain',
               }}
             />
-            <View style={{marginLeft: normalizeWidth(16)}}>
+            <View style={{ marginLeft: normalizeWidth(16) }}>
               <Text style={fstyles.semiTwelwe}>{item.title}</Text>
               <Text
                 style={[
@@ -728,10 +728,10 @@ const OngoingCourses = props => {
       },
     }));
   };
-  const NotesCard = ({item: section}) => {
+  const NotesCard = ({ item: section }) => {
     // const isOpen = expanded[item.id];
     return (
-      <View style={{marginBottom: 16}}>
+      <View style={{ marginBottom: 16 }}>
         {/* Section Header */}
         <Text style={styles.sectionHeader}>{section.title}</Text>
 
@@ -763,12 +763,12 @@ const OngoingCourses = props => {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <LinearGradient
         colors={gradientColors}
         locations={[0, 0.7]}
-        start={{x: 0, y: 0}}
-        end={{x: 1, y: 1}}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFillObject}
       />
       <View>
@@ -780,14 +780,13 @@ const OngoingCourses = props => {
             resizeMode: 'contain',
           }}
         />
-        <Text>sdfghjk</Text>
       </View>
       <ScrollView>
         <LinearGradient
           colors={['#1C0743', '#090215']}
-          start={{x: 0.5, y: 0}}
-          end={{x: 0.5, y: 1}}
-          style={{flex: 1, borderTopLeftRadius: 32, borderTopRightRadius: 32}}>
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={{ flex: 1, borderTopLeftRadius: 32, borderTopRightRadius: 32 }}>
           <View>
             <View
               style={{
@@ -798,7 +797,7 @@ const OngoingCourses = props => {
               <Text
                 style={[
                   fstyles.twelweRegular,
-                  {fontStyle: 'italic', marginTop: 4, color: '#F6F3FC'},
+                  { fontStyle: 'italic', marginTop: 4, color: '#F6F3FC' },
                 ]}>
                 Master the fundamentals of UI/UX design and build stunning,
                 user-friendly digital experiences.
@@ -821,8 +820,8 @@ const OngoingCourses = props => {
               'rgba(129, 95, 196, 0.40)', // end color at 79.34%
             ]}
             locations={[0.0152, 0.7934]} // converted from 1.52%, 79.34%
-            start={{x: 0, y: 0}}
-            end={{x: 0.9744, y: 0.225}} // 103deg ≈ (cosθ ≈ 0.9744, sinθ ≈ 0.2250)
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0.9744, y: 0.225 }} // 103deg ≈ (cosθ ≈ 0.9744, sinθ ≈ 0.2250)
             style={{
               borderRadius: 12,
               borderWidth: 1,
@@ -833,7 +832,7 @@ const OngoingCourses = props => {
               marginVertical: normalizeHeight(24),
             }}>
             {/* content goes here */}
-            <Text style={[fstyles.boldFourteen, {color: '#B095E3'}]}>
+            <Text style={[fstyles.boldFourteen, { color: '#B095E3' }]}>
               My Progress
             </Text>
             <View
@@ -842,7 +841,7 @@ const OngoingCourses = props => {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
               }}>
-              <Text style={[fstyles.semiTwelwe, {color: '#F6F3FC'}]}>
+              <Text style={[fstyles.semiTwelwe, { color: '#F6F3FC' }]}>
                 2/8 modules completed
               </Text>
               <LinearGradient
@@ -851,14 +850,14 @@ const OngoingCourses = props => {
                   '#815FC4', // at 101.85%
                 ]}
                 locations={[0.4403, 1.0185]} // Converted from 44.03%, 101.85%
-                start={{x: 0, y: 0}}
-                end={{x: 0.559, y: 0.829}} // 124deg ≈ cos(124°) = 0.559, sin(124°) = 0.829
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0.559, y: 0.829 }} // 124deg ≈ cos(124°) = 0.559, sin(124°) = 0.829
                 style={{
                   borderRadius: 12,
                   paddingVertical: normalizeHeight(4),
                   paddingHorizontal: normalizeWidth(8),
                 }}>
-                <Text style={[fstyles.mediumTen, {color: '#EEE7F9'}]}>17%</Text>
+                <Text style={[fstyles.mediumTen, { color: '#EEE7F9' }]}>17%</Text>
               </LinearGradient>
             </View>
 
@@ -890,7 +889,7 @@ const OngoingCourses = props => {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
               }}>
-              <View style={{flex: 3}}>
+              <View style={{ flex: 3 }}>
                 <Text
                   style={[
                     fstyles.mediumTen,
@@ -905,13 +904,13 @@ const OngoingCourses = props => {
                 <Text
                   style={[
                     fstyles.boldTwelwe,
-                    {color: '#EEE7F9', marginTop: normalizeHeight(4)},
+                    { color: '#EEE7F9', marginTop: normalizeHeight(4) },
                   ]}>
                   4
                   <Text
                     style={[
                       fstyles.mediumTen,
-                      {color: 'rgba(238, 231, 249, 0.60)'},
+                      { color: 'rgba(238, 231, 249, 0.60)' },
                     ]}>
                     /36
                   </Text>
@@ -940,19 +939,19 @@ const OngoingCourses = props => {
                 <Text
                   style={[
                     fstyles.boldTwelwe,
-                    {color: '#EEE7F9', marginTop: normalizeHeight(4)},
+                    { color: '#EEE7F9', marginTop: normalizeHeight(4) },
                   ]}>
                   4
                   <Text
                     style={[
                       fstyles.mediumTen,
-                      {color: 'rgba(238, 231, 249, 0.60)'},
+                      { color: 'rgba(238, 231, 249, 0.60)' },
                     ]}>
                     /36
                   </Text>
                 </Text>
               </View>
-              <View style={{alignItems: 'flex-end', flex: 3.33}}>
+              <View style={{ alignItems: 'flex-end', flex: 3.33 }}>
                 <Text
                   style={[
                     fstyles.mediumTen,
@@ -977,7 +976,7 @@ const OngoingCourses = props => {
                   <Text
                     style={[
                       fstyles.mediumTen,
-                      {color: 'rgba(238, 231, 249, 0.60)'},
+                      { color: 'rgba(238, 231, 249, 0.60)' },
                     ]}>
                     /36
                   </Text>
@@ -991,7 +990,7 @@ const OngoingCourses = props => {
             horizontal
             contentContainerStyle={{}}
             showsHorizontalScrollIndicator={false}
-            renderItem={({item, index}) => {
+            renderItem={({ item, index }) => {
               const isSelected = selectedIndex === index;
               return (
                 <TouchableOpacity onPress={() => setSelectedIndex(index)}>
@@ -1019,7 +1018,7 @@ const OngoingCourses = props => {
             }}
           />
         </LinearGradient>
-        <FlatList
+        {selectedIndex === 0 || selectedIndex === 1 || selectedIndex === 2 && <FlatList
           keyExtractor={(item, index) => `_${index}`}
           horizontal
           data={exploreCourses}
@@ -1030,7 +1029,7 @@ const OngoingCourses = props => {
             marginBottom: normalizeHeight(16),
             marginTop: normalizeHeight(24),
           }}
-        />
+        />}
         {
           selectedIndex === 0 ? (
             <FlatList
@@ -1044,39 +1043,45 @@ const OngoingCourses = props => {
               keyExtractor={(_, index) => index.toString()}
               renderItem={ResourcesCard}
             />
-          ) : (
-            <>
-              <LinearGradient
-                colors={[
-                  'rgba(211, 196, 239, 0)', // 0% transparent
-                  'rgba(211, 196, 239, 0.10)', // 100% faded light purple
-                ]}
-                locations={[0.0502, 1]} // 5.02%, 100%
-                start={{x: 0, y: 0.5}}
-                end={{x: 1, y: 0.5}} // 98deg ≈ horizontal gradient
-                style={{
-                  borderRadius: 12,
-                  borderWidth: 1,
-                  borderColor: 'rgba(176, 149, 227, 0.16)', // var(--Primary-Light-16)
-                  backgroundColor: 'rgba(48, 11, 115, 0.40)', // fallback background layer
-                  padding: 16,
-                  marginHorizontal: normalizeWidth(24),
-                  // your inner padding if needed
-                }}>
-                {/* Inner content goes here */}
-                {/* implement fonts and check the design for notes */}
-              </LinearGradient>
-              <FlatList
-                data={notesData}
-                keyExtractor={item => item.id}
-                renderItem={NotesCard}
-                contentContainerStyle={{
-                  paddingHorizontal: normalizeWidth(16),
-                  paddingVertical: normalizeHeight(16),
-                }}
-              />
-            </>
-          )
+          ) : selectedIndex === 4 ? (
+            //overview section
+            <View>
+              <Text style={fstyles.heavyTwentyFour}>overview section</Text>
+            </View>
+          ) :
+            (
+              <>
+                <LinearGradient
+                  colors={[
+                    'rgba(211, 196, 239, 0)', // 0% transparent
+                    'rgba(211, 196, 239, 0.10)', // 100% faded light purple
+                  ]}
+                  locations={[0.0502, 1]} // 5.02%, 100%
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }} // 98deg ≈ horizontal gradient
+                  style={{
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: 'rgba(176, 149, 227, 0.16)', // var(--Primary-Light-16)
+                    backgroundColor: 'rgba(48, 11, 115, 0.40)', // fallback background layer
+                    padding: 16,
+                    marginHorizontal: normalizeWidth(24),
+                    // your inner padding if needed
+                  }}>
+                  {/* Inner content goes here */}
+                  {/* implement fonts and check the design for notes */}
+                </LinearGradient>
+                <FlatList
+                  data={notesData}
+                  keyExtractor={item => item.id}
+                  renderItem={NotesCard}
+                  contentContainerStyle={{
+                    paddingHorizontal: normalizeWidth(16),
+                    paddingVertical: normalizeHeight(16),
+                  }}
+                />
+              </>
+            )
           //  implement fonts and check the design for notes
         }
       </ScrollView>
@@ -1119,18 +1124,6 @@ const styles = StyleSheet.create({
   },
   metaText: {
     color: '#B095E3',
-    fontSize: 12,
-  },
-  progressCircle: {
-    backgroundColor: '#3F2D73',
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  progressText: {
-    color: '#FFFFFF',
     fontSize: 12,
   },
   divider: {

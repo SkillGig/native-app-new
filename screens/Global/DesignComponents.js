@@ -7,6 +7,7 @@ export const CircularProgress = ({
   strokeWidth = 4,
   value = 2,
   maxProgress = 4,
+  textStyle
 }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -17,7 +18,6 @@ export const CircularProgress = ({
   return (
     <View style={{ width: size, height: size }}>
       <Svg width={size} height={size}>
-        {/* Background Circle */}
         <Circle
           stroke={'rgba(211, 196, 239, 0.20)'}
           fill="none"
@@ -26,8 +26,6 @@ export const CircularProgress = ({
           r={radius}
           strokeWidth={strokeWidth}
         />
-
-        {/* Progress Circle */}
         <Circle
           stroke={"#B095E3"}
           fill="none"
@@ -43,8 +41,6 @@ export const CircularProgress = ({
           originY={size / 2}
         />
       </Svg>
-
-      {/* Optional Center Text */}
       <View
         style={{
           position: 'absolute',
@@ -55,7 +51,7 @@ export const CircularProgress = ({
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <Text style={{ fontSize: 10, fontWeight: '500',color:"#EEE7F9" }}>
+        <Text style={[{ fontSize: 10, fontWeight: '500', color: "#EEE7F9" }, textStyle]}>
           {clampedValue}/{maxProgress}
         </Text>
       </View>
