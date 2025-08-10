@@ -19,17 +19,77 @@ const LeaderBoard = props => {
   const fstyles = getFontStyles(isDark, colors);
 
   const leaderboardRanks = [
-   { id: 1, name: 'asdfvb', points: 413, myrank: 0 },
-   { id: 2, name: 'asdfvb', points: 762, myrank: 0 },
-   { id: 3, name: 'asdfvb', points: 188, myrank: 1 },
-   { id: 4, name: 'asdfvb', points: 950, myrank: 0 },
-   { id: 5, name: 'asdfvb', points: 576, myrank: 0 },
-   { id: 6, name: 'asdfvb', points: 329, myrank: 0 },
-   { id: 7, name: 'asdfvb', points: 887, myrank: 0 },
-   { id: 8, name: 'asdfvb', points: 74, myrank: 0 },
-   { id: 9, name: 'asdfvb', points: 655, myrank: 0 },
-   { id: 10, name: 'asdfvb', points: 999, myrank: 0 },
- ];
+        {
+            "userId": 29,
+            "name": "Gagan Vasanth 4",
+            "totalXP": "10",
+            "rankOfUser": 1,
+            "currentUser": 1
+        },
+        {
+            "userId": 13,
+            "name": "Gagan Vasanth",
+            "totalXP": "0",
+            "rankOfUser": 2,
+            "currentUser": 0
+        },
+        {
+            "userId": 14,
+            "name": "Gagan Vasanth 2",
+            "totalXP": "0",
+            "rankOfUser": 3,
+            "currentUser": 0
+        },
+        {
+            "userId": 15,
+            "name": "Gagan Vasanth 2",
+            "totalXP": "0",
+            "rankOfUser": 4,
+            "currentUser": 0
+        },
+        {
+            "userId": 16,
+            "name": "Gagan Vasanth 2",
+            "totalXP": "0",
+            "rankOfUser": 5,
+            "currentUser": 0
+        },
+        {
+            "userId": 17,
+            "name": "Gagan Vasanth 2",
+            "totalXP": "0",
+            "rankOfUser": 6,
+            "currentUser": 0
+        },
+        {
+            "userId": 24,
+            "name": "Gagan Vasanth 2",
+            "totalXP": "0",
+            "rankOfUser": 7,
+            "currentUser": 0
+        },
+        {
+            "userId": 25,
+            "name": "Gagan Vasanth 3",
+            "totalXP": "0",
+            "rankOfUser": 8,
+            "currentUser": 0
+        },
+        {
+            "userId": 26,
+            "name": "Gagan Vasanth 2",
+            "totalXP": "0",
+            "rankOfUser": 9,
+            "currentUser": 0
+        },
+        {
+            "userId": 27,
+            "name": "Gagan Vasanth 3",
+            "totalXP": "0",
+            "rankOfUser": 10,
+            "currentUser": 0
+        }
+    ]
  
  
   return (
@@ -105,7 +165,7 @@ const LeaderBoard = props => {
                     </Text>
                   </View>
                   <Text style={fstyles.semiFourteen}>
-                   {item.points}
+                   {item.totalXP}
                     <Text
                       style={[
                         fstyles.mediumTen,
@@ -122,7 +182,7 @@ const LeaderBoard = props => {
               </LinearGradient>
             </View>
             <View style={styles.rankOverlay}>
-              <Text style={[styles.rankText,{color:item.id>4?'#815FC4':'rgba(242, 223, 161, 0.50)'}]}>#{item.id}</Text>
+              <Text style={[styles.rankText,{color:item.id>4?'#815FC4':'rgba(242, 223, 161, 0.50)'}]}>#{item.rankOfUser}</Text>
             </View>
           </View>
         ))}

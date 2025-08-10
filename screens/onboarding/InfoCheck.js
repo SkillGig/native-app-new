@@ -328,10 +328,10 @@ const InfoCheck = ({navigation, route}) => {
             if (bottomSheetField.branch !== field.branch.value) {
               dataToUpdate.push({
                 fieldName: 'branch',
-                oldValue: branchDetailsOptions.find(
+                oldValue: branchDetailsOptions?.find(
                   option => option.value === field.branch.value,
                 )?.key,
-                newValue: branchDetailsOptions.find(
+                newValue: branchDetailsOptions?.find(
                   option => option.value === bottomSheetField.branch,
                 )?.key,
               });
@@ -420,7 +420,7 @@ const InfoCheck = ({navigation, route}) => {
             onSelectOption={d => {
               setBottomSheetField(prev => ({...prev, branch: d.value}));
             }}
-            selectedOption={branchDetailsOptions.find(
+            selectedOption={branchDetailsOptions?.find(
               option => option.value === bottomSheetField.branch,
             )}
           />

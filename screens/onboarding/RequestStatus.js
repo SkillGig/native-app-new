@@ -59,9 +59,9 @@ const RequestStatus = ({navigation, route}) => {
         };
       }
     });
-  } else if (ongoingRequestDetails[0].diffDetails) {
+  } else if (ongoingRequestDetails[0]?.diffDetails) {
     try {
-      const entries = ongoingRequestDetails[0].diffDetails
+      const entries = ongoingRequestDetails[0]?.diffDetails
         .split('},')
         .map((entry, idx, arr) =>
           JSON.parse(idx < arr.length - 1 ? `${entry}}` : entry),

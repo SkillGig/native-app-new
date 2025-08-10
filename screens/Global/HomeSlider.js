@@ -47,34 +47,34 @@ const HomeSlider = forwardRef(
     const {isDark, colors} = useContext(ThemeContext);
     const fstyles = getFontStyles(isDark, colors);
     // Defensive: ensure snapPoints is always a valid array with at least 1 element
-    const safeSnapPoints =
-      Array.isArray(snapPoints) && snapPoints.length > 0 ? snapPoints : ['87%'];
+   const safeSnapPoints =
+   Array.isArray(snapPoints) && snapPoints.length > 0 ? snapPoints : ['87%'];
     // Defensive: ensure index is always in range
-    const initialIndex = safeSnapPoints.length > 1 ? 1 : 0;
+const initialIndex = safeSnapPoints.length > 1 ? 1 : 0;
     const [currentSnapIndex, setCurrentSnapIndex] =
       React.useState(initialIndex);
 
-    const userConfig = useUserStore(state => state.userConfig);
+ const userConfig = useUserStore(state => state.userConfig);
 
-    const handleSheetChanges = useCallback(
-      index => {
-        if (onSheetChange) {
-          onSheetChange(index);
-        }
-        setCurrentSnapIndex(index);
-        // Vibrate when sheet is opened or closed
-        if (index === 0 || index === 1) {
-          Vibration.vibrate(50);
-        }
-        // Prevent dragging above max snap: if index is not 1 (max), snap back to 1
-        if (index !== 1 && index !== 0) {
-          if (sheetRef.current) {
-            sheetRef.current.snapToIndex(initialIndex);
-          }
-        }
-      },
-      [onSheetChange, initialIndex],
-    );
+const handleSheetChanges = useCallback(
+  index => {
+    if (onSheetChange) {
+      onSheetChange(index);
+    }
+    setCurrentSnapIndex(index);
+
+    // Vibrate only for valid indexes
+    if (index >= 0 && index < safeSnapPoints.length) {
+      Vibration.vibrate(50);
+    }
+
+    // Prevent dragging above max snap
+    if (index !== initialIndex && index !== -1) {
+      sheetRef.current?.snapToIndex(initialIndex);
+    }
+  },
+  [onSheetChange, initialIndex, safeSnapPoints.length],
+);
 
     useImperativeHandle(ref, () => ({
       snapTo: index => {
