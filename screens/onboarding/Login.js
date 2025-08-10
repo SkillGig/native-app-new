@@ -1,115 +1,177 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-import {CustomSvg} from '../../components';
+import {View, Platform, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {
   normalizeHeight,
   normalizeWidth,
 } from '../../components/Responsivescreen';
-import images from '../../assets/images';
 import CompTextInput from '../../components/CompTextInput';
+import React, {useCallback, useState} from 'react';
+import PageLayout from './PageLayout';
+import {
+  findOrgWithOrgCode,
+  loginWithOrgAndStudentId,
+} from '../../src/api/userOnboardingAPIs';
+import Loader from '../../components/Loader';
+import {useFocusEffect} from '@react-navigation/native';
+import CommonButton from '../../components/CommonButton';
 
-const Login = () => {
-  console.log('loginnnnnn');
-  const [field, setField] = useState({});
-  const handleSubmit = () => {
-    console.log('Submit');
+const Login = ({navigation, route}) => {
+  const initialOrgCode = route?.params?.orgCode || '';
+  const initialStudentId = route?.params?.studentId || '';
+
+  const [field, setField] = useState({
+    orgCode: initialOrgCode,
+    studentId: initialStudentId,
+  });
+  const [orgError, setOrgError] = useState('');
+  const [studentIdError, setStudentIdError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const isFormValid = field.orgCode.length >= 4 && field.studentId.length >= 4;
+
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(false);
+    }, []),
+  );
+
+  const handleSubmit = async () => {
+    // return navigation.navigate('RoadMap');
+
+    setOrgError('');
+    setStudentIdError('');
+    setLoading(true);
+    try {
+      // 1. Verify Org
+      const orgData = await findOrgWithOrgCode(field.orgCode);
+
+      if (orgData?.error) {
+        setOrgError(orgData.error);
+        setLoading(false);
+        return;
+      }
+      // 2. Login
+      const loginData = await loginWithOrgAndStudentId({
+        orgCode: field.orgCode,
+        studentId: field.studentId,
+      });
+
+      if (loginData?.error?.error) {
+        setStudentIdError(loginData?.error?.error);
+        setLoading(false);
+        return;
+      }
+
+      return navigation.navigate('VerifyOTP', {
+        orgCode: field.orgCode,
+        studentId: field.studentId,
+        loginData,
+      });
+      // 3. Navigate if both succeed
+      // navigation.navigate('VerifyOTP');
+    } catch (err) {
+      // Error handling for each API
+      if (err?.response?.data?.error || err?.error) {
+        const errorMsg = err.response?.data?.error || err.error;
+        if (errorMsg.toLowerCase().includes('org')) {
+          setOrgError(errorMsg);
+        } else {
+          setStudentIdError(errorMsg);
+        }
+      } else {
+        setStudentIdError('Something went wrong. Please try again.');
+      }
+    }
+    setLoading(false);
   };
+
   return (
-    <LinearGradient
-      colors={['#381874', '#150534']}
-      style={{
-        flex: 1,
-      }}>
-      <Image source={images.SIDEPATTERN} style={styles.sidePattern} />
-      <View
-        style={{
-          marginTop: normalizeHeight(55),
-          marginHorizontal: normalizeWidth(24),
-        }}>
-        <Image
-          source={images.BACKICON}
-          style={{
-            height: normalizeHeight(24),
-            width: normalizeWidth(24),
-            resizeMode: 'contain',
+    <PageLayout
+      heading="Let's Go 🚀"
+      description="The grind starts here !!"
+      hasBackButton
+      onBackButton={() => navigation.goBack()}>
+      <View style={{marginTop: normalizeHeight(60)}}>
+        <CompTextInput
+          label="Organization Code *"
+          placeholder="Enter Organization code"
+          infoText
+          fieldDesc="Enter your organization code (8 digit)"
+          value={field.orgCode}
+          onChangeText={text => {
+            setField(prev => ({...prev, orgCode: text}));
+            setOrgError('');
           }}
+          errorMessage={orgError}
+          editable={true}
         />
-        <Text
-          style={{
-            fontSize: 32,
-            color: 'rgba(255, 255, 255, 0.60)',
-            fontWeight: '900',
-          }}>
-          Let’s Go 🚀
-        </Text>
-        <Text style={{fontSize: 14, color: '#EADDFF', fontWeight: '500'}}>
-          The grind starts here !!
-        </Text>
-        <View style={{marginTop: normalizeHeight(60)}}>
-          <CompTextInput
-            label={'Org Code *'}
-            placeholder="Enter Organisation code"
-            infoText={true}
-            errorMessage={'Enter your organisation code (8 digit)'}
-            value={field.orgcode}
-          />
-        </View>
-
-        <View style={{marginTop: normalizeHeight(35)}}>
-          <CompTextInput
-            label={'Student ID *'}
-            placeholder="Enter Student ID"
-            infoText={true}
-            value={field.orgcode}
-          />
-        </View>
-
-        <TouchableOpacity
-          style={{
-            backgroundColor: '#563593',
-            paddingVertical: normalizeHeight(12),
-            borderRadius: normalizeWidth(12),
-            marginTop: normalizeHeight(260),
-            alignItems: 'center',
-          }}
-          onPress={handleSubmit}>
-          <Text
-            style={{
-              color: '#EADDFF',
-              fontSize: normalizeWidth(16),
-              fontWeight: '700',
-            }}>
-            Submit
-          </Text>
-        </TouchableOpacity>
-
-        <View>
-          {/* <TextInput
-  onFocus={ () => this.onFocus() }
-  style={{
-    borderBottomWidth:1,
-    color:"rgba(255, 255, 255, 0.54)",
-    borderColor:"rgba(255, 255, 255, 0.42)"}}/> */}
-        </View>
       </View>
-    </LinearGradient>
+
+      <View style={{marginTop: normalizeHeight(35)}}>
+        <CompTextInput
+          label="Student ID *"
+          placeholder="Enter Student ID"
+          infoText
+          value={field.studentId}
+          onChangeText={text => {
+            setField(prev => ({...prev, studentId: text}));
+            setStudentIdError('');
+          }}
+          errorMessage={studentIdError}
+          editable={true}
+        />
+      </View>
+
+      <CommonButton
+        name="Submit"
+        onPress={handleSubmit}
+        disabled={!isFormValid || loading}
+      />
+      {loading && <Loader />}
+    </PageLayout>
   );
 };
 
-export default Login;
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    position: 'relative',
+  },
+  container: {
+    flex: 1,
+    marginTop: normalizeHeight(55),
+    marginHorizontal: normalizeWidth(24),
+  },
   sidePattern: {
     position: 'absolute',
     top: 0,
     left: 0,
     resizeMode: 'contain',
   },
+  backIcon: {
+    height: normalizeHeight(24),
+    width: normalizeWidth(24),
+    resizeMode: 'contain',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '900',
+  },
+  subtitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginTop: 4,
+  },
+  submitButton: {
+    paddingVertical: normalizeHeight(12),
+    borderRadius: normalizeWidth(12),
+    marginTop: normalizeHeight(260),
+    alignItems: 'center',
+  },
+  submitText: {
+    color: '#EADDFF',
+    fontSize: normalizeWidth(16),
+    fontWeight: '700',
+  },
 });
+
+export default Login;

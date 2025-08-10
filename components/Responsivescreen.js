@@ -1,4 +1,4 @@
-import { Dimensions, PixelRatio } from 'react-native';
+import {Dimensions, PixelRatio} from 'react-native';
 const baseWidth = 375;
 const baseHeight = 812;
 
@@ -94,6 +94,18 @@ const normalizeWidth = width => {
   return newwidth;
 };
 
+/**
+ * Calculates the given percentage of the device's current screen height.
+ * @param {number|string} percent - The percentage (0-100 or '50%') of the screen height to calculate.
+ * @returns {number} The calculated height in dp.
+ */
+const heightFromScreenPercent = percent => {
+  const value = typeof percent === 'string' ? parseFloat(percent) : percent;
+  return Math.round(
+    PixelRatio.roundToNearestPixel((screenHeight * value) / 100),
+  );
+};
+
 export {
   widthPercentageToDP,
   heightPercentageToDP,
@@ -101,4 +113,5 @@ export {
   removeOrientationListener,
   normalizeHeight,
   normalizeWidth,
+  heightFromScreenPercent,
 };

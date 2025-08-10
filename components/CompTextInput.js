@@ -1,16 +1,15 @@
-
 import {
   View,
   Image,
   Text,
   TextInput,
   StyleSheet,
-  Pressable,
-  Platform,
   TouchableOpacity,
 } from 'react-native';
-import React, {useRef} from 'react';
-import {normalizeHeight, normalizeWidth} from './Responsivescreen';
+import React, {useContext, useRef} from 'react';
+import {normalizeWidth} from './Responsivescreen';
+import {ThemeContext} from '../src/context/ThemeContext';
+import images from '../assets/images';
 
 const CompTextInput = props => {
   const {
@@ -23,11 +22,20 @@ const CompTextInput = props => {
     noteLeft,
     infoText = false,
     errorMessage,
+    fieldDesc,
     inputstyle,
+    opacity = 1,
+    type,
+    status,
+    onChangeText,
   } = props;
   const textInRef = useRef(null);
+  const {isDark} = useContext(ThemeContext);
+
   return (
-    <View pointerEvents={!onPress && editable === false ? 'none' : 'auto'}>
+    <View
+      pointerEvents={!onPress && editable === false ? 'none' : 'auto'}
+      style={{opacity: opacity}}>
       {label ? (
         <View style={[styles.label, {}]}>
           {label ? (
@@ -37,7 +45,7 @@ const CompTextInput = props => {
                   labelstyle
                     ? labelstyle
                     : {
-                        color: '#D6C0FD',
+                        color: isDark ? '#D6C0FD' : '#200A47',
                         fontSize: 12,
                         fontWeight: '600',
                       }
@@ -53,25 +61,53 @@ const CompTextInput = props => {
       <TouchableOpacity
         onPress={() => (onPress ? onPress() : textInRef.current.focus())}
         accessible={false}>
-        <TextInput
-          ref={textInRef}
-          style={[
-            inputstyle
-              ? inputstyle
-              : {
-                paddingLeft:normalizeWidth(-4),
-                  fontSize: 16,
-                  fontWeight: '700',
-                  borderBottomWidth: 1,
-                  borderBottomColor: 'white',
-                  color: 'rgba(255, 255, 255, 0.87)',
-                },
-          ]}
-          placeholderTextColor={'rgba(255, 255, 255, 0.28)'}
-          color={'white'}
-          returnKeyType={'done'}
-          {...props}
-        />
+        <View style={{position: 'relative', justifyContent: 'center'}}>
+          <TextInput
+            ref={textInRef}
+            style={[
+              {
+                paddingLeft: normalizeWidth(-4),
+                fontSize: 16,
+                fontWeight: '700',
+                borderBottomWidth: 1,
+                borderBottomColor: isDark ? 'white' : '#4F378A',
+                color: isDark
+                  ? 'rgba(255, 255, 255, 0.87)'
+                  : 'rgba(0, 0, 0, 0.87)',
+                paddingRight: 36, // add right padding to not overlap with icon
+              },
+              inputstyle,
+            ]}
+            placeholderTextColor={
+              isDark ? 'rgba(255, 255, 255, 0.28)' : 'rgba(0, 0, 0, 0.28)'
+            }
+            returnKeyType="done"
+            onChangeText={onChangeText}
+            {...props}
+          />
+
+          {/* Icon or trailing content */}
+          {type === 'status' ? (
+            <View style={{position: 'absolute', right: 0, paddingRight: 8}}>
+              <Text
+                style={{
+                  color: isDark
+                    ? 'rgba(255, 255, 255, 0.87)'
+                    : 'rgba(0, 0, 0, 0.87)',
+                }}>
+                {status === 'approved' ? (
+                  <Image source={images.RIGHTCIRCLE} />
+                ) : status === 'rejected' ? (
+                  <Image source={images.WRONGCIRCLE} />
+                ) : (
+                  <></>
+                )}
+              </Text>
+            </View>
+          ) : (
+            <></>
+          )}
+        </View>
       </TouchableOpacity>
 
       <Text
@@ -81,19 +117,20 @@ const CompTextInput = props => {
             textAlign: 'right',
             fontSize: 12,
             zIndex: 2,
-            marginTop:normalizeHeight(2),
-            lineHeight:normalizeHeight(18),
           },
           {
             paddingLeft: infoText ? normalizeWidth(0) : normalizeWidth(0),
-            paddingBottom: normalizeHeight(8),
             color:
-              infoText ?'rgba(255, 255, 255, 0.54)'
-                : 'red',
-            textAlign: infoText  ? 'left' : 'right',
+              infoText && isDark
+                ? errorMessage
+                  ? 'red'
+                  : 'rgba(255, 255, 255, 0.54)'
+                : 'rgba(0, 0, 0, 0.54)',
+
+            textAlign: infoText ? 'left' : 'right',
           },
         ]}>
-        {errorMessage ? errorMessage : '  '}
+        {errorMessage ? errorMessage : fieldDesc}
       </Text>
     </View>
   );
@@ -109,6 +146,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     //  paddingBottom: normalizeHeight(4),
+    fontSize: 12,
+    fontWeight: '600',
   },
   note: {
     color: 'rgba(255, 255, 255, 0.42)',
