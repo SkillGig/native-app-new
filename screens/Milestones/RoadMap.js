@@ -17,7 +17,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {getFontStyles} from '../../styles/FontStyles';
 import { normalizeHeight,normalizeWidth } from '../../components/Responsivescreen';
 import images from '../../assets/images';
-const RoadMap = () => {
+const RoadMap = ({navigation}) => {
   const {isDark, colors} = useContext(ThemeContext);
   const fstyles = getFontStyles(isDark, colors);
 
@@ -75,15 +75,18 @@ const RoadMap = () => {
   const leaderboardRanks = [
     {
       id: 1,
-      name: 'asdfvb',
+      name: 'Tanvi',
+      points:"87654"
     },
     {
       id: 3,
-      name: 'asdfvb',
+      name: 'Pragna',
+      points:"345"
     },
     {
       id: 9,
-      name: 'asdfvb',
+      name: 'Prakruthi',
+      points:"8765"
     },
   ];
 
@@ -222,7 +225,7 @@ const RoadMap = () => {
           <View style={styles.leaderboardDivider} />
         </View>
 
-        {leaderboardRanks.map((_, index) => (
+        {leaderboardRanks.map((item, index) => (
           <View key={index} style={styles.leaderboardCardWrapper}>
             <View style={styles.leaderboardCard}>
               <LinearGradient
@@ -237,22 +240,24 @@ const RoadMap = () => {
                       style={styles.avatar}
                     />
                     <Text style={[fstyles.heavyTwenty, styles.nameText]}>
-                      Tanvi
+                    {item.name}
                     </Text>
                   </View>
                   <Text style={fstyles.boldSixteen}>
-                    1503<Text style={fstyles.mediumTen}> XP</Text>
+                    {item.points}<Text style={fstyles.mediumTen}> XP</Text>
                   </Text>
                 </View>
               </LinearGradient>
             </View>
             <View style={styles.rankOverlay}>
-              <Text style={styles.rankText}>#1</Text>
+              <Text style={styles.rankText}>#{item.id}</Text>
             </View>
           </View>
         ))}
 
-        <TouchableOpacity style={styles.viewLeaderboardBtn}>
+        <TouchableOpacity style={styles.viewLeaderboardBtn} onPress={()=>{
+          navigation.navigate('LeaderBoard')
+        }}>
           <Text style={styles.viewLeaderboardText}>View Leaderboard</Text>
           <Image source={images.BACKICON} style={styles.viewLeaderboardIcon} />
         </TouchableOpacity>
@@ -322,7 +327,6 @@ const RoadMap = () => {
                 horizontal
                 keyExtractor={(item, index) => `_${index}`}
                 renderItem={({item, index}) => {
-                  console.log(item, 'item.lengthhhh');
                   return (
                     <View
                       style={{
@@ -411,58 +415,11 @@ const RoadMap = () => {
                               </View>
                             </View>
                           </View>
-                          <View
-                            style={{
-                              marginLeft: normalizeWidth(4),
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              marginTop: normalizeHeight(20),
-                            }}>
-                            <View>
-                              <View
-                                style={{
-                                  flexDirection: 'row',
-                                  alignItems: 'center',
-                                }}>
-                                <Image
-                                  source={images.COURSEREADING}
-                                  style={{
-                                    height: normalizeHeight(12),
-                                    width: normalizeWidth(12),
-                                    resizeMode: 'contain',
-                                  }}
-                                />
-                                <Text
-                                  style={[
-                                    fstyles.mediumTen,
-                                    {marginLeft: normalizeWidth(2)},
-                                  ]}>
-                                  4.2 Rating
-                                </Text>
-                              </View>
-                              <Text
-                                style={[
-                                  fstyles.mediumTen,
-                                  {color: 'rgba(238, 231, 249, 0.60)'},
-                                ]}>
-                                4.9k Enrolled
-                              </Text>
-                            </View>
-                            <TouchableOpacity
-                              style={{
-                                height: normalizeHeight(33),
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                borderRadius: 12,
-                                width: normalizeWidth(90),
-                                backgroundColor: '#815FC4',
-                              }}>
-                              <Text style={fstyles.semiTwelwe}>
-                                View Details
-                              </Text>
-                            </TouchableOpacity>
-                          </View>
+                          <TouchableOpacity style={{justifyContent:"center",height:normalizeHeight(33),alignItems:"center",
+                          marginTop:normalizeHeight(20),borderRadius:12,
+                            backgroundColor:"#815FC4"}}>
+                            <Text style={fstyles.semiTwelwe}>Download Certificate</Text>
+                          </TouchableOpacity>
                         </View>
                       </LinearGradient>
                     </View>

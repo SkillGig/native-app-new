@@ -34,11 +34,10 @@ import {connectNotificationSocket} from '../../src/api/notificationSocket';
 const MainDash = ({navigation}) => {
   const [activeCurrentView, setActiveCurrentView] = useState(null);
   const [activeTab, setActiveTab] = useState('home');
-
   const bottomSheetRef = useRef(null);
 
-  const snapPoints = useRef(['13%', '87%']).current;
-
+  // const snapPoints = useRef(['13%', '87%']).current;
+  const snapPoints = useRef(['40%']).current;
   const handleHeaderItemsPress = view => {
     setActiveCurrentView(view);
   };
@@ -93,7 +92,23 @@ const MainDash = ({navigation}) => {
   const showSnackbar = useSnackbarStore(state => state.showSnackbar);
   const setFcmToken = useUserStore(state => state.setFcmToken);
   const userConfig = useUserStore(state => state.userConfig);
-
+const handleTabPress = (tabKey) => {
+    setActiveTab(tabKey);
+    switch (tabKey) {
+      case 'home':
+        navigation.navigate('MainDash'); // change to your route name
+        break;
+      case 'milestone':
+        navigation.navigate('RoadMap');
+        break;
+      case 'connect':
+        navigation.navigate('ConnectScreen');
+        break;
+      case 'mockinterview':
+        navigation.navigate('MockInterviewScreen');
+        break;
+    }
+  };
   const notificationData = [
     {
       id: 'a1',
@@ -340,7 +355,12 @@ const MainDash = ({navigation}) => {
         {/* Example: show/hide HomeSlider based on featureToggles.showUserRoadmap */}
         <HomeSlider
           ref={bottomSheetRef}
-          initialIndex={2}
+  //         initialIndex={
+  //   snapPoints.length > 2 
+  //     ? 2 
+  //     : snapPoints.length - 1 // fallback to last valid index
+  // }
+   initialIndex={1} 
           snapPoints={snapPoints}
           courseFilter={courseFilter}
           exploreCoursesFilter={exploreCoursesFilter}
@@ -350,14 +370,14 @@ const MainDash = ({navigation}) => {
           weekStatus={weekStatus}
           currentDay={currentDay}
           statusMap={statusMap}
-          onSheetChange={index => {
-            if (index === 1) {
-              setActiveCurrentView(null);
+         onSheetChange={index => {
+           if (index === 1) {
+          setActiveCurrentView(null);
             }
           }}
         />
         {/* ...other features can be toggled similarly using featureToggles keys */}
-        <BottomNavBar activeKey={activeTab} onTabPress={setActiveTab} />
+        <BottomNavBar activeKey={activeTab} onTabPress={handleTabPress} />
       </PageLayout>
     </View>
   );

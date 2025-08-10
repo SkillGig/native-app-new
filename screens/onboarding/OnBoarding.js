@@ -142,7 +142,7 @@ const OnboardingScreen = ({navigation}) => {
   }, [animating, currentIndex, fadeAnim, translateYAnim]);
 
   const handleContinue = () => {
-    navigation.navigate('QuizzesDashboard');
+    navigation.navigate('YourScreen');
   };
 
   const hasHydrated = useUserStore.persist?.hasHydrated?.();
