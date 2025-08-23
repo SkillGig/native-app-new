@@ -5,7 +5,7 @@ import {
   DarkTheme,
 } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Login from './screens/onboarding/Login';
 import Dashboard from './screens/onboarding/Dashboard';
 import OnBoarding from './screens/onboarding/OnBoarding';
@@ -29,7 +29,153 @@ import QuizzesDashboard from './screens/Quizzes/QuizzesDashboard';
 import QuizQuestions from './screens/Quizzes/QuizQuestions';
 import QuizSummary from './screens/Quizzes/QuizSummary';
 import YourScreen from './screens/Quizzes/YourScreen';
+import BottomNavBar from './components/BottomNavBar';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import images from './assets/images';
+import LinearGradient from 'react-native-linear-gradient';
+import { normalizeHeight, normalizeWidth } from './components/Responsivescreen';
+
+const Tab = createBottomTabNavigator();
+
 const Stack = createNativeStackNavigator();
+
+function BottomTabs() {
+  return (
+        <View style={styles.container}>
+      <LinearGradient
+        colors={["rgba(28,7,67,0)", "#0000"]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={styles.gradient}
+      />
+
+    <Tab.Navigator
+    screenOptions={{
+    headerShown: false,
+    tabBarStyle: {
+      position: 'absolute',
+      bottom: 16,
+      left: 16,
+      right: 16,
+      height: normalizeHeight(64),
+      backgroundColor: '#300B73',
+      borderRadius: 24,
+      elevation: 5,
+      shadowColor: '#000',
+      shadowOpacity: 0.1,
+      shadowOffset: { width: 0, height: 4 },
+      shadowRadius: 8,
+      borderWidth: 1,
+      borderColor: 'white',
+      width: '70%',
+      marginLeft: normalizeWidth(20),
+    },
+  }}
+    >
+      <Tab.Screen
+        name="MainDash"
+        component={MainDash}
+        options={{
+          tabBarButton: props => {
+            const { onPress, accessibilityState } = props;
+            return (
+              <TouchableOpacity onPress={onPress} style={{ flex: 1 }}>
+                <BottomNavBar
+                  focused={accessibilityState.selected}
+                  img={images.HOME}
+                  pagename={'Home'}
+                  focusedImg={images.HOMEACTIVE}
+                />
+              </TouchableOpacity>
+            );
+          },
+        }}
+      />
+
+      <Tab.Screen
+        name="RoadMap"
+        component={RoadMap}
+        options={{
+          headerShown: false,
+          tabBarButton: props => {
+            const { onPress, accessibilityState } = props;
+            return (
+              <TouchableOpacity onPress={onPress} style={{ flex: 1 }}>
+                <BottomNavBar
+                  focused={accessibilityState.selected}
+                  img={images.MILESTONE}
+                  pagename={'Milestones'}
+                  focusedImg={images.MILESTONEACTIVE}
+                />
+              </TouchableOpacity>
+            );
+          },
+        }}
+      />
+
+      <Tab.Screen
+        name="OngoingCourses"
+        component={OngoingCourses}
+        options={{
+          headerShown: false,
+          tabBarButton: props => {
+            const { onPress, accessibilityState } = props;
+            return (
+              <TouchableOpacity onPress={onPress} style={{ flex: 1 }}>
+                <BottomNavBar
+                  focused={accessibilityState.selected}
+                  img={images.CONNECT}
+                  pagename={'Connect'}
+                  focusedImg={images.CONNECTACTIVE}
+                />
+              </TouchableOpacity>
+            );
+          },
+        }}
+      />
+
+   <Tab.Screen
+  name="QuizzesDashboard"
+  component={QuizzesDashboard}   // replace with your screen
+  options={{
+    tabBarButton: props => {
+      const { onPress } = props;
+      return (
+        <TouchableOpacity
+          onPress={onPress}
+        style={{
+            position: 'absolute',
+            bottom: 0, // raise it higher than the bar
+            right: -85,  // place outside right side
+            width:normalizeWidth(64),
+            height:normalizeHeight(64),
+            borderRadius: 35,
+            backgroundColor: '#644c91',
+            justifyContent: 'center',
+            alignItems: 'center',
+            elevation: 8,
+          }}
+        >
+          {/* Custom icon or image */}
+          <BottomNavBar
+            focused={false}
+            img={images.COURSEREADING}
+            // pagename={'Special'}
+            focusedImg={images.COURSEREADING}
+          />
+        </TouchableOpacity>
+      );
+    },
+  }}
+/>
+
+
+    </Tab.Navigator>
+
+
+      </View>
+  );
+}
 
 const Navigation = () => {
   const {isDark} = useContext(ThemeContext);
@@ -79,7 +225,8 @@ const Navigation = () => {
 
         <Stack.Screen
           name="MainDash"
-          component={MainDash}
+          // component={MainDash}
+          component={BottomTabs}
           options={{headerShown: false}}
         />
 
@@ -162,3 +309,14 @@ const Navigation = () => {
 };
 
 export default Navigation;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  gradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  blur: {
+    ...StyleSheet.absoluteFillObject,
+  },
+});

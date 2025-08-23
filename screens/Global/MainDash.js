@@ -23,7 +23,6 @@ import NotificationsPanel from './NotificationsPanel';
 import ProfileComponent from './Profile';
 import useUserStore from '../../src/store/useUserStore';
 import HomeSlider from './HomeSlider';
-import BottomNavBar from '../../components/BottomNavBar';
 import {requestAndRegisterFcmToken} from '../../src/api/userOnboardingAPIs';
 import messaging from '@react-native-firebase/messaging';
 import Loader from '../../components/Loader';
@@ -33,7 +32,6 @@ import {connectNotificationSocket} from '../../src/api/notificationSocket';
 
 const MainDash = ({navigation}) => {
   const [activeCurrentView, setActiveCurrentView] = useState(null);
-  const [activeTab, setActiveTab] = useState('home');
   const bottomSheetRef = useRef(null);
 
   // const snapPoints = useRef(['13%', '87%']).current;
@@ -92,23 +90,7 @@ const MainDash = ({navigation}) => {
   const showSnackbar = useSnackbarStore(state => state.showSnackbar);
   const setFcmToken = useUserStore(state => state.setFcmToken);
   const userConfig = useUserStore(state => state.userConfig);
-const handleTabPress = (tabKey) => {
-    setActiveTab(tabKey);
-    switch (tabKey) {
-      case 'home':
-        navigation.navigate('MainDash'); // change to your route name
-        break;
-      case 'milestone':
-        navigation.navigate('RoadMap');
-        break;
-      case 'connect':
-        navigation.navigate('ConnectScreen');
-        break;
-      case 'mockinterview':
-        navigation.navigate('MockInterviewScreen');
-        break;
-    }
-  };
+
   const notificationData = [
     {
       id: 'a1',
@@ -376,8 +358,6 @@ const handleTabPress = (tabKey) => {
             }
           }}
         />
-        {/* ...other features can be toggled similarly using featureToggles keys */}
-        <BottomNavBar activeKey={activeTab} onTabPress={handleTabPress} />
       </PageLayout>
     </View>
   );
