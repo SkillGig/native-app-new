@@ -10,13 +10,18 @@ import {
   Vibration,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import CommonButton from '../../components/CommonButton';
 import images from '../../assets/images';
 import useUserStore from '../../src/store/useUserStore';
-import Loader from '../../components/Loader';
-import {fetchUserRoadmaps} from '../../src/api/userOnboardingAPIs';
+import {
+  enrollUserToRoadmap,
+  fetchUserRoadmaps,
+} from '../../src/api/userOnboardingAPIs';
+import useSnackbarStore from '../../src/store/useSnackbarStore';
 
 const CareerGoalScreen = ({navigation, route}) => {
   const [selected, setSelected] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
   const [apiResult, setApiResult] = useState(null); // Store API result
 
@@ -35,6 +40,7 @@ const CareerGoalScreen = ({navigation, route}) => {
   const setIsUserEnrolledToRoadmap = useUserStore(
     state => state.setIsUserEnrolledToRoadmap,
   );
+  const showSnackbar = useSnackbarStore(state => state.showSnackbar);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -177,6 +183,49 @@ const CareerGoalScreen = ({navigation, route}) => {
   // Determine if the submit button should be disabled
   const isSubmitButtonDisabled = selected === null;
 
+  const handleSubmit = async () => {
+    if (isSubmitButtonDisabled || submitting) {
+      return;
+    }
+    setSubmitting(true);
+    try {
+      if (selected === "I don't know yet !") {
+        navigation.replace('RoadmapQuestionsFlow', {
+          fromCareerGoal: true,
+        });
+      } else {
+        // get the selected roadmap id
+        const selectedRoadmap = availableRoadmaps.find(
+          roadmap => roadmap.value === selected,
+        );
+        // call the API to set the career goal
+        // await setCareerGoal(selectedRoadmap.id)
+        try {
+          await enrollUserToRoadmap(selectedRoadmap.key);
+          // If networkAPICall fails it should throw; on success proceed
+          setIsUserEnrolledToRoadmap(true);
+          console.log(selectedRoadmap, 'the selected roadmap iiiissss');
+          navigation.reset({
+            index: 0,
+            routes: [
+              {
+                name: 'MainDash',
+              },
+            ],
+          });
+        } catch (e) {
+          showSnackbar?.({
+            message: 'Failed to set career goal. Please try again.',
+            type: 'error',
+          });
+          return; // stay on page
+        }
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   useEffect(() => {
     // If availableRoadmaps is empty, fetch user roadmaps
     if (!isUserEnrolledToRoadmap) {
@@ -255,6 +304,8 @@ const CareerGoalScreen = ({navigation, route}) => {
     );
   }
 
+  console.log(availableRoadmaps, 'Available Roadmaps in CareerGoalScreen');
+
   return (
     <LinearGradient colors={['#180037', '#260964']} style={styles.gradient}>
       <SafeAreaView style={styles.safeArea}>
@@ -273,48 +324,24 @@ const CareerGoalScreen = ({navigation, route}) => {
             renderItem={renderOption}
           />
 
-          <TouchableOpacity
+          <CommonButton
+            name={
+              selected === "I don't know yet !"
+                ? 'Continue'
+                : 'Set My Career Goal'
+            }
+            onPress={handleSubmit}
+            disabled={isSubmitButtonDisabled}
+            loading={submitting}
             style={[
               styles.submitButton,
-              isSubmitButtonDisabled && styles.disabledSubmitButton, // Apply disabled style
+              isSubmitButtonDisabled && styles.disabledSubmitButton,
             ]}
-            onPress={() => {
-              if (selected === "I don't know yet !") {
-                navigation.replace('RoadmapQuestionsFlow', {
-                  fromCareerGoal: true,
-                });
-              } else {
-                // get the selected roadmap id
-                const selectedRoadmap = availableRoadmaps.find(
-                  roadmap => roadmap.value === selected,
-                );
-                // call the API to set the career goal
-
-                console.log(selectedRoadmap, 'the selected roadmap iiiissss');
-
-                navigation.reset({
-                  index: 0,
-                  routes: [
-                    {
-                      name: 'MainDash',
-                    },
-                  ],
-                });
-              }
-            }}
-            activeOpacity={isSubmitButtonDisabled ? 1 : 0.8} // Prevent active opacity change when disabled
-            disabled={isSubmitButtonDisabled} // Disable the button
-          >
-            <Text
-              style={[
-                styles.submitText,
-                isSubmitButtonDisabled && styles.disabledSubmitText, // Apply disabled text style
-              ]}>
-              {selected === "I don't know yet !"
-                ? 'Continue'
-                : 'Set My Career Goal'}
-            </Text>
-          </TouchableOpacity>
+            textStyle={[
+              styles.submitText,
+              isSubmitButtonDisabled && styles.disabledSubmitText,
+            ]}
+          />
         </View>
       </SafeAreaView>
     </LinearGradient>

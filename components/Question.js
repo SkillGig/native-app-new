@@ -12,39 +12,40 @@ const Question = ({
   options,
   multiSelect = false,
   numberOfOptionsToSelect,
+  minSelections = 1,
+  maxSelections,
   onSubmit,
   initialSelected = [],
 }) => {
   const [selected, setSelected] = useState(initialSelected);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
-  const handleSelect = item => {
+  const handleSelect = optionId => {
+    console.log(optionId, 'the option selected is this');
     Vibration.vibrate(15); // Vibrate on option select
     if (multiSelect) {
-      if (selected.includes(item)) {
-        setSelected(selected.filter(i => i !== item));
+      if (selected.includes(optionId)) {
+        setSelected(selected.filter(i => i !== optionId));
       } else {
-        if (selected.length < numberOfOptionsToSelect) {
-          setSelected([...selected, item]);
-        } else {
-          setSelected([...selected.slice(1), item]);
+        const max = maxSelections || numberOfOptionsToSelect;
+        if (selected.length < max) {
+          setSelected([...selected, optionId]);
         }
+        // If already at max, do nothing (no more can be selected)
       }
     } else {
-      setSelected([item]);
+      setSelected([optionId]);
     }
   };
 
   useEffect(() => {
-    // For multiSelect, require at least minSelect; for single, require 1
+    // For multiSelect, require at least minSelections; for single, require 1
     if (!multiSelect) {
       setIsSubmitDisabled(selected.length === 0);
     } else {
-      setIsSubmitDisabled(
-        selected.length === numberOfOptionsToSelect ? false : true,
-      );
+      setIsSubmitDisabled(selected.length >= minSelections ? false : true);
     }
-  }, [selected, multiSelect, numberOfOptionsToSelect]);
+  }, [selected, multiSelect, minSelections]);
 
   return (
     <View style={styles.container}>
@@ -52,22 +53,23 @@ const Question = ({
       {multiSelect ? (
         <View style={styles.multiOptionsWrap}>
           {options.map(item => {
-            const isSelected = selected.includes(item);
+            const isSelected = selected.includes(item.optionId);
+            console.log(item, selected, 'the selected and items when rendered');
             return (
               <TouchableOpacity
-                key={item}
+                key={item.optionId}
                 style={[
                   styles.multiOption,
                   isSelected && styles.selectedMultiOption,
                 ]}
-                onPress={() => handleSelect(item)}
+                onPress={() => handleSelect(item.optionId)}
                 activeOpacity={0.8}>
                 <Text
                   style={[
                     styles.multiOptionText,
                     isSelected && styles.selectedMultiOptionText,
                   ]}>
-                  {item}
+                  {item.optionText}
                 </Text>
                 {isSelected && <Text style={styles.checkmark}>✓</Text>}
               </TouchableOpacity>
@@ -77,10 +79,11 @@ const Question = ({
       ) : (
         <View style={styles.singleOptionsWrap}>
           {options.map(item => {
-            const isSelected = selected.includes(item);
+            console.log(item, selected, 'the selected and items when rendered');
+            const isSelected = selected.includes(item.optionId);
             return (
               <TouchableOpacity
-                key={item}
+                key={item.optionId}
                 style={[styles.option, isSelected && styles.selectedOption]}
                 onPress={() => handleSelect(item)}
                 activeOpacity={0.8}>
@@ -89,7 +92,7 @@ const Question = ({
                     styles.optionText,
                     isSelected && styles.selectedText,
                   ]}>
-                  {item}
+                  {item.optionText}
                 </Text>
                 {isSelected && <Text style={styles.checkmark}>✓</Text>}
               </TouchableOpacity>

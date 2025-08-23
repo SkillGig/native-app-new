@@ -163,3 +163,42 @@ export const getUserConfig = async () => {
     auth: true,
   });
 };
+
+export const enrollUserToRoadmap = async roadmapId => {
+  return await networkAPICall({
+    url: userService.enrollToRoadmap,
+    method: 'POST',
+    data: {roadmapId},
+    service: 'userService',
+    auth: true,
+  });
+};
+
+export const fetchOnboardingQuestion = async previousQuestionId => {
+  return await networkAPICall({
+    url: userService.fetchOnboardingQuestion,
+    method: 'GET',
+    params: {previousQuestionId},
+    service: 'userService',
+    auth: true,
+  });
+};
+
+export const submitOnboardingQuestionAnswer = async (questionId, selectedOptions) => {
+  return await networkAPICall({
+    url: userService.submitOnboardingQuestionAnswer,
+    method: 'POST',
+    data: {questionId, selectedOptions},
+    service: 'userService',
+    auth: true,
+  });
+};
+
+export const calculateRoadmap = async () => {
+  return await networkAPICall({
+    url: userService.calculateRoadmap,
+    method: 'POST',
+    service: 'userService',
+    auth: true,
+  });
+};

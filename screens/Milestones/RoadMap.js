@@ -1,4 +1,11 @@
-import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   View,
   Text,
@@ -15,7 +22,10 @@ import {
 import {ThemeContext} from '../../src/context/ThemeContext';
 import LinearGradient from 'react-native-linear-gradient';
 import {getFontStyles} from '../../styles/FontStyles';
-import { normalizeHeight,normalizeWidth } from '../../components/Responsivescreen';
+import {
+  normalizeHeight,
+  normalizeWidth,
+} from '../../components/Responsivescreen';
 import images from '../../assets/images';
 const RoadMap = ({navigation}) => {
   const {isDark, colors} = useContext(ThemeContext);
@@ -40,6 +50,22 @@ const RoadMap = ({navigation}) => {
 
   const progressAnims = useRef(data.map(() => new Animated.Value(0))).current;
 
+  const animateIndicator = useCallback(
+    index => {
+      progressAnims.forEach((anim, i) => {
+        anim.stopAnimation();
+        anim.setValue(i < index ? 1 : 0); // completed ones filled, reset others
+      });
+
+      Animated.timing(progressAnims[index], {
+        toValue: 1,
+        duration: AUTO_SCROLL_INTERVAL,
+        useNativeDriver: false,
+      }).start();
+    },
+    [progressAnims],
+  );
+
   useEffect(() => {
     animateIndicator(currentIndex);
 
@@ -50,20 +76,7 @@ const RoadMap = ({navigation}) => {
     }, AUTO_SCROLL_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [currentIndex]);
-
-  const animateIndicator = index => {
-    progressAnims.forEach((anim, i) => {
-      anim.stopAnimation();
-      anim.setValue(i < index ? 1 : 0); // completed ones filled, reset others
-    });
-
-    Animated.timing(progressAnims[index], {
-      toValue: 1,
-      duration: AUTO_SCROLL_INTERVAL,
-      useNativeDriver: false,
-    }).start();
-  };
+  }, [currentIndex, data.length, animateIndicator]);
 
   const onScrollEnd = e => {
     const newIndex = Math.round(e.nativeEvent.contentOffset.x / width);
@@ -76,17 +89,17 @@ const RoadMap = ({navigation}) => {
     {
       id: 1,
       name: 'Tanvi',
-      points:"87654"
+      points: '87654',
     },
     {
       id: 3,
       name: 'Pragna',
-      points:"345"
+      points: '345',
     },
     {
       id: 9,
       name: 'Prakruthi',
-      points:"8765"
+      points: '8765',
     },
   ];
 
@@ -240,11 +253,12 @@ const RoadMap = ({navigation}) => {
                       style={styles.avatar}
                     />
                     <Text style={[fstyles.heavyTwenty, styles.nameText]}>
-                    {item.name}
+                      {item.name}
                     </Text>
                   </View>
                   <Text style={fstyles.boldSixteen}>
-                    {item.points}<Text style={fstyles.mediumTen}> XP</Text>
+                    {item.points}
+                    <Text style={fstyles.mediumTen}> XP</Text>
                   </Text>
                 </View>
               </LinearGradient>
@@ -255,9 +269,11 @@ const RoadMap = ({navigation}) => {
           </View>
         ))}
 
-        <TouchableOpacity style={styles.viewLeaderboardBtn} onPress={()=>{
-          navigation.navigate('LeaderBoard')
-        }}>
+        <TouchableOpacity
+          style={styles.viewLeaderboardBtn}
+          onPress={() => {
+            navigation.navigate('LeaderBoard');
+          }}>
           <Text style={styles.viewLeaderboardText}>View Leaderboard</Text>
           <Image source={images.BACKICON} style={styles.viewLeaderboardIcon} />
         </TouchableOpacity>
@@ -317,116 +333,122 @@ const RoadMap = ({navigation}) => {
           </Text>
         </View>
         <View
-              style={{
-                marginBottom: normalizeHeight(24),
-                // marginLeft: normalizeWidth(20),
-              }}>
-              <FlatList
-                showsHorizontalScrollIndicator={false}
-                data={courseFilter}
-                horizontal
-                keyExtractor={(item, index) => `_${index}`}
-                renderItem={({item, index}) => {
-                  return (
-                    <View
-                      style={{
-                        width: normalizeWidth(208),
-                        marginTop: normalizeHeight(16),
-                        borderRadius: 12,
-                        borderWidth: 1,
-                        borderColor: 'rgba(176, 149, 227, 0.4)',
-                        overflow: 'hidden',
-                        marginLeft: item.length - 1 ? 0 : normalizeWidth(20),
-                      }}>
-                      <LinearGradient
-                        colors={[
-                          'rgba(70, 49, 115, 0.3)',
-                          '#463173',
-                          '#463173',
-                          'rgba(70, 49, 115, 0.3)',
-                        ]}
-                        locations={[0, 0.49, 0.59, 1]}
-                        start={{x: 0.5, y: 0}}
-                        end={{x: 0.5, y: 1}}
+          style={{
+            marginBottom: normalizeHeight(24),
+            // marginLeft: normalizeWidth(20),
+          }}>
+          <FlatList
+            showsHorizontalScrollIndicator={false}
+            data={courseFilter}
+            horizontal
+            keyExtractor={(item, index) => `_${index}`}
+            renderItem={({item, index}) => {
+              return (
+                <View
+                  style={{
+                    width: normalizeWidth(208),
+                    marginTop: normalizeHeight(16),
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: 'rgba(176, 149, 227, 0.4)',
+                    overflow: 'hidden',
+                    marginLeft: item.length - 1 ? 0 : normalizeWidth(20),
+                  }}>
+                  <LinearGradient
+                    colors={[
+                      'rgba(70, 49, 115, 0.3)',
+                      '#463173',
+                      '#463173',
+                      'rgba(70, 49, 115, 0.3)',
+                    ]}
+                    locations={[0, 0.49, 0.59, 1]}
+                    start={{x: 0.5, y: 0}}
+                    end={{x: 0.5, y: 1}}
+                    style={{
+                      paddingVertical: normalizeHeight(8),
+                      paddingHorizontal: normalizeWidth(8),
+                      borderRadius: 12,
+                      width: '100%',
+                    }}>
+                    <View>
+                      <Image
+                        source={images.TESTONGOING}
                         style={{
-                          paddingVertical: normalizeHeight(8),
-                          paddingHorizontal: normalizeWidth(8),
-                          borderRadius: 12,
-                          width: '100%',
+                          height: normalizeHeight(78),
+                          width: normalizeWidth(192),
+                          resizeMode: 'contain',
+                        }}
+                      />
+                      <View
+                        style={{
+                          marginTop: normalizeHeight(12),
+                          marginHorizontal: normalizeWidth(4),
                         }}>
-                        <View>
-                          <Image
-                            source={images.TESTONGOING}
-                            style={{
-                              height: normalizeHeight(78),
-                              width: normalizeWidth(192),
-                              resizeMode: 'contain',
-                            }}
-                          />
+                        <Text style={fstyles.boldFourteen}>Figma Basics</Text>
+                        <Text
+                          style={[
+                            fstyles.twelweRegular,
+                            {
+                              fontStyle: 'italic',
+                              color: 'rgba(255, 255, 255, 0.60)',
+                            },
+                          ]}>
+                          By Anshika Gupta
+                        </Text>
+                        <View style={{marginTop: normalizeHeight(8)}}>
                           <View
                             style={{
-                              marginTop: normalizeHeight(12),
-                              marginHorizontal: normalizeWidth(4),
+                              flexDirection: 'row',
+                              flexWrap: 'nowrap',
                             }}>
-                            <Text style={fstyles.boldFourteen}>
-                              Figma Basics
-                            </Text>
-                            <Text
-                              style={[
-                                fstyles.twelweRegular,
-                                {
-                                  fontStyle: 'italic',
-                                  color: 'rgba(255, 255, 255, 0.60)',
-                                },
-                              ]}>
-                              By Anshika Gupta
-                            </Text>
-                            <View style={{marginTop: normalizeHeight(8)}}>
-                              <View
+                            {courseType.map((item, index) => (
+                              <TouchableOpacity
+                                key={`_${index}`}
                                 style={{
-                                  flexDirection: 'row',
-                                  flexWrap: 'nowrap',
+                                  borderWidth: 1,
+                                  borderColor: 'rgba(176, 149, 227, 0.40)',
+                                  borderRadius: 20,
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                  paddingHorizontal: normalizeWidth(8),
+                                  height: normalizeHeight(19),
+                                  marginRight: normalizeWidth(5),
+                                }}
+                                onPress={() => {
+                                  console.log(item.title, 'titleeee');
                                 }}>
-                                {courseType.map((item, index) => (
-                                  <TouchableOpacity
-                                    key={`_${index}`}
-                                    style={{
-                                      borderWidth: 1,
-                                      borderColor: 'rgba(176, 149, 227, 0.40)',
-                                      borderRadius: 20,
-                                      justifyContent: 'center',
-                                      alignItems: 'center',
-                                      paddingHorizontal: normalizeWidth(8),
-                                      height: normalizeHeight(19),
-                                      marginRight: normalizeWidth(5),
-                                    }}
-                                    onPress={() => {
-                                      console.log(item.title, 'titleeee');
-                                    }}>
-                                    <Text
-                                      style={[
-                                        fstyles.mediumTen,
-                                        {color: '#D3C4EF'},
-                                      ]}>
-                                      {item.title}
-                                    </Text>
-                                  </TouchableOpacity>
-                                ))}
-                              </View>
-                            </View>
+                                <Text
+                                  style={[
+                                    fstyles.mediumTen,
+                                    {color: '#D3C4EF'},
+                                  ]}>
+                                  {item.title}
+                                </Text>
+                              </TouchableOpacity>
+                            ))}
                           </View>
-                          <TouchableOpacity style={{justifyContent:"center",height:normalizeHeight(33),alignItems:"center",
-                          marginTop:normalizeHeight(20),borderRadius:12,
-                            backgroundColor:"#815FC4"}}>
-                            <Text style={fstyles.semiTwelwe}>Download Certificate</Text>
-                          </TouchableOpacity>
                         </View>
-                      </LinearGradient>
+                      </View>
+                      <TouchableOpacity
+                        style={{
+                          justifyContent: 'center',
+                          height: normalizeHeight(33),
+                          alignItems: 'center',
+                          marginTop: normalizeHeight(20),
+                          borderRadius: 12,
+                          backgroundColor: '#815FC4',
+                        }}>
+                        <Text style={fstyles.semiTwelwe}>
+                          Download Certificate
+                        </Text>
+                      </TouchableOpacity>
                     </View>
-                  );
-                }}
-              />
-            </View>
+                  </LinearGradient>
+                </View>
+              );
+            }}
+          />
+        </View>
       </ScrollView>
     </LinearGradient>
   );
