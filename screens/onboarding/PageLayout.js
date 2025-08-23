@@ -16,6 +16,7 @@ import {
   normalizeWidth,
 } from '../../components/Responsivescreen';
 import useUserStore from '../../src/store/useUserStore';
+import { useNavigation } from '@react-navigation/native';
 // import {useNavigation} from '@react-navigation/native';
 
 const PageLayout = ({
@@ -28,19 +29,19 @@ const PageLayout = ({
   delayRedirectToHome = false, // new prop
 }) => {
   const {isDark} = useContext(ThemeContext);
-  // const navigation = useNavigation();
-  // const authToken = useUserStore(state => state.user.authToken);
-  // const refreshToken = useUserStore(state => state.user.refreshToken);
+  const navigation = useNavigation();
+  const authToken = useUserStore(state => state.user.authToken);
+  const refreshToken = useUserStore(state => state.user.refreshToken);
 
-  // useEffect(() => {
-  //   console.log(authToken, refreshToken, 'PageLayout Tokens');
-  //   if (authToken && refreshToken && !delayRedirectToHome) {
-  //     navigation.reset({
-  //       index: 0,
-  //       routes: [{name: 'MainDash'}],
-  //     });
-  //   }
-  // }, [authToken, refreshToken, navigation, delayRedirectToHome]);
+  useEffect(() => {
+    console.log(authToken, refreshToken, 'PageLayout Tokens');
+    if (authToken && refreshToken && !delayRedirectToHome) {
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'MainDash'}],
+      });
+    }
+  }, [authToken, refreshToken, navigation, delayRedirectToHome]);
 
   const gradientColors = useMemo(
     () => (isDark ? ['#300B73', '#090215'] : ['#381874', '#150534']),

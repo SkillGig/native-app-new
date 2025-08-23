@@ -14,6 +14,10 @@ export const userService = {
   updateUserProfile: '/profile/update',
   changePassword: '/change-password',
   deleteAccount: '/delete-account',
+  enrollToRoadmap: '/enroll-roadmap',
+  fetchOnboardingQuestion: '/onboarding/questions',
+  submitOnboardingQuestionAnswer: '/onboarding/submit-response',
+  calculateRoadmap: '/onboarding/calculate-roadmap',
 };
 
 export const notificationsService = {

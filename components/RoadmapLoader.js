@@ -54,8 +54,8 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   starsImage: {
-    width: 120,
-    height: 120,
+    width: 200,
+    height: 200,
     alignSelf: 'center',
   },
   textContainer: {

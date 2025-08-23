@@ -1,114 +1,206 @@
-import React, {useRef, useEffect} from 'react';
-import {SafeAreaView, View, Animated} from 'react-native';
+import React, {useRef, useEffect, useState} from 'react';
+import {SafeAreaView, View, Animated, ActivityIndicator} from 'react-native';
 import Question from '../../components/Question';
-
-// Updated questions data
-const QUESTIONS = [
-  {
-    id: 1,
-    question: 'Which of these do you enjoy the most?',
-    options: [
-      'Building UIs',
-      'Solving backend problems',
-      'Designing experiences',
-      'Testing applications',
-      'Analyzing data',
-    ],
-    multiSelect: false,
-    numberOfOptionsToSelect: 1,
-  },
-  {
-    id: 2,
-    question: 'Pick up to 2 areas you want to improve:',
-    options: [
-      'Frontend',
-      'Backend',
-      'DevOps',
-      'UI/UX',
-      'Testing',
-      'Data Analysis',
-    ],
-    multiSelect: true,
-    numberOfOptionsToSelect: 2,
-  },
-  {
-    id: 3,
-    question: 'Which work style do you prefer?',
-    options: ['Teamwork', 'Solo', 'Flexible'],
-    multiSelect: false,
-    numberOfOptionsToSelect: 1,
-  },
-  {
-    id: 4,
-    question: 'Select the tools you have used (max 3):',
-    options: ['React', 'Node.js', 'Figma', 'Jira', 'Python', 'AWS'],
-    multiSelect: true,
-    numberOfOptionsToSelect: 3,
-  },
-  {
-    id: 5,
-    question: 'What motivates you most?',
-    options: [
-      'Solving problems',
-      'Helping users',
-      'Learning new tech',
-      'Building products',
-    ],
-    multiSelect: false,
-    numberOfOptionsToSelect: 1,
-  },
-];
+import RoadmapLoader from '../../components/RoadmapLoader';
+import FinalRoadmapSelection from './FinalRoadmapSelection';
+import {
+  fetchOnboardingQuestion,
+  submitOnboardingQuestionAnswer,
+  calculateRoadmap,
+  enrollUserToRoadmap,
+} from '../../src/api/userOnboardingAPIs';
+import useUserStore from '../../src/store/useUserStore';
+import useSnackbarStore from '../../src/store/useSnackbarStore';
 
 const RoadmapQuestionsFlow = ({navigation}) => {
-  const [currentQ, setCurrentQ] = React.useState(0);
-  const [answers, setAnswers] = React.useState([]); // {questionId, answer}
+  const [loading, setLoading] = useState(true);
+  const [question, setQuestion] = useState(null);
+  const [progress, setProgress] = useState({
+    totalQuestions: 0,
+    answeredQuestions: 0,
+  });
+  const [selected, setSelected] = useState([]);
+  const [roadmap, setRoadmap] = useState(null);
+  const [roadmapLoading, setRoadmapLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [enrolling, setEnrolling] = useState(false);
   const progressAnim = useRef(new Animated.Value(0)).current;
 
-  // Animate progress bar smoothly
-  useEffect(() => {
-    // Animate to (currentQ / QUESTIONS.length) * 100
-    const progress = (currentQ / QUESTIONS.length) * 100;
-    Animated.timing(progressAnim, {
-      toValue: progress,
-      duration: 400,
-      useNativeDriver: false,
-    }).start();
-  }, [currentQ, progressAnim]);
+  const setIsUserEnrolledToRoadmap = useUserStore(
+    state => state.setIsUserEnrolledToRoadmap,
+  );
+  const showSnackbar = useSnackbarStore(state => state.showSnackbar);
 
-  const handleSubmit = selected => {
-    setAnswers(prev => {
-      const updated = [...prev];
-      updated[currentQ] = {
-        questionId: QUESTIONS[currentQ].id,
-        answer: selected,
-      };
-      return updated;
-    });
-    if (currentQ < QUESTIONS.length - 1) {
-      setCurrentQ(currentQ + 1);
+  // Fetch first question on mount
+  useEffect(() => {
+    let cancelled = false;
+    const fetchFirst = async () => {
+      setLoading(true);
+      try {
+        const res = await fetchOnboardingQuestion(0);
+        if (res?.data?.nextQuestionDetails) {
+          setQuestion(res.data.nextQuestionDetails);
+          setProgress(res.data.userQuestionCompletionProgress);
+        } else {
+          // No question, check progress
+          if (
+            res?.error?.userQuestionCompletionProgress?.totalQuestions ===
+            res?.error?.userQuestionCompletionProgress?.answeredQuestions
+          ) {
+            // All answered, show roadmap loader and calculate roadmap
+            setRoadmapLoading(true);
+            const roadmapRes = await calculateRoadmap();
+            // Wait for 5 seconds to show the loader
+            setTimeout(() => {
+              setRoadmap(roadmapRes?.data?.data?.recommendations?.[0] || null);
+              setRoadmapLoading(false);
+            }, 5000);
+          }
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+    fetchFirst();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Animate progress bar
+  useEffect(() => {
+    if (progress.totalQuestions > 0) {
+      const pct = (progress.answeredQuestions / progress.totalQuestions) * 100;
+      // Always reset progressAnim to 0 if starting a new flow
+      if (progress.answeredQuestions === 0) {
+        progressAnim.setValue(0);
+      }
+      Animated.timing(progressAnim, {
+        toValue: pct,
+        duration: 400,
+        useNativeDriver: false,
+      }).start();
     } else {
-      // All questions answered
-      setTimeout(() => {
-        console.log('All answers:', [
-          ...answers,
-          {questionId: QUESTIONS[currentQ].id, answer: selected},
-        ]);
-        navigation.reset({
-          index: 0,
-          routes: [
-            {
-              name: 'MainDash',
-            },
-          ],
-        });
-      }, 0);
+      progressAnim.setValue(0);
+    }
+  }, [progress.totalQuestions, progress.answeredQuestions, progressAnim]);
+
+  const handleAcceptRoadmap = async () => {
+    if (!roadmap?.roadmapId) {
+      showSnackbar?.({
+        message: 'Invalid roadmap selection. Please try again.',
+        type: 'error',
+      });
+      return;
+    }
+
+    setEnrolling(true);
+    try {
+      await enrollUserToRoadmap(roadmap.roadmapId);
+      setIsUserEnrolledToRoadmap(true);
+      navigation.reset({index: 0, routes: [{name: 'MainDash'}]});
+    } catch (error) {
+      showSnackbar?.({
+        message: 'Roadmap Enrollment is failed please retry again',
+        type: 'error',
+      });
+    } finally {
+      setEnrolling(false);
     }
   };
 
-  const q = QUESTIONS[currentQ];
+  const handleRejectRoadmap = () => {
+    // Reset to career goal selection screen
+    navigation.reset({index: 0, routes: [{name: 'CareerGoal'}]});
+  };
+
+  const handleSubmit = async selectedOptions => {
+    if (!question) {
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await submitOnboardingQuestionAnswer(
+        question.questionId,
+        selectedOptions,
+      );
+      // Fetch next question
+      const res = await fetchOnboardingQuestion(question.questionId);
+
+      // Update progress from response data regardless of whether there's a next question
+      const progressData =
+        res?.data?.userQuestionCompletionProgress ||
+        res?.error?.userQuestionCompletionProgress;
+
+      console.log(progressData, 'the progress data');
+      if (progressData) {
+        setProgress(progressData);
+      }
+
+      if (res?.data?.nextQuestionDetails) {
+        setQuestion(res.data.nextQuestionDetails);
+        setSelected([]);
+      } else {
+        // No more questions, check if all are answered
+        if (progressData?.totalQuestions === progressData?.answeredQuestions) {
+          setRoadmapLoading(true); // Show roadmap loader
+          const roadmapRes = await calculateRoadmap();
+          // Wait for 5 seconds to show the loader
+          setTimeout(() => {
+            setRoadmap(roadmapRes?.data?.data?.recommendations?.[0] || null);
+            setRoadmapLoading(false);
+          }, 5000);
+        }
+        setQuestion(null);
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // If loading, show spinner
+  if (loading) {
+    return (
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: '#180037',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <ActivityIndicator size="large" color="#9C7BFF" />
+      </SafeAreaView>
+    );
+  }
+
+  // If roadmap loading, show RoadmapLoader
+  if (roadmapLoading) {
+    return (
+      <SafeAreaView style={{flex: 1, backgroundColor: '#180037'}}>
+        <RoadmapLoader />
+      </SafeAreaView>
+    );
+  }
+
+  // If roadmap is present, show FinalRoadmapSelection
+  if (roadmap) {
+    return (
+      <FinalRoadmapSelection
+        navigation={navigation}
+        roadmapName={roadmap.roadmapName}
+        centerIcon={null} // Ignore for now as requested
+        onAccept={handleAcceptRoadmap}
+        onReject={handleRejectRoadmap}
+        enrolling={enrolling} // Pass loading state
+      />
+    );
+  }
+
+  // If question is present, show it
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#180037'}}>
-      {/* Animated Progress Bar */}
       <View
         style={{
           height: 6,
@@ -130,14 +222,31 @@ const RoadmapQuestionsFlow = ({navigation}) => {
         />
       </View>
       <Question
-        key={currentQ}
-        question={q.question}
-        options={q.options}
-        multiSelect={q.multiSelect}
-        numberOfOptionsToSelect={q.numberOfOptionsToSelect}
-        initialSelected={answers[currentQ]?.answer || (q.multiSelect ? [] : [])}
+        key={question.questionId}
+        question={question.questionText}
+        options={question.options}
+        multiSelect={question.questionType === 'multi_select'}
+        numberOfOptionsToSelect={question.maxSelections || 1}
+        minSelections={question.minSelections || 1}
+        maxSelections={question.maxSelections || 1}
+        initialSelected={selected}
         onSubmit={handleSubmit}
       />
+      {submitting && (
+        <View
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            top: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(24,0,55,0.2)',
+          }}>
+          <ActivityIndicator size="large" color="#9C7BFF" />
+        </View>
+      )}
     </SafeAreaView>
   );
 };

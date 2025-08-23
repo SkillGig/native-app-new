@@ -106,54 +106,52 @@ const Navigation = () => {
           component={RoadmapQuestionsFlow}
           options={{headerShown: false}}
         />
-        
         <Stack.Screen
           name="LeaderBoard"
           component={LeaderBoard}
           options={{headerShown: false}}
         />
-        
-      <Stack.Screen
+        <Stack.Screen
           name="CourseContent"
           component={CourseContent}
           options={{headerShown: false}}
         />
-      <Stack.Screen
+        <Stack.Screen
           name="ExploreCourses"
           component={ExploreCourses}
           options={{headerShown: false}}
         />
 
-     <Stack.Screen
+        <Stack.Screen
           name="CourseScreening"
           component={CourseScreening}
           options={{headerShown: false}}
         />
 
-       <Stack.Screen
+        <Stack.Screen
           name="OngoingCourses"
           component={OngoingCourses}
           options={{headerShown: false}}
         />
-    
-           <Stack.Screen
+
+        <Stack.Screen
           name="QuizzesDashboard"
           component={QuizzesDashboard}
           options={{headerShown: false}}
         />
-        
-          <Stack.Screen
+
+        <Stack.Screen
           name="QuizQuestions"
           component={QuizQuestions}
           options={{headerShown: false}}
         />
-        
+
         <Stack.Screen
           name="QuizSummary"
           component={QuizSummary}
           options={{headerShown: false}}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="YourScreen"
           component={YourScreen}
           options={{headerShown: false}}

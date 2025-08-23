@@ -1,5 +1,11 @@
 import React from 'react';
-import {TouchableOpacity, Text, StyleSheet} from 'react-native';
+import {
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  View,
+} from 'react-native';
 import {normalizeHeight, normalizeWidth} from './Responsivescreen';
 
 const CommonButton = ({
@@ -9,24 +15,38 @@ const CommonButton = ({
   loading = false,
   style = {},
   textStyle = {},
-}) => (
-  <TouchableOpacity
-    disabled={disabled || loading}
-    onPress={onPress}
-    style={[
-      styles.button,
-      {
-        backgroundColor: !disabled ? '#563593' : 'rgba(255,255,255,0.2)',
-        opacity: !disabled ? 1 : 0.3,
-      },
-      style,
-    ]}
-  >
-    <Text style={[styles.text, textStyle]}>
-      {loading ? 'Please wait...' : name}
-    </Text>
-  </TouchableOpacity>
-);
+}) => {
+  const effectiveDisabled = disabled || loading;
+  return (
+    <TouchableOpacity
+      disabled={effectiveDisabled}
+      onPress={onPress}
+      style={[
+        styles.button,
+        {
+          backgroundColor: !effectiveDisabled
+            ? '#563593'
+            : 'rgba(255,255,255,0.2)',
+          opacity: !effectiveDisabled ? 1 : 0.5,
+        },
+        style,
+      ]}
+      activeOpacity={effectiveDisabled ? 1 : 0.8}>
+      {loading ? (
+        <View style={styles.loadingWrap}>
+          <ActivityIndicator
+            color="#EADDFF"
+            size="small"
+            style={{marginRight: 8}}
+          />
+          <Text style={[styles.text, textStyle]}>Please wait...</Text>
+        </View>
+      ) : (
+        <Text style={[styles.text, textStyle]}>{name}</Text>
+      )}
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   button: {
@@ -39,6 +59,11 @@ const styles = StyleSheet.create({
     color: '#EADDFF',
     fontSize: normalizeWidth(16),
     fontWeight: '700',
+  },
+  loadingWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

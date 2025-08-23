@@ -107,7 +107,7 @@ const OnboardingScreen = ({navigation}) => {
       return;
     }
     // Vibrate on slide change
-    Vibration.vibrate(15);
+    // Vibration.vibrate(15);
     setAnimating(true);
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -142,7 +142,7 @@ const OnboardingScreen = ({navigation}) => {
   }, [animating, currentIndex, fadeAnim, translateYAnim]);
 
   const handleContinue = () => {
-    navigation.navigate('YourScreen');
+    navigation.navigate('Login');
   };
 
   const hasHydrated = useUserStore.persist?.hasHydrated?.();
