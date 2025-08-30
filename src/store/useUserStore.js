@@ -14,6 +14,7 @@ const useUserStore = create(
         orgInfo: null,
         isUserEnrolledToRoadmap: false,
         availableRoadmaps: [],
+        streakModal: false,
         fcmToken: '', // Store FCM token
       },
       userConfig: {}, // Add userConfig to Zustand store
@@ -83,6 +84,14 @@ const useUserStore = create(
         })),
       setUserConfig: config => set(state => ({userConfig: config})), // Add setUserConfig
       getUserConfig: () => get().userConfig, // Add getUserConfig
+      setStreakModal: (value) => {
+        set(state => ({
+          user: {
+            ...state.user,
+            streakModal: value,
+          },
+        }));
+      },
       logout: () =>
         set({
           user: {

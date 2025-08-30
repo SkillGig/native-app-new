@@ -1,4 +1,4 @@
-import React, {useState, useContext, useRef, useEffect} from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,32 +8,37 @@ import {
   Platform,
   Animated,
 } from 'react-native';
-import {CodeField} from '../../components';
+import { CodeField } from '../../components';
 import {
   normalizeHeight,
   normalizeWidth,
 } from '../../components/Responsivescreen';
 import PageLayout from './PageLayout';
-import {ThemeContext} from '../../src/context/ThemeContext';
-import {resendOTP, verifyOTP} from '../../src/api/userOnboardingAPIs';
+import { ThemeContext } from '../../src/context/ThemeContext';
+import { resendOTP, verifyOTP } from '../../src/api/userOnboardingAPIs';
 import CommonButton from '../../components/CommonButton';
 import Loader from '../../components/Loader';
+import useUserStore from '../../src/store/useUserStore';
 
 const RESEND_OTP_TIME = 5;
 
-const VerifyOTP = ({route, navigation}) => {
+const VerifyOTP = ({ route, navigation }) => {
   const [otpval, setotpval] = useState('');
   const [otpStatus, setOtpStatus] = useState('normal');
   const [timer, setTimer] = useState(RESEND_OTP_TIME);
   const [resending, setResending] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [otpId, setOtpId] = useState('');
-  const {isDark} = useContext(ThemeContext);
+  const { isDark } = useContext(ThemeContext);
   const otpRef = useRef();
   const [shakeAnim] = useState(new Animated.Value(0)); // For heading nod
   const [bounceAnim] = useState(new Animated.Value(1)); // For OTP field bounce
 
-  const {orgCode, studentId, loginData} = route.params;
+  const { orgCode, studentId, loginData } = route.params;
+
+  const setIsUserEnrolledToRoadmap = useUserStore(
+    state => state.setIsUserEnrolledToRoadmap
+  );
 
   console.log('VerifyOTP screen params:', {
     orgCode,
@@ -121,6 +126,7 @@ const VerifyOTP = ({route, navigation}) => {
             700,
           );
         } else if (res?.data?.data?.isUserEnrolledToRoadmap === false) {
+          setIsUserEnrolledToRoadmap(false);
           setTimeout(
             () =>
               navigation.reset({
@@ -144,6 +150,7 @@ const VerifyOTP = ({route, navigation}) => {
             700,
           );
         } else {
+          setIsUserEnrolledToRoadmap(true);
           setTimeout(
             () =>
               navigation.reset({
@@ -256,7 +263,7 @@ const VerifyOTP = ({route, navigation}) => {
           marginVertical: normalizeHeight(46),
           marginLeft: normalizeWidth(4),
         }}>
-        <Text style={[styles.shared, {color: isDark ? '#EEE7F9' : '#3C0E90'}]}>
+        <Text style={[styles.shared, { color: isDark ? '#EEE7F9' : '#3C0E90' }]}>
           We've just shared a high security 4 digit code with you on +91
           {loginData?.data?.maskedPhone}
         </Text>
@@ -268,10 +275,10 @@ const VerifyOTP = ({route, navigation}) => {
         ref={otpRef}
         status={otpStatus}
         value={loginData?.data.generatedOtp || ''}
-        style={{transform: [{scale: bounceAnim}]}}
+        style={{ transform: [{ scale: bounceAnim }] }}
       />
 
-      <View style={{marginTop: normalizeHeight(24)}}>
+      <View style={{ marginTop: normalizeHeight(24) }}>
         <Text
           style={{
             fontSize: 12,
@@ -300,8 +307,8 @@ const VerifyOTP = ({route, navigation}) => {
                       ? '#EEE7F9'
                       : '#5013C0'
                     : isDark
-                    ? 'white'
-                    : 'rgba(0, 0, 0, 0.12)',
+                      ? 'white'
+                      : 'rgba(0, 0, 0, 0.12)',
                 textDecorationLine:
                   timer === 0 && !resending ? 'underline' : 'none',
               }}>

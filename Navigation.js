@@ -32,6 +32,7 @@ import YourScreen from './screens/Quizzes/YourScreen';
 import BottomNavBar from './components/BottomNavBar';
 import { StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import CurrentDayStreakBreakdown from './screens/Global/CurrentDayStreakBreakdown';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -121,6 +122,12 @@ const Navigation = () => {
         <Stack.Screen
           name="StreakCalender"
           component={StreakCalender}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="CurrentDayStreakBreakdown"
+          component={CurrentDayStreakBreakdown}
           options={{ headerShown: false }}
         />
 

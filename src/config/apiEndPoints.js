@@ -9,7 +9,7 @@ export const authService = {
 };
 export const userService = {
   userConfig: '/config',
-  fetchUserRoadmaps: '/roadmaps',
+  fetchUserRoadmaps: '/onboarding/roadmaps',
   getUserProfile: '/profile',
   updateUserProfile: '/profile/update',
   changePassword: '/change-password',
@@ -18,6 +18,11 @@ export const userService = {
   fetchOnboardingQuestion: '/onboarding/questions',
   submitOnboardingQuestionAnswer: '/onboarding/submit-response',
   calculateRoadmap: '/onboarding/calculate-roadmap',
+  weeklyStreaks: '/rewards/weekly-streak-summary',
+  streakBreakDown: '/rewards/day-streak-breakup',
+  streakStatus: '/rewards/streak-status',
+  markAnimationSeen: '/rewards/mark-animation-seen',
+  streakMonthlyCalendar: '/rewards/monthly-summary',
 };
 
 export const notificationsService = {

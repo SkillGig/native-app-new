@@ -48,8 +48,12 @@ const Header = ({activeCurrentView, setActiveCurrentView}) => {
           <Image source={images.FEMALEAVATAR} style={styles.avatar} />
         </TouchableOpacity>
         <View style={styles.profileTextContainer}>
-          <Text style={[fstyles.thirteenMedium,{color:'white'}]}>{getGreeting()}</Text>
-          <Text style={[fstyles.twentyBold, {color: '#EEE7F9'}]}>Shravani</Text>
+          <Text style={[fstyles.thirteenMedium, {color: 'white'}]}>
+            {getGreeting()}
+          </Text>
+          <Text style={[fstyles.twentyBold, {color: '#EEE7F9'}]}>
+            {userConfig.userName}
+          </Text>
         </View>
       </View>
 

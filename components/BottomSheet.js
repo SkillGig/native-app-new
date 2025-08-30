@@ -25,9 +25,9 @@ const Bottomsheet = forwardRef((props, ref) => {
     headerText,
     onSubmit,
     isSubmitButtonActive,
-     showIndicator = true,
-      headerLayoutType = 'default', 
-      handleClose
+    showIndicator = true,
+    headerLayoutType = 'default',
+    handleClose,
   } = props;
   const snapPoints = useMemo(() => height, [height]);
 
@@ -66,36 +66,45 @@ const Bottomsheet = forwardRef((props, ref) => {
       enablePanDownToClose
       backdropComponent={StyledBackdrop}
       // handleIndicatorStyle={styles.handleIndicator}
-      handleIndicatorStyle={showIndicator ? styles.handleIndicator : { display: 'none' }}
+      handleIndicatorStyle={
+        showIndicator ? styles.handleIndicator : {display: 'none'}
+      }
       backgroundStyle={styles.sheetBackground}
       onChange={handleSheetChanges}
       android_keyboardInputMode="adjustResize">
       <BottomSheetView style={styles.sheetContainer}>
-      {enableHeader && (
-  <View style={headerLayoutType === 'spaced' ? styles.headerSpaced : styles.headerDefault}>
-    <Text style={styles.headerText}>{headerText}</Text>
-    {headerLayoutType === 'spaced' && (
-      <TouchableOpacity onPress={handleClose}> {/* Add handleClose function */}
-        <Image source={images.CLOSEICON} style={styles.crossIcon} />
-      </TouchableOpacity>
-    )}
-  </View>
-)}
+        {enableHeader && (
+          <View
+            style={
+              headerLayoutType === 'spaced'
+                ? styles.headerSpaced
+                : styles.headerDefault
+            }>
+            <Text style={styles.headerText}>{headerText}</Text>
+            {headerLayoutType === 'spaced' && (
+              <TouchableOpacity onPress={handleClose}>
+                {' '}
+                {/* Add handleClose function */}
+                <Image source={images.CLOSEICON} style={styles.crossIcon} />
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
 
         <ScrollView>{children}</ScrollView>
         {props.footer && (
-        <View style={styles.submitButtonBackground}>
-          <TouchableOpacity
-            style={styles.footerButton(isSubmitButtonActive)}
-            onPress={
-              isSubmitButtonActive
-                ? onSubmit
-                : () => console.log('Update Something')
-            }>
-            <Text style={styles.submitText}>Submit</Text>
-          </TouchableOpacity>
-        </View>
-      )} 
+          <View style={styles.submitButtonBackground}>
+            <TouchableOpacity
+              style={styles.footerButton(isSubmitButtonActive)}
+              onPress={
+                isSubmitButtonActive
+                  ? onSubmit
+                  : () => console.log('Update Something')
+              }>
+              <Text style={styles.submitText}>Submit</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </BottomSheetView>
     </BottomSheetModal>
   );
@@ -170,18 +179,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingBottom:normalizeHeight(12),
-    paddingHorizontal:normalizeWidth(16),
+    paddingBottom: normalizeHeight(12),
+    paddingHorizontal: normalizeWidth(16),
   },
   headerText: {
     fontSize: 16,
-    fontWeight:"700",
-    color:"white"
+    fontWeight: '700',
+    color: 'white',
   },
   crossIcon: {
-    width:normalizeWidth(20),
+    width: normalizeWidth(20),
     height: normalizeHeight(20),
-    resizeMode:"contain"
+    resizeMode: 'contain',
   },
 });
 

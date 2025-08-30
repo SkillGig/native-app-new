@@ -2,8 +2,8 @@ import React, {
   useRef,
   useCallback,
   forwardRef,
-  useImperativeHandle,
   useContext,
+  useEffect,
 } from 'react';
 import {
   StyleSheet,
@@ -15,6 +15,7 @@ import {
   Vibration,
 } from 'react-native';
 import BottomSheet, {BottomSheetFlatList} from '@gorhom/bottom-sheet';
+import {Easing} from 'react-native-reanimated';
 import {FlatList} from 'react-native-gesture-handler';
 import LinearGradient from 'react-native-linear-gradient';
 import {
@@ -29,63 +30,65 @@ import useUserStore from '../../src/store/useUserStore';
 
 const {height: SCREEN_HEIGHT} = Dimensions.get('window');
 
+// Custom animation configuration to match popular apps like Swiggy/CULT
+const customAnimationConfigs = {
+  damping: 50,      // Higher damping for smoother, less bouncy feel
+  stiffness: 150,   // Moderate stiffness for natural responsiveness
+  duration: 600,    // Optimal duration - not too fast, not too slow
+  easing: Easing.bezier(0.25, 0.46, 0.45, 0.94), // iOS-like smooth curve
+};
+
 const HomeSlider = forwardRef(
-  (
-    {
-      snapPoints = ['14%', '87%'],
-      onSheetChange,
-      courseFilter = [],
-      exploreCoursesFilter = [],
-      courseType = [],
-      weekStatus = [],
-      currentDay = '',
-      statusMap = {},
-    },
-    ref,
-  ) => {
+  ({
+    onSheetChange,
+    courseFilter = [],
+    exploreCoursesFilter = [],
+    courseType = [],
+    weekStatus = [],
+    currentDay = '',
+    statusMap = {},
+    activeCurrentView,
+    onStreakPress,
+  }) => {
     const sheetRef = useRef(null);
     const {isDark, colors} = useContext(ThemeContext);
     const fstyles = getFontStyles(isDark, colors);
-    // Defensive: ensure snapPoints is always a valid array with at least 1 element
-   const safeSnapPoints =
-   Array.isArray(snapPoints) && snapPoints.length > 0 ? snapPoints : ['87%'];
-    // Defensive: ensure index is always in range
-const initialIndex = safeSnapPoints.length > 1 ? 1 : 0;
-    const [currentSnapIndex, setCurrentSnapIndex] =
-      React.useState(initialIndex);
+    const snapPoints = useRef(['14%', '87%']);
+    let safeSnapPoints = snapPoints.current;
 
- const userConfig = useUserStore(state => state.userConfig);
+    const [initialIndex, setInitialIndex] = React.useState(0);
 
-const handleSheetChanges = useCallback(
-  index => {
-    if (onSheetChange) {
-      onSheetChange(index);
-    }
-    setCurrentSnapIndex(index);
+    const userConfig = useUserStore(state => state.userConfig);
 
-    // Vibrate only for valid indexes
-    if (index >= 0 && index < safeSnapPoints.length) {
-      Vibration.vibrate(50);
-    }
-
-    // Prevent dragging above max snap
-    if (index !== initialIndex && index !== -1) {
-      sheetRef.current?.snapToIndex(initialIndex);
-    }
-  },
-  [onSheetChange, initialIndex, safeSnapPoints.length],
-);
-
-    useImperativeHandle(ref, () => ({
-      snapTo: index => {
-        if (sheetRef.current && index >= 0 && index < safeSnapPoints.length) {
-          sheetRef.current.snapToIndex(index);
+    const handleSheetChanges = useCallback(
+      index => {
+        if (onSheetChange) {
+          onSheetChange(index);
         }
+
+        // Vibrate only for valid indexes
+        if (index >= 0 && index < safeSnapPoints.length) {
+          Vibration.vibrate(10);
+        }
+
+        // Prevent dragging above max snap
+        if (index > 1) {
+          sheetRef.current?.snapToIndex(1);
+          return setInitialIndex(1);
+        }
+        setInitialIndex(index);
       },
-      close: () => {
-        sheetRef.current?.close();
-      },
-    }));
+      [onSheetChange, safeSnapPoints.length],
+    );
+
+    useEffect(() => {
+      console.log(activeCurrentView, 'the active current view');
+      if (activeCurrentView !== null) {
+        sheetRef.current?.snapToIndex(0);
+      } else if (activeCurrentView === null) {
+        sheetRef.current?.snapToIndex(1);
+      }
+    }, [activeCurrentView]);
 
     // On mount, always snap to initialIndex
     React.useEffect(() => {
@@ -139,6 +142,7 @@ const handleSheetChanges = useCallback(
             weekStatus={weekStatus}
             currentDay={currentDay}
             statusMap={statusMap}
+            onStreakPress={onStreakPress}
           />
         )}
         {/* Ongoing Courses */}
@@ -211,21 +215,28 @@ const handleSheetChanges = useCallback(
       </View>
     );
 
+    useEffect(() => {
+      if (sheetRef?.current) {
+        setTimeout(() => {
+          setInitialIndex(1);
+        }, 1000);
+      }
+    }, []);
+
     return (
       <BottomSheet
         ref={sheetRef}
         index={initialIndex}
         snapPoints={safeSnapPoints}
         enablePanDownToClose={false}
-        enableContentPanningGesture={currentSnapIndex === 0}
-        enableHandlePanningGesture={currentSnapIndex === 0}
+        enableContentPanningGesture={initialIndex === 0}
+        enableHandlePanningGesture={initialIndex === 0}
         enableOverDrag={false}
         animateOnMount={true}
+        animationConfigs={customAnimationConfigs}
         onChange={handleSheetChanges}
         handleIndicatorStyle={
-          currentSnapIndex === 1
-            ? {opacity: 0, height: 0}
-            : styles.handleIndicator
+          initialIndex === 1 ? {opacity: 0, height: 0} : styles.handleIndicator
         }
         style={styles.bottomSheetContainer}
         detached={false}

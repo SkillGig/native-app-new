@@ -1,8 +1,3 @@
-/**
- * Refactor prompt:
- // Copilot will now generate the ListHeaderComponent structure with FlatLists + HomeHero.
- */
-
 import React, {useRef, useState, useCallback, useEffect} from 'react';
 import {
   View,
@@ -23,64 +18,55 @@ import NotificationsPanel from './NotificationsPanel';
 import ProfileComponent from './Profile';
 import useUserStore from '../../src/store/useUserStore';
 import HomeSlider from './HomeSlider';
-import {requestAndRegisterFcmToken} from '../../src/api/userOnboardingAPIs';
+import {
+  currentDayStreakStatus,
+  getStreakBreakDown,
+  getWeeklyStreaks,
+  requestAndRegisterFcmToken,
+} from '../../src/api/userOnboardingAPIs';
 import messaging from '@react-native-firebase/messaging';
 import Loader from '../../components/Loader';
 import {getUserConfig} from '../../src/api/userOnboardingAPIs';
 import useSnackbarStore from '../../src/store/useSnackbarStore';
 import {connectNotificationSocket} from '../../src/api/notificationSocket';
+import {StreakCalendarBottomSheet} from '../../components';
 
 const MainDash = ({navigation}) => {
-  const [activeCurrentView, setActiveCurrentView] = useState(null);
-  const bottomSheetRef = useRef(null);
+  const [activeCurrentView, setActiveCurrentView] = useState(0);
+  const [streakStatusResponse, setStreakStatusResponse] = useState(null);
 
-  // const snapPoints = useRef(['13%', '87%']).current;
-  const snapPoints = useRef(['40%']).current;
+  // Refs for bottom sheets
+  const streakCalendarRef = useRef(null);
+
   const handleHeaderItemsPress = view => {
     setActiveCurrentView(view);
   };
-
-  useEffect(() => {
-    // Reset active view when component mounts
-    if (activeCurrentView !== null) {
-      bottomSheetRef.current?.snapTo(0);
-    } else {
-      bottomSheetRef.current?.snapTo(1);
-    }
-  }, [activeCurrentView]);
 
   const handleHeaderItemsCollapse = () => {
     setActiveCurrentView(null);
   };
 
-  const weekStatus = [
-    {day: 'Mon', status: 'completed'},
-    {day: 'Tue', status: 'yet_to_start'},
-    {day: 'Wed', status: 'not_done'},
-    {day: 'Thu', status: 'not_done'},
-    {day: 'Fri', status: 'completed'},
-    {day: 'Sat', status: 'yet_to_start'},
-    {day: 'Sun', status: 'completed'},
-  ];
+  // Handle streak calendar open
+  const handleStreakPress = () => {
+    if (streakCalendarRef.current) {
+      streakCalendarRef.current.present();
+    }
+  };
 
   const statusMap = {
-    completed: {
+    done: {
       icon: images.STREAKICON,
       color: '#4CAF50',
     },
-    yet_to_start: {
+    'yet-to-do': {
       icon: images.YETTOSTARTSTREAK,
       color: '#2196F3',
     },
-    not_done: {
+    'not-done': {
       icon: images.STREAKFAILED,
       color: '#F44336',
     },
   };
-
-  const today = new Date();
-  const dayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const currentDay = dayMap[today.getDay()];
 
   const logout = useUserStore(state => state.logout);
   const fcmToken = useUserStore(state => state.fcmToken);
@@ -269,32 +255,58 @@ const MainDash = ({navigation}) => {
           console.log(res, 'User Config Response');
           if (res?.data?.config) {
             setUserConfig(res.data.config);
+            // if user streaks flag is 1 then we need to call the user streaks API
+            const streaksFlag = res.data.config.showUserStreaks;
+            if (streaksFlag === 1) {
+              const todayStreakStatus = await currentDayStreakStatus();
+              console.log(todayStreakStatus, 'the todays streak status');
+              const streaksRes = await getWeeklyStreaks();
+              setStreakStatusResponse(streaksRes.data);
+              if (
+                todayStreakStatus.data.data.completedStreak &&
+                !todayStreakStatus.data.data.animationSeen
+              ) {
+                const streakDate = new Date();
+                const formattedStreakDate = `${streakDate
+                  .getDate()
+                  .toString()
+                  .padStart(2, '0')}-${(streakDate.getMonth() + 1)
+                  .toString()
+                  .padStart(2, '0')}-${streakDate.getFullYear()}`;
+                const streakBreakDown = await getStreakBreakDown(
+                  formattedStreakDate,
+                );
+                return navigation.navigate('CurrentDayStreakBreakdown', {
+                  streakBreakDownInfo: streakBreakDown.data,
+                });
+              }
+            }
           } else {
             showSnackbar({
               message: 'Invalid user. Please log in again.',
               type: 'error',
             });
-            navigation.reset({
-              index: 0,
-              routes: [{name: 'OnBoarding'}],
-            });
+            // navigation.reset({
+            //   index: 0,
+            //   routes: [{name: 'OnBoarding'}],
+            // });
           }
         } catch (e) {
           showSnackbar({
             message: 'Invalid user. Please log in again.',
             type: 'error',
           });
-          navigation.reset({
-            index: 0,
-            routes: [{name: 'OnBoarding'}],
-          });
+          // navigation.reset({
+          //   index: 0,
+          //   routes: [{name: 'OnBoarding'}],
+          // });
         } finally {
           setLoading(false);
         }
       }
     }
     fetchUserConfig();
-  }, [user, setUserConfig, showSnackbar, navigation]);
+  }, [user, setUserConfig, showSnackbar, navigation, logout]);
 
   // Connect to notification WebSocket room if userId is present and socket is not connected
   useEffect(() => {
@@ -323,42 +335,39 @@ const MainDash = ({navigation}) => {
           {activeCurrentView === 'notifications' && (
             <NotificationsPanel
               notificationData={notificationData}
-              handleHeaderItemsCollapse={handleHeaderItemsCollapse}
+              handleHeaderItemsCollapse={() => handleHeaderItemsCollapse()}
             />
           )}
           {activeCurrentView === 'profile' && (
             <ProfileComponent
               profileData={profileData}
-              handleHeaderItemsCollapse={handleHeaderItemsCollapse}
+              handleHeaderItemsCollapse={() => handleHeaderItemsCollapse()}
             />
           )}
         </Animated.View>
 
         {/* Example: show/hide HomeSlider based on featureToggles.showUserRoadmap */}
         <HomeSlider
-          ref={bottomSheetRef}
-  //         initialIndex={
-  //   snapPoints.length > 2 
-  //     ? 2 
-  //     : snapPoints.length - 1 // fallback to last valid index
-  // }
-   initialIndex={1} 
-          snapPoints={snapPoints}
           courseFilter={courseFilter}
           exploreCoursesFilter={exploreCoursesFilter}
           recommendedCourses={courseFilter}
           allCourses={courseFilter}
           courseType={courseType}
-          weekStatus={weekStatus}
-          currentDay={currentDay}
+          weekStatus={streakStatusResponse}
           statusMap={statusMap}
-         onSheetChange={index => {
-           if (index === 1) {
-          setActiveCurrentView(null);
+          activeCurrentView={activeCurrentView}
+          onStreakPress={handleStreakPress}
+          onSheetChange={index => {
+            console.log(index, 'the current sheet index');
+            if (index === 1) {
+              setActiveCurrentView(null);
             }
           }}
         />
       </PageLayout>
+
+      {/* Streak Calendar Bottom Sheet */}
+      <StreakCalendarBottomSheet ref={streakCalendarRef} />
     </View>
   );
 };

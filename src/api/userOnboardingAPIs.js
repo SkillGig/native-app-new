@@ -184,7 +184,10 @@ export const fetchOnboardingQuestion = async previousQuestionId => {
   });
 };
 
-export const submitOnboardingQuestionAnswer = async (questionId, selectedOptions) => {
+export const submitOnboardingQuestionAnswer = async (
+  questionId,
+  selectedOptions,
+) => {
   return await networkAPICall({
     url: userService.submitOnboardingQuestionAnswer,
     method: 'POST',
@@ -198,6 +201,57 @@ export const calculateRoadmap = async () => {
   return await networkAPICall({
     url: userService.calculateRoadmap,
     method: 'POST',
+    service: 'userService',
+    auth: true,
+  });
+};
+
+export const getWeeklyStreaks = async () => {
+  return await networkAPICall({
+    url: userService.weeklyStreaks,
+    method: 'GET',
+    service: 'userService',
+    auth: true,
+  });
+};
+
+export const currentDayStreakStatus = async (date = null) => {
+  return await networkAPICall({
+    url: userService.streakStatus,
+    method: 'GET',
+    params: {date},
+    service: 'userService',
+    auth: true,
+  });
+};
+
+export const getStreakBreakDown = async date => {
+  return await networkAPICall({
+    url: userService.streakBreakDown,
+    method: 'GET',
+    params: {date},
+    service: 'userService',
+    auth: true,
+  });
+};
+
+export const markStreakAnimationSeen = async () => {
+  return await networkAPICall({
+    url: userService.markAnimationSeen,
+    method: 'POST',
+    service: 'userService',
+    auth: true,
+  });
+};
+
+export const getStreakMonthlyCalendar = async (month, year) => {
+  return await networkAPICall({
+    url: userService.streakMonthlyCalendar,
+    method: 'GET',
+    params: {
+      month,
+      year,
+    },
     service: 'userService',
     auth: true,
   });
