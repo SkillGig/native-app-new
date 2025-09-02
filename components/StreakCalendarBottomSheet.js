@@ -16,6 +16,7 @@ import {
 import {Calendar} from 'react-native-calendars';
 import LinearGradient from 'react-native-linear-gradient';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import {
   getStreakMonthlyCalendar,
   currentDayStreakStatus,
@@ -24,21 +25,38 @@ import {normalizeHeight, normalizeWidth} from './Responsivescreen';
 import images from '../assets/images';
 import Loader from './Loader';
 import BottomSheet from './BottomSheet';
-import {BottomSheetView} from '@gorhom/bottom-sheet';
+import useUserStore from '../src/store/useUserStore';
 
-const weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+// Enable custom date parsing support
+dayjs.extend(customParseFormat);
+
+const weekDays = [
+  {key: 'Mon', label: 'M'},
+  {key: 'Tue', label: 'T'},
+  {key: 'Wed', label: 'W'},
+  {key: 'Thu', label: 'T'},
+  {key: 'Fri', label: 'F'},
+  {key: 'Sat', label: 'S'},
+  {key: 'Sun', label: 'S'},
+];
 
 // Calendar header component
-const CalendarHeader = ({currentDate, changeMonth}) => {
+const CalendarHeader = ({currentDate, changeMonth, minMonth}) => {
   const monthName = currentDate.toLocaleString('default', {month: 'long'});
   const year = currentDate.getFullYear();
   const today = dayjs();
   const currentMonthJs = dayjs(currentDate);
   const canGoNext = currentMonthJs.isBefore(today.endOf('month'), 'month');
+  const canGoPrev = minMonth
+    ? currentMonthJs.isAfter(dayjs(minMonth), 'month')
+    : true;
 
   return (
     <View style={styles.calendarHeader}>
-      <TouchableOpacity onPress={() => changeMonth(-1)}>
+      <TouchableOpacity
+        onPress={() => changeMonth(-1)}
+        disabled={!canGoPrev}
+        style={{opacity: canGoPrev ? 1 : 0.3}}>
         <Image source={images.LEFTCALENDARARROW} style={styles.arrowIcon} />
       </TouchableOpacity>
       <Text style={styles.monthText}>{`${monthName} ${year}`}</Text>
@@ -150,11 +168,21 @@ const TaskBreakdown = ({loadingBreakdown, selectedDate, selectedDateTasks}) => {
         style={styles.gradientContainer}>
         <View style={styles.breakdownHeader}>
           <Image source={images.TICKGREENCIRCLE} style={styles.checkIcon} />
-          <Text style={styles.breakdownDate}>{dateFormatted}</Text>
+          <View style={styles.dateContainer}>
+            <Text style={[styles.breakdownDateText, {marginLeft: 10}]}>
+              {formattedDate.day}
+            </Text>
+            <Text style={styles.ordinalSuffix}>{formattedDate.suffix}</Text>
+            <Text style={styles.breakdownDateText}>
+              {' ' + formattedDate.month + ' ' + formattedDate.year}
+            </Text>
+          </View>
         </View>
         <View style={styles.tasksList}>
-          {selectedDateTasks.todayTasks.map((task, index) => (
-            <View key={index} style={styles.taskItem}>
+          {selectedDateTasks.todayTasks.map(task => (
+            <View
+              key={`${selectedDate}-${task?.taskName || task}`}
+              style={styles.taskItem}>
               <Image source={images.STREAKTASKTICK} style={styles.taskIcon} />
               <Text style={styles.taskText}>
                 {task.taskType === 'course_video'
@@ -178,6 +206,15 @@ const StreakCalendarBottomSheet = forwardRef((props, ref) => {
   const [selectedDate, setSelectedDate] = useState(null); // No default selection initially
   const [selectedDateTasks, setSelectedDateTasks] = useState(null);
   const [loadingBreakdown, setLoadingBreakdown] = useState(false);
+  const userEnrolledAt = useUserStore(state => state.userConfig.userEnrolledAt);
+  console.log(userEnrolledAt, 'the user enrolled date is');
+  const enrolledDate = useMemo(() => {
+    if (!userEnrolledAt) {
+      return null;
+    }
+    const parsed = dayjs(userEnrolledAt, 'YYYY-MM-DD HH:mm:ss', true);
+    return parsed.isValid() ? parsed : dayjs(userEnrolledAt);
+  }, [userEnrolledAt]);
 
   // Get current month and year
   const currentMonth = currentDate.getMonth() + 1;
@@ -188,6 +225,14 @@ const StreakCalendarBottomSheet = forwardRef((props, ref) => {
     async (month, year) => {
       setLoading(true);
       try {
+        // Avoid fetching months entirely before enrollment
+        if (enrolledDate) {
+          const monthStart = dayjs(`${year}-${month}-01`, 'YYYY-M-D');
+          if (monthStart.isBefore(enrolledDate.startOf('month'), 'month')) {
+            setCalendarData([]);
+            return;
+          }
+        }
         const response = await getStreakMonthlyCalendar(month, year);
 
         if (response?.message === 'success' && response?.data) {
@@ -199,9 +244,14 @@ const StreakCalendarBottomSheet = forwardRef((props, ref) => {
 
           if (todayEntry) {
             const formattedToday = dayjs().format('YYYY-MM-DD');
-            setSelectedDate(formattedToday);
-            // Fetch today's tasks automatically
-            await fetchDateTasks(formattedToday);
+            // Only auto-select today if not before enrollment
+            if (
+              !enrolledDate ||
+              !dayjs(formattedToday).isBefore(enrolledDate, 'day')
+            ) {
+              setSelectedDate(formattedToday);
+              await fetchDateTasks(formattedToday);
+            }
           }
         }
       } catch (error) {
@@ -209,7 +259,7 @@ const StreakCalendarBottomSheet = forwardRef((props, ref) => {
         setLoading(false);
       }
     },
-    [fetchDateTasks],
+    [fetchDateTasks, enrolledDate],
   );
 
   // Fetch tasks for a specific date
@@ -245,7 +295,14 @@ const StreakCalendarBottomSheet = forwardRef((props, ref) => {
 
   // Month change handler
   const changeMonth = offset => {
-    const newDate = dayjs(currentDate).add(offset, 'month').toDate();
+    const candidate = dayjs(currentDate).add(offset, 'month');
+    if (
+      enrolledDate &&
+      candidate.isBefore(enrolledDate.startOf('month'), 'month')
+    ) {
+      return;
+    }
+    const newDate = candidate.toDate();
     setCurrentDate(newDate);
     setSelectedDate(null); // Clear selection when month changes
     setSelectedDateTasks(null);
@@ -256,6 +313,11 @@ const StreakCalendarBottomSheet = forwardRef((props, ref) => {
     const dateString = day.dateString;
     const today = dayjs();
     const selectedDay = dayjs(dateString);
+
+    // Block dates before enrollment
+    if (enrolledDate && selectedDay.isBefore(enrolledDate, 'day')) {
+      return;
+    }
 
     // Prevent clicking on future dates
     if (selectedDay.isAfter(today, 'day')) {
@@ -365,6 +427,9 @@ const StreakCalendarBottomSheet = forwardRef((props, ref) => {
         const isSelected = date === selectedDate;
         const isCompleted = item.status === 'done';
         const isFutureDate = dayjs(date).isAfter(today, 'day');
+        const isBeforeEnrolled = enrolledDate
+          ? dayjs(date).isBefore(enrolledDate, 'day')
+          : false;
 
         // Find if this date is part of a streak group
         const streakGroup = streakGroups.find(group => group.includes(date));
@@ -381,7 +446,25 @@ const StreakCalendarBottomSheet = forwardRef((props, ref) => {
           }
         }
 
-        if (isSelected) {
+        if (isBeforeEnrolled) {
+          marked[date] = {
+            disabled: true,
+            customStyles: {
+              container: {
+                borderRadius: 24,
+                width: normalizeWidth(32),
+                height: normalizeHeight(32),
+                justifyContent: 'center',
+                alignItems: 'center',
+                opacity: 0.5,
+              },
+              text: {
+                fontWeight: '400',
+                opacity: 0.5,
+              },
+            },
+          };
+        } else if (isSelected) {
           // Selected date styling based on status
           let containerStyle = {};
           let textColor = '#FFFFFF';
@@ -442,7 +525,6 @@ const StreakCalendarBottomSheet = forwardRef((props, ref) => {
             disabled: true,
             customStyles: {
               container: {
-                backgroundColor: 'rgba(122, 13, 18, 0.1)', // Further reduced opacity for disabled state
                 borderRadius: 24,
                 width: normalizeWidth(32),
                 height: normalizeHeight(32),
@@ -451,7 +533,6 @@ const StreakCalendarBottomSheet = forwardRef((props, ref) => {
                 opacity: 0.7, // Reduced from 0.5 to 0.3 for more disabled appearance
               },
               text: {
-                color: '#FFA59C',
                 fontWeight: '400',
                 opacity: 0.7, // Reduced from 0.5 to 0.3 for more disabled appearance
               },
@@ -611,7 +692,7 @@ const StreakCalendarBottomSheet = forwardRef((props, ref) => {
     }
 
     return marked;
-  }, [calendarData, selectedDate]);
+  }, [calendarData, selectedDate, enrolledDate]);
 
   // Handle close
   const handleClose = () => {
@@ -665,13 +746,16 @@ const StreakCalendarBottomSheet = forwardRef((props, ref) => {
                 <CalendarHeader
                   currentDate={currentDate}
                   changeMonth={changeMonth}
+                  minMonth={
+                    enrolledDate ? enrolledDate.startOf('month').toDate() : null
+                  }
                 />
 
                 {/* Custom weekday header */}
                 <View style={styles.weekdayContainer}>
-                  {weekDays.map((day, index) => (
-                    <Text key={index} style={styles.weekdayText}>
-                      {day}
+                  {weekDays.map(day => (
+                    <Text key={day.key} style={styles.weekdayText}>
+                      {day.label}
                     </Text>
                   ))}
                 </View>
@@ -727,19 +811,27 @@ const StreakCalendarBottomSheet = forwardRef((props, ref) => {
 
                 {/* Info text - only show when no date is selected */}
                 {!selectedDate && (
-                  <View style={styles.infoContainer}>
-                    <Image
-                      source={images.SNACKBARINFO}
-                      style={styles.infoIconSmall}
-                    />
-                    <Text style={styles.infoText}>
-                      Click on a date to know more
-                    </Text>
+                  <View
+                    style={{
+                      maxWidth: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <View style={styles.infoContainer}>
+                      <Image
+                        source={images.SNACKBARINFO}
+                        style={styles.infoIconSmall}
+                      />
+                      <Text style={styles.infoText}>
+                        Click on a date to know more
+                      </Text>
+                    </View>
                   </View>
                 )}
 
                 {/* Divider */}
-                {selectedDate && <View style={styles.divider} />}
+                <View style={styles.divider} />
 
                 <View>
                   <TaskBreakdown
@@ -847,11 +939,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: normalizeHeight(16),
-    backgroundColor: 'rgba(48, 11, 115, 1)', // Updated background color as per screenshot
+    paddingVertical: normalizeHeight(4),
+    paddingHorizontal: normalizeWidth(8),
+    backgroundColor: '#300B73', // Updated background color as per screenshot
     borderRadius: 8,
-    marginTop: normalizeHeight(12),
-    marginHorizontal: normalizeWidth(16), // Add horizontal margins for proper width
+    marginTop: normalizeHeight(40),
+    marginHorizontal: normalizeWidth(8), // Add horizontal margins for proper width
+    maxWidth: '100%',
+    opacity: 0.8,
   },
   divider: {
     height: 1,
@@ -861,15 +956,15 @@ const styles = StyleSheet.create({
     marginHorizontal: normalizeWidth(16),
   },
   infoIconSmall: {
-    width: normalizeWidth(16),
-    height: normalizeHeight(16),
+    width: normalizeWidth(18),
+    height: normalizeHeight(18),
     resizeMode: 'contain',
     marginRight: normalizeWidth(8),
     tintColor: '#B095E3',
   },
   infoText: {
     color: '#B095E3',
-    fontSize: normalizeWidth(14),
+    fontSize: normalizeWidth(12),
     fontWeight: '600',
   },
   breakdownSection: {

@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useMemo} from 'react';
 import {Image, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import images from '../../assets/images';
@@ -17,6 +17,15 @@ const DailyStreak = ({
 }) => {
   const {isDark, colors} = useContext(ThemeContext);
   const fstyles = getFontStyles(isDark, colors);
+
+  const getShortDay = useMemo(() => {
+    return day => {
+      if (!day || typeof day !== 'string') {
+        return '';
+      }
+      return day.substring(0, 3);
+    };
+  }, []);
 
   const handleStreakPress = () => {
     if (onStreakPress) {
@@ -57,7 +66,7 @@ const DailyStreak = ({
                             : 'rgba(229, 220, 246, 0.40)',
                         },
                       ]}>
-                      {item.day}
+                      {getShortDay(item.day)}
                     </Text>
                     {item.status === 'done' ? (
                       <LinearGradient

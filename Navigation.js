@@ -1,21 +1,20 @@
-import React, { useContext } from 'react';
+import React, {useContext} from 'react';
 import {
   NavigationContainer,
   DefaultTheme,
   DarkTheme,
 } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Login from './screens/onboarding/Login';
 import Dashboard from './screens/onboarding/Dashboard';
 import OnBoarding from './screens/onboarding/OnBoarding';
 import VerifyOTP from './screens/onboarding/VerifyOTP';
-import { ThemeContext } from './src/context/ThemeContext';
+import {ThemeContext} from './src/context/ThemeContext';
 import UnlockedExp from './screens/onboarding/UnlockedExp';
 import InfoCheck from './screens/onboarding/InfoCheck';
 import RequestStatus from './screens/onboarding/RequestStatus';
 import MainDash from './screens/Global/MainDash';
-import StreakCalender from './screens/Global/StreakCalender';
 import RoadMap from './screens/Milestones/RoadMap';
 import AutoScrollCarousel from './screens/Milestones/AutoScrollCarousel';
 import CareerGoalScreen from './screens/onboarding/CareerGoalSelection';
@@ -30,7 +29,7 @@ import QuizQuestions from './screens/Quizzes/QuizQuestions';
 import QuizSummary from './screens/Quizzes/QuizSummary';
 import YourScreen from './screens/Quizzes/YourScreen';
 import BottomNavBar from './components/BottomNavBar';
-import { StyleSheet, View } from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import CurrentDayStreakBreakdown from './screens/Global/CurrentDayStreakBreakdown';
 
@@ -38,25 +37,24 @@ const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 // Define the custom tab bar component outside of render to avoid re-creation
-const CustomTabBar = (props) => <BottomNavBar {...props} />;
+const CustomTabBar = props => <BottomNavBar {...props} />;
 
 function BottomTabs() {
   return (
     <View style={styles.container}>
       <LinearGradient
         colors={['rgba(28,7,67,0)', '#0000']}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
+        start={{x: 0.5, y: 0}}
+        end={{x: 0.5, y: 1}}
         style={styles.gradient}
       />
 
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
-          tabBarStyle: { display: 'none' }, // Hide default tab bar
+          tabBarStyle: {display: 'none'}, // Hide default tab bar
         }}
-        tabBar={CustomTabBar}
-      >
+        tabBar={CustomTabBar}>
         <Tab.Screen name="MainDash" component={MainDash} />
         <Tab.Screen name="RoadMap" component={RoadMap} />
         <Tab.Screen name="OngoingCourses" component={OngoingCourses} />
@@ -67,7 +65,7 @@ function BottomTabs() {
 }
 
 const Navigation = () => {
-  const { isDark } = useContext(ThemeContext);
+  const {isDark} = useContext(ThemeContext);
 
   return (
     <NavigationContainer theme={isDark ? DarkTheme : DefaultTheme}>
@@ -75,128 +73,122 @@ const Navigation = () => {
         <Stack.Screen
           name="Login"
           component={Login}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen name="Dashboard" component={Dashboard} />
         <Stack.Screen
           name="OnBoarding"
           component={OnBoarding}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="VerifyOTP"
           component={VerifyOTP}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="UnlockedExp"
           component={UnlockedExp}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         <Stack.Screen
           name="InfoCheck"
           component={InfoCheck}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         <Stack.Screen
           name="RequestStatus"
           component={RequestStatus}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         <Stack.Screen
           name="CareerGoal"
           component={CareerGoalScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         <Stack.Screen
           name="MainDash"
           // component={MainDash}
           component={BottomTabs}
-          options={{ headerShown: false }}
-        />
-
-        <Stack.Screen
-          name="StreakCalender"
-          component={StreakCalender}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         <Stack.Screen
           name="CurrentDayStreakBreakdown"
           component={CurrentDayStreakBreakdown}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         <Stack.Screen
           name="RoadMap"
           component={RoadMap}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         <Stack.Screen
           name="AutoScrollCarousel"
           component={AutoScrollCarousel}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         <Stack.Screen
           name="RoadmapQuestionsFlow"
           component={RoadmapQuestionsFlow}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="LeaderBoard"
           component={LeaderBoard}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="CourseContent"
           component={CourseContent}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="ExploreCourses"
           component={ExploreCourses}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         <Stack.Screen
           name="CourseScreening"
           component={CourseScreening}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         <Stack.Screen
           name="OngoingCourses"
           component={OngoingCourses}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         <Stack.Screen
           name="QuizzesDashboard"
           component={QuizzesDashboard}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         <Stack.Screen
           name="QuizQuestions"
           component={QuizQuestions}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         <Stack.Screen
           name="QuizSummary"
           component={QuizSummary}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="YourScreen"
           component={YourScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>
