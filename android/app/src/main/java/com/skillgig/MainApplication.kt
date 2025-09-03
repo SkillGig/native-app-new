@@ -35,6 +35,10 @@ class MainApplication : Application(), ReactApplication {
 
   override fun onCreate() {
     super.onCreate()
+    // Global font scale override
+    val configuration = resources.configuration
+    configuration.fontScale = 1.0f
+    resources.updateConfiguration(configuration, resources.displayMetrics)
     SoLoader.init(this, OpenSourceMergedSoMapping)
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
       // If you opted-in for the New Architecture, we load the native entry point for this app.

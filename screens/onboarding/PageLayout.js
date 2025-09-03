@@ -1,4 +1,4 @@
-import React, {useContext, useMemo, useEffect} from 'react';
+import React, {useMemo, useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,13 +10,12 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import images from '../../assets/images';
-import {ThemeContext} from '../../src/context/ThemeContext';
 import {
   normalizeHeight,
   normalizeWidth,
 } from '../../components/Responsivescreen';
 import useUserStore from '../../src/store/useUserStore';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 // import {useNavigation} from '@react-navigation/native';
 
 const PageLayout = ({
@@ -28,7 +27,7 @@ const PageLayout = ({
   hidePattern = false,
   delayRedirectToHome = false, // new prop
 }) => {
-  const {isDark} = useContext(ThemeContext);
+  // Removed isDark, using dark theme values directly
   const navigation = useNavigation();
   const authToken = useUserStore(state => state.user.authToken);
   const refreshToken = useUserStore(state => state.user.refreshToken);
@@ -43,15 +42,9 @@ const PageLayout = ({
     }
   }, [authToken, refreshToken, navigation, delayRedirectToHome]);
 
-  const gradientColors = useMemo(
-    () => (isDark ? ['#300B73', '#090215'] : ['#381874', '#150534']),
-    [isDark],
-  );
+  const gradientColors = useMemo(() => ['#300B73', '#090215'], []);
 
-  const patternImage = useMemo(
-    () => (isDark ? images.SIDEPATTERNDARK : images.SIDEPATTERNLIGHT),
-    [isDark],
-  );
+  const patternImage = useMemo(() => images.SIDEPATTERNDARK, []);
 
   // Only render children if tokens are not present, or if delayRedirectToHome is true
   // if (authToken && refreshToken && !delayRedirectToHome) {
@@ -79,24 +72,16 @@ const PageLayout = ({
             onPress={onBackButton}
             style={styles.backIconWrapper}
             activeOpacity={0.7}>
-            <Image
-              source={isDark ? images.BACKICON : images.BLACKBACKICON}
-              style={styles.backIcon}
-            />
+            <Image source={images.BACKICON} style={styles.backIcon} />
           </TouchableOpacity>
         )}
         {heading && (
-          <Text
-            style={[
-              styles.title,
-              {color: isDark ? 'rgba(255,255,255,0.6)' : '#2A0D54'},
-            ]}>
+          <Text style={[styles.title, {color: 'rgba(255,255,255,0.6)'}]}>
             {heading}
           </Text>
         )}
         {description && (
-          <Text
-            style={[styles.subtitle, {color: isDark ? '#EADDFF' : '#4F378A'}]}>
+          <Text style={[styles.subtitle, {color: '#EADDFF'}]}>
             {description}
           </Text>
         )}

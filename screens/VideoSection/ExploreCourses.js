@@ -11,12 +11,9 @@ import {getFontStyles} from '../../styles/FontStyles';
 const ExploreCourses = props => {
   console.log('im preiyankaa');
 
-  const {isDark, colors} = useContext(ThemeContext);
-  const gradientColors = useMemo(
-    () => (isDark ? ['#300B73', '#090215'] : ['#381874', '#150534']),
-    [isDark],
-  );
-  const fstyles = getFontStyles(isDark, colors);
+  const {colors} = useContext(ThemeContext);
+  const gradientColors = useMemo(() => ['#300B73', '#090215'], []);
+  const fstyles = getFontStyles(false, colors);
 
   const exploreCourses = [
     {
@@ -55,9 +52,11 @@ const ExploreCourses = props => {
           borderRadius: 20,
           borderWidth: 1,
           borderColor: 'rgba(176, 149, 227, 0.40)',
-          marginRight:normalizeWidth(5)
+          marginRight: normalizeWidth(5),
         }}>
-        <Text style={[fstyles.thirteenMedium,{color:'white'}]}>All courses</Text>
+        <Text style={[fstyles.thirteenMedium, {color: 'white'}]}>
+          All courses
+        </Text>
       </View>
     );
   };
@@ -83,7 +82,7 @@ const ExploreCourses = props => {
             resizeMode: 'contain',
           }}
         />
-         
+
         <View>
           <Text
             style={[
@@ -93,8 +92,8 @@ const ExploreCourses = props => {
             Explore Couses
           </Text>
         </View>
-        </View>
-        <View>
+      </View>
+      <View>
         <FlatList
           keyExtractor={(item, index) => `_${index}`}
           horizontal
@@ -102,12 +101,11 @@ const ExploreCourses = props => {
           renderItem={RenderFPList}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
-            paddingHorizontal:normalizeWidth(23),
+            paddingHorizontal: normalizeWidth(23),
             marginBottom: normalizeHeight(16),
           }}
         />
-        </View>
-     
+      </View>
     </View>
   );
 };

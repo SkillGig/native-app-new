@@ -1,15 +1,13 @@
-import React, {useContext, useRef, useEffect, useState} from 'react';
+import React, {useRef, useEffect, useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
-  Image,
   ScrollView,
   BackHandler,
 } from 'react-native';
-import {ThemeContext} from '../../src/context/ThemeContext';
 import CompTextInput from '../../components/CompTextInput';
 import CmpCheckBox from '../../components/CmpCheckBox';
 import {Bottomsheet} from '../../components';
@@ -78,7 +76,7 @@ const InfoCheck = ({navigation, route}) => {
     state => state.setIsUserEnrolledToRoadmap,
   );
 
-  const {isDark} = useContext(ThemeContext);
+  // Removed isDark, using dark theme values directly
 
   const BottomsheetRef = useRef(null);
 
@@ -215,7 +213,7 @@ const InfoCheck = ({navigation, route}) => {
               label="Name"
               value={field.name.value}
               labelstyle={styles.label}
-              inputstyle={styles.input(isDark)}
+              inputstyle={styles.input}
               editable={false}
               opacity={0.75}
             />
@@ -223,7 +221,7 @@ const InfoCheck = ({navigation, route}) => {
               label="Phone Number"
               value={field.phone.value}
               labelstyle={styles.label}
-              inputstyle={styles.input(isDark)}
+              inputstyle={styles.input}
               editable={false}
               opacity={0.75}
             />
@@ -231,7 +229,7 @@ const InfoCheck = ({navigation, route}) => {
               label="Email"
               value={field.email.value}
               labelstyle={styles.label}
-              inputstyle={styles.input(isDark)}
+              inputstyle={styles.input}
               editable={false}
               opacity={0.75}
             />
@@ -239,7 +237,7 @@ const InfoCheck = ({navigation, route}) => {
               label="Branch"
               value={field.branch.value}
               labelstyle={styles.label}
-              inputstyle={styles.input(isDark)}
+              inputstyle={styles.input}
               editable={false}
               opacity={0.75}
             />
@@ -248,7 +246,7 @@ const InfoCheck = ({navigation, route}) => {
                 label="Start Date"
                 value={field.startDate.value}
                 labelstyle={styles.label}
-                inputstyle={styles.inputSmall(isDark)}
+                inputstyle={styles.inputSmall}
                 editable={false}
                 opacity={0.75}
               />
@@ -256,7 +254,7 @@ const InfoCheck = ({navigation, route}) => {
                 label="End Date"
                 value={field.endDate.value}
                 labelstyle={styles.label}
-                inputstyle={styles.inputSmall(isDark)}
+                inputstyle={styles.inputSmall}
                 editable={false}
                 opacity={0.75}
               />
@@ -264,12 +262,12 @@ const InfoCheck = ({navigation, route}) => {
 
             <TouchableOpacity
               onPress={handleDiscrepancyPress}
-              style={styles.discrepancyButton(isDark)}>
+              style={styles.discrepancyButton}>
               <Text style={styles.discrepancyText}>
                 Does something feels wrong?
               </Text>
 
-              <Text style={styles.discrepancyYes(isDark)}>Yes</Text>
+              <Text style={styles.discrepancyYes}>Yes</Text>
             </TouchableOpacity>
             <View style={styles.checkboxWrapper}>
               <CmpCheckBox
@@ -287,7 +285,7 @@ const InfoCheck = ({navigation, route}) => {
       </View>
       <TouchableOpacity
         onPress={handleSubmit}
-        style={styles.submitButton(isDark, !field?.checkBox)}
+        style={styles.submitButton(!field?.checkBox)}
         disabled={!field?.checkBox}>
         <Text style={styles.submitText}>Submit</Text>
       </TouchableOpacity>
@@ -389,7 +387,7 @@ const InfoCheck = ({navigation, route}) => {
               setBottomSheetField(prev => ({...prev, name: text}))
             }
             labelstyle={styles.label}
-            inputstyle={styles.input(isDark)}
+            inputstyle={styles.input}
             editable={true}
           />
           <CompTextInput
@@ -400,7 +398,7 @@ const InfoCheck = ({navigation, route}) => {
               setBottomSheetField(prev => ({...prev, phone: text}))
             }
             labelstyle={styles.label}
-            inputstyle={styles.input(isDark)}
+            inputstyle={styles.input}
             editable={true}
           />
           <CompTextInput
@@ -411,7 +409,7 @@ const InfoCheck = ({navigation, route}) => {
               setBottomSheetField(prev => ({...prev, email: text}))
             }
             labelstyle={styles.label}
-            inputstyle={styles.input(isDark)}
+            inputstyle={styles.input}
             editable={true}
           />
           <DropdownSelector
@@ -460,48 +458,47 @@ const styles = StyleSheet.create({
   cardImage: {borderRadius: 20},
   cardContent: {padding: 20},
   label: {color: '#D6C0FD'},
-  input: isDark => ({
-    color: isDark ? '#FFF' : 'rgba(0,0,0,0.6)',
+  input: {
+    color: '#FFF',
     borderBottomWidth: 1,
-    borderBottomColor: isDark ? '#FFF' : 'rgba(0,0,0,0.4)',
+    borderBottomColor: '#FFF',
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 10,
-  }),
-  inputSmall: isDark => ({
+  },
+  inputSmall: {
     width: normalizeWidth(110),
     fontSize: 16,
     fontWeight: '700',
     borderBottomWidth: 1,
-    borderBottomColor: isDark ? '#FFF' : 'rgba(0,0,0,0.4)',
-    color: isDark ? '#FFF' : 'rgba(0,0,0,0.4)',
-  }),
+    borderBottomColor: '#FFF',
+    color: '#FFF',
+  },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginVertical: 8,
   },
-  discrepancyButton: isDark => ({
+  discrepancyButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: isDark ? '#1C0743' : '#EEE7F9',
+    backgroundColor: '#1C0743',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
     marginTop: 12,
-  }),
+  },
   discrepancyText: {color: '#FFF', fontSize: 12, fontWeight: '600'},
-  discrepancyYes: isDark => ({
-    color: isDark ? '#B095E3' : '#5013C0',
+  discrepancyYes: {
+    color: '#B095E3',
     fontSize: 12,
     fontWeight: '600',
-  }),
+  },
   checkboxWrapper: {marginTop: 16},
-  submitButton: (isDark, disabled) => ({
+  submitButton: disabled => ({
     width: normalizeWidth(308),
-    backgroundColor:
-      isDark && !disabled ? '#815FC4' : disabled ? '#232127' : '#5013C0',
+    backgroundColor: !disabled ? '#815FC4' : '#232127',
     position: 'absolute',
     bottom: 40,
     left: 10,

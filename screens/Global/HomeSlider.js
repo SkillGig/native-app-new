@@ -4,6 +4,7 @@ import React, {
   forwardRef,
   useContext,
   useEffect,
+  useImperativeHandle,
 } from 'react';
 import {
   StyleSheet,
@@ -32,24 +33,27 @@ const {height: SCREEN_HEIGHT} = Dimensions.get('window');
 
 // Custom animation configuration to match popular apps like Swiggy/CULT
 const customAnimationConfigs = {
-  damping: 50,      // Higher damping for smoother, less bouncy feel
-  stiffness: 150,   // Moderate stiffness for natural responsiveness
-  duration: 600,    // Optimal duration - not too fast, not too slow
+  damping: 50, // Higher damping for smoother, less bouncy feel
+  stiffness: 150, // Moderate stiffness for natural responsiveness
+  duration: 600, // Optimal duration - not too fast, not too slow
   easing: Easing.bezier(0.25, 0.46, 0.45, 0.94), // iOS-like smooth curve
 };
 
 const HomeSlider = forwardRef(
-  ({
-    onSheetChange,
-    courseFilter = [],
-    exploreCoursesFilter = [],
-    courseType = [],
-    weekStatus = [],
-    currentDay = '',
-    statusMap = {},
-    activeCurrentView,
-    onStreakPress,
-  }) => {
+  (
+    {
+      onSheetChange,
+      courseFilter = [],
+      exploreCoursesFilter = [],
+      courseType = [],
+      weekStatus = [],
+      currentDay = '',
+      statusMap = {},
+      activeCurrentView,
+      onStreakPress,
+    },
+    ref,
+  ) => {
     const sheetRef = useRef(null);
     const {isDark, colors} = useContext(ThemeContext);
     const fstyles = getFontStyles(isDark, colors);
@@ -59,6 +63,14 @@ const HomeSlider = forwardRef(
     const [initialIndex, setInitialIndex] = React.useState(0);
 
     const userConfig = useUserStore(state => state.userConfig);
+
+    // Expose ref methods to parent components
+    useImperativeHandle(ref, () => ({
+      snapToIndex: index => sheetRef.current?.snapToIndex(index),
+      close: () => sheetRef.current?.close(),
+      expand: () => sheetRef.current?.expand(),
+      collapse: () => sheetRef.current?.collapse(),
+    }));
 
     const handleSheetChanges = useCallback(
       index => {

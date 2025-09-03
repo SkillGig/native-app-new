@@ -1,4 +1,4 @@
-import React, {useEffect, useContext} from 'react';
+import React, {useEffect} from 'react';
 import {View, Text, Image, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {
@@ -6,12 +6,10 @@ import {
   normalizeWidth,
 } from '../../components/Responsivescreen';
 import images from '../../assets/images';
-import {ThemeContext} from '../../src/context/ThemeContext';
 import useUserStore from '../../src/store/useUserStore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UnlockedExp = ({navigation, route}) => {
-  const {isDark, colors} = useContext(ThemeContext);
+  // Removed isDark, using dark theme values directly
   const setTokens = useUserStore(state => state.setTokens);
 
   useEffect(() => {
@@ -22,29 +20,19 @@ const UnlockedExp = ({navigation, route}) => {
           authToken: route.params.authToken,
           refreshToken: route.params.refreshToken,
         });
-        // AsyncStorage.setItem('authToken', route.params.authToken || '');
-        // AsyncStorage.setItem('refreshToken', route.params.refreshToken || '');
-        // setTokens({
-        //   authToken: route.params.authToken || '',
-        //   refreshToken: route.params.refreshToken || '',
-        // });
       }
       navigation.replace('MainDash'); // use 'replace' to prevent back navigation
-    }, 3000); // 5 seconds
+    }, 3000); // 3 seconds
 
     return () => clearTimeout(timer); // cleanup on unmount
   }, [navigation, route, setTokens]);
 
-  const gradientColors = isDark
-    ? ['#381874', '#150534']
-    : ['#FBF8FF', '#DFCEFF'];
-  const patternImage = isDark
-    ? images.SIDEPATTERNDARK
-    : images.SIDEPATTERNLIGHT;
+  const gradientColors = ['#381874', '#150534'];
+  const patternImage = images.SIDEPATTERNDARK;
 
   return (
     <LinearGradient colors={gradientColors} style={styles.gradient}>
-      {!isDark && <Image source={patternImage} style={styles.sidePattern} />}
+      <Image source={patternImage} style={styles.sidePattern} />
       <Image
         source={images.TICKSUCCESS}
         style={{
@@ -58,7 +46,7 @@ const UnlockedExp = ({navigation, route}) => {
           style={{
             fontSize: 32,
             fontWeight: '900',
-            color: isDark ? 'white' : '#300B73',
+            color: 'white',
           }}>
           Great!!
         </Text>
@@ -69,7 +57,7 @@ const UnlockedExp = ({navigation, route}) => {
             marginTop: normalizeHeight(10),
             fontSize: 14,
             fontWeight: '600',
-            color: isDark ? 'white' : '#300B73',
+            color: 'white',
           }}>
           You've just unlocked premium{'\n'}experience to prep for that{'\n'}
           Dream Job !!

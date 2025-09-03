@@ -18,7 +18,7 @@ const CmpCheckBox = props => {
     linkTextStyle,
     extStyles = {},
   } = props;
-  const {isDark, colors} = useContext(ThemeContext);
+  const {colors} = useContext(ThemeContext);
   const onClick = () => {
     onSelect(!value);
   };
@@ -29,10 +29,10 @@ const CmpCheckBox = props => {
     : 'transparent';
   const borderWidth = value ? normalizeWidth(0) : normalizeWidth(1);
   const borderColor = value
-    ? isDark
+    ? true
       ? 'transparent'
       : 'transparent'
-    : isDark
+    : true
     ? 'white'
     : '#5013C0';
 
@@ -47,9 +47,12 @@ const CmpCheckBox = props => {
         style={[styles.box, {backgroundColor, borderColor, borderWidth}]}>
         {disabled ? null : value ? <Check /> : null}
       </Pressable>
-      <Text style={[styles.textStyle, textStyle, {color: colors.text}]}>
+      <Text
+        style={[styles.textStyle, textStyle, {color: colors.text}]}
+        allowFontScaling={false}>
         {text}
         <Text
+          allowFontScaling={false}
           hitslop={{top: 100, bottom: 100, left: 100, right: 100}}
           onPress={() => (linkPress ? linkPress() : null)}
           // style={{color: 'blue'}}

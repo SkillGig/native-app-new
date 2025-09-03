@@ -6,9 +6,9 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import React, {useContext, useRef} from 'react';
+import React, {useRef} from 'react';
 import {normalizeWidth} from './Responsivescreen';
-import {ThemeContext} from '../src/context/ThemeContext';
+// ThemeContext import removed, always dark theme
 import images from '../assets/images';
 
 const CompTextInput = props => {
@@ -30,7 +30,7 @@ const CompTextInput = props => {
     onChangeText,
   } = props;
   const textInRef = useRef(null);
-  const {isDark} = useContext(ThemeContext);
+  // Always dark theme
 
   return (
     <View
@@ -39,23 +39,26 @@ const CompTextInput = props => {
       {label ? (
         <View style={[styles.label, {}]}>
           {label ? (
-            <>
-              <Text
-                style={
-                  labelstyle
-                    ? labelstyle
-                    : {
-                        color: isDark ? '#D6C0FD' : '#200A47',
-                        fontSize: 12,
-                        fontWeight: '600',
-                      }
-                }>
-                {label}
-                <Text style={styles.label2}>{label2}</Text>
+            <Text
+              allowFontScaling={false}
+              style={
+                labelstyle
+                  ? labelstyle
+                  : {
+                      color: '#D6C0FD',
+                      fontSize: 12,
+                      fontWeight: '600',
+                    }
+              }>
+              {label}
+              <Text style={styles.label2} allowFontScaling={false}>
+                {label2}
               </Text>
-            </>
+            </Text>
           ) : null}
-          <Text style={styles.note}>{noteRight ? noteRight : noteLeft}</Text>
+          <Text style={styles.note} allowFontScaling={false}>
+            {noteRight ? noteRight : noteLeft}
+          </Text>
         </View>
       ) : null}
       <TouchableOpacity
@@ -63,6 +66,7 @@ const CompTextInput = props => {
         accessible={false}>
         <View style={{position: 'relative', justifyContent: 'center'}}>
           <TextInput
+            allowFontScaling={false}
             ref={textInRef}
             style={[
               {
@@ -70,17 +74,13 @@ const CompTextInput = props => {
                 fontSize: 16,
                 fontWeight: '700',
                 borderBottomWidth: 1,
-                borderBottomColor: isDark ? 'white' : '#4F378A',
-                color: isDark
-                  ? 'rgba(255, 255, 255, 0.87)'
-                  : 'rgba(0, 0, 0, 0.87)',
-                paddingRight: 36, // add right padding to not overlap with icon
+                borderBottomColor: 'white',
+                color: 'rgba(255, 255, 255, 0.87)',
+                paddingRight: 36,
               },
               inputstyle,
             ]}
-            placeholderTextColor={
-              isDark ? 'rgba(255, 255, 255, 0.28)' : 'rgba(0, 0, 0, 0.28)'
-            }
+            placeholderTextColor={'rgba(255, 255, 255, 0.28)'}
             returnKeyType="done"
             onChangeText={onChangeText}
             {...props}
@@ -89,45 +89,25 @@ const CompTextInput = props => {
           {/* Icon or trailing content */}
           {type === 'status' ? (
             <View style={{position: 'absolute', right: 0, paddingRight: 8}}>
-              <Text
-                style={{
-                  color: isDark
-                    ? 'rgba(255, 255, 255, 0.87)'
-                    : 'rgba(0, 0, 0, 0.87)',
-                }}>
-                {status === 'approved' ? (
-                  <Image source={images.RIGHTCIRCLE} />
-                ) : status === 'rejected' ? (
-                  <Image source={images.WRONGCIRCLE} />
-                ) : (
-                  <></>
-                )}
-              </Text>
+              {status === 'approved' ? (
+                <Image source={images.RIGHTCIRCLE} />
+              ) : status === 'rejected' ? (
+                <Image source={images.WRONGCIRCLE} />
+              ) : null}
             </View>
-          ) : (
-            <></>
-          )}
+          ) : null}
         </View>
       </TouchableOpacity>
 
       <Text
+        allowFontScaling={false}
         style={[
           {
-            color: 'red',
-            textAlign: 'right',
+            color: errorMessage ? 'red' : 'rgba(255, 255, 255, 0.54)',
+            textAlign: infoText ? 'left' : 'right',
             fontSize: 12,
             zIndex: 2,
-          },
-          {
-            paddingLeft: infoText ? normalizeWidth(0) : normalizeWidth(0),
-            color:
-              infoText && isDark
-                ? errorMessage
-                  ? 'red'
-                  : 'rgba(255, 255, 255, 0.54)'
-                : 'rgba(0, 0, 0, 0.54)',
-
-            textAlign: infoText ? 'left' : 'right',
+            paddingLeft: normalizeWidth(0),
           },
         ]}>
         {errorMessage ? errorMessage : fieldDesc}

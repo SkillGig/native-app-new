@@ -14,7 +14,7 @@ import {normalizeHeight, normalizeWidth} from './Responsivescreen';
 import {ThemeContext} from '../src/context/ThemeContext';
 import Icon from 'react-native-vector-icons/AntDesign';
 import images from '../assets/images';
-import { Image } from 'react-native-svg';
+import {Image} from 'react-native-svg';
 
 const DropdownSelector = ({
   options = [],
@@ -25,7 +25,7 @@ const DropdownSelector = ({
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({top: 0, isAbove: false});
   const triggerRef = useRef();
-  const {isDark} = useContext(ThemeContext);
+  // Always dark theme
 
   console.log(selectedOption, 'Selected Option in DropdownSelector');
 
@@ -58,6 +58,7 @@ const DropdownSelector = ({
         ref={triggerRef}>
         <View style={[styles.label, {}]}>
           <Text
+            allowFontScaling={false}
             style={{
               color: '#D6C0FD',
               fontSize: 12,
@@ -69,28 +70,27 @@ const DropdownSelector = ({
 
         <View style={{position: 'relative', justifyContent: 'center'}}>
           <TextInput
+            allowFontScaling={false}
             style={[
               {
                 paddingLeft: normalizeWidth(-4),
                 fontSize: 16,
                 fontWeight: '700',
                 borderBottomWidth: 1,
-                borderBottomColor: isDark ? 'white' : '#4F378A',
-                color: isDark
+                borderBottomColor: 'white',
+                color: 'white'
                   ? 'rgba(255, 255, 255, 0.87)'
                   : 'rgba(0, 0, 0, 0.87)',
                 paddingRight: 36, // add right padding to not overlap with icon
               },
             ]}
-            placeholderTextColor={
-              isDark ? 'rgba(255, 255, 255, 0.28)' : 'rgba(0, 0, 0, 0.28)'
-            }
+            placeholderTextColor={'rgba(255, 255, 255, 0.28)'}
             returnKeyType="done"
             editable={false}
             value={selectedOption ? selectedOption.value : ''}
           />
           <View style={{position: 'absolute', right: 0, paddingRight: 8}}>
-            <Image source={images.DROPDOWN}  />
+            <Image source={images.DROPDOWN} />
           </View>
         </View>
       </TouchableOpacity>
@@ -129,7 +129,9 @@ const DropdownSelector = ({
                     },
                   ]}
                   onPress={() => handleSelect(item)}>
-                  <Text style={styles.optionText}>{item.value}</Text>
+                  <Text style={styles.optionText} allowFontScaling={false}>
+                    {item.value}
+                  </Text>
                 </TouchableOpacity>
               )}
               showsVerticalScrollIndicator={false}

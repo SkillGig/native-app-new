@@ -30,8 +30,8 @@ if (
 
 const AutoScrollCarousel = ({steps}) => {
   const [openIndices, setOpenIndices] = useState([]); // ✅ Allow multiple open
-  const {isDark, colors} = useContext(ThemeContext);
-  const fstyles = getFontStyles(isDark, colors);
+  const {colors} = useContext(ThemeContext);
+  const fstyles = getFontStyles(false, colors);
   const toggleExpand = index => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setOpenIndices(
@@ -56,11 +56,20 @@ const AutoScrollCarousel = ({steps}) => {
                   styles.circle,
                   item.completed && styles.completedCircle,
                 ]}>
-                {item.completed &&<Image source={images.RIGHTCIRCLE} style={{height:normalizeHeight(24),width:normalizeWidth(24),resizeMode:"contain"}}/>}
+                {item.completed && (
+                  <Image
+                    source={images.RIGHTCIRCLE}
+                    style={{
+                      height: normalizeHeight(24),
+                      width: normalizeWidth(24),
+                      resizeMode: 'contain',
+                    }}
+                  />
+                )}
               </View>
               {index !== steps.length - 1 && <View style={styles.lineBottom} />}
             </View>
-             <TouchableOpacity
+            <TouchableOpacity
               style={styles.card}
               onPress={() => toggleExpand(index)}
               activeOpacity={0.8}>
@@ -83,56 +92,165 @@ const AutoScrollCarousel = ({steps}) => {
                 />
               </View>
               <Text
-                  style={[
-                    fstyles.twelweRegular,
-                    {marginVertical: normalizeHeight(4)},
-                  ]}>
-                  {item.description}
-                </Text>
-                {!isOpen && <View style={[fstyles.flexAlign,{marginTop:normalizeHeight(10)}]}>
-                  <Image source={images.COURSEVIDEO} style={{height:normalizeHeight(12),width:normalizeWidth(12),resizeMode:"contain"}}/>
-                  <Text style={[fstyles.mediumTen,{color:'#B095E3',marginLeft:normalizeWidth(4)}]}>2 Courses </Text>
-                  <Text style={[fstyles.mediumTen,{marginHorizontal:normalizeWidth(4)}]}>|</Text>
-                  <Image source={images.COURSEVIDEO} style={{height:normalizeHeight(12),width:normalizeWidth(12),resizeMode:"contain"}}/>
-                  <Text style={[fstyles.mediumTen,{color:'#B095E3',marginLeft:normalizeWidth(4)}]}>2 Courses </Text>
-                </View>}
+                style={[
+                  fstyles.twelweRegular,
+                  {marginVertical: normalizeHeight(4)},
+                ]}>
+                {item.description}
+              </Text>
+              {!isOpen && (
+                <View
+                  style={[fstyles.flexAlign, {marginTop: normalizeHeight(10)}]}>
+                  <Image
+                    source={images.COURSEVIDEO}
+                    style={{
+                      height: normalizeHeight(12),
+                      width: normalizeWidth(12),
+                      resizeMode: 'contain',
+                    }}
+                  />
+                  <Text
+                    style={[
+                      fstyles.mediumTen,
+                      {color: '#B095E3', marginLeft: normalizeWidth(4)},
+                    ]}>
+                    2 Courses{' '}
+                  </Text>
+                  <Text
+                    style={[
+                      fstyles.mediumTen,
+                      {marginHorizontal: normalizeWidth(4)},
+                    ]}>
+                    |
+                  </Text>
+                  <Image
+                    source={images.COURSEVIDEO}
+                    style={{
+                      height: normalizeHeight(12),
+                      width: normalizeWidth(12),
+                      resizeMode: 'contain',
+                    }}
+                  />
+                  <Text
+                    style={[
+                      fstyles.mediumTen,
+                      {color: '#B095E3', marginLeft: normalizeWidth(4)},
+                    ]}>
+                    2 Courses{' '}
+                  </Text>
+                </View>
+              )}
               {isOpen && (
                 <>
-                
-                <View style={[fstyles.line,{marginVertical:normalizeHeight(8)}]}/>
+                  <View
+                    style={[fstyles.line, {marginVertical: normalizeHeight(8)}]}
+                  />
 
-                <>
-                <View style={fstyles.flexAlignJustify}>
-                <View>
-                <Text style={fstyles.semiTwelwe}>Course Name A</Text>
-                <Text style={[fstyles.mediumTen,{color:'#D3C4EF',marginTop:normalizeHeight(4)}]}>HTML | CSS | Javascript</Text>
-                </View>
-                <TouchableOpacity style={{backgroundColor:"#815FC44D",paddingVertical:normalizeHeight(4),paddingHorizontal:normalizeWidth(6),borderRadius:4}}>
-                <Text style={[fstyles.mediumTen,{textDecorationLine:"underline"}]}>View Course</Text>
-                </TouchableOpacity>
-                </View>
-                <View style={{marginTop:normalizeHeight(4),marginBottom:normalizeHeight(6),flexDirection:'row',alignItems:"center"}}>
-                  <Image source={images.CLOCK} style={{height:normalizeHeight(12),width:normalizeWidth(12),resizeMode:"contain"}}/>
-                  <Text style={[fstyles.mediumTen,{color:'#B095E3',marginLeft:normalizeWidth(7)}]}>58 mins</Text>
-                </View>
-                </>
+                  <>
+                    <View style={fstyles.flexAlignJustify}>
+                      <View>
+                        <Text style={fstyles.semiTwelwe}>Course Name A</Text>
+                        <Text
+                          style={[
+                            fstyles.mediumTen,
+                            {color: '#D3C4EF', marginTop: normalizeHeight(4)},
+                          ]}>
+                          HTML | CSS | Javascript
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: '#815FC44D',
+                          paddingVertical: normalizeHeight(4),
+                          paddingHorizontal: normalizeWidth(6),
+                          borderRadius: 4,
+                        }}>
+                        <Text
+                          style={[
+                            fstyles.mediumTen,
+                            {textDecorationLine: 'underline'},
+                          ]}>
+                          View Course
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View
+                      style={{
+                        marginTop: normalizeHeight(4),
+                        marginBottom: normalizeHeight(6),
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}>
+                      <Image
+                        source={images.CLOCK}
+                        style={{
+                          height: normalizeHeight(12),
+                          width: normalizeWidth(12),
+                          resizeMode: 'contain',
+                        }}
+                      />
+                      <Text
+                        style={[
+                          fstyles.mediumTen,
+                          {color: '#B095E3', marginLeft: normalizeWidth(7)},
+                        ]}>
+                        58 mins
+                      </Text>
+                    </View>
+                  </>
 
-                <>
-                <View style={fstyles.flexAlignJustify}>
-                <View>
-                <Text style={fstyles.semiTwelwe}>Course Name B</Text>
-                <Text style={[fstyles.mediumTen,{color:'#D3C4EF',marginTop:normalizeHeight(4)}]}>HTML | CSS | Javascript</Text>
-                </View>
-                <TouchableOpacity style={{backgroundColor:"#815FC44D",paddingVertical:normalizeHeight(4),paddingHorizontal:normalizeWidth(6),borderRadius:4}}>
-                <Text style={[fstyles.mediumTen,{textDecorationLine:"underline"}]}>View Course</Text>
-                </TouchableOpacity>
-                </View>
-                <View style={{marginTop:normalizeHeight(4),marginBottom:normalizeHeight(6),flexDirection:'row',alignItems:"center"}}>
-                  <Image source={images.CLOCK} style={{height:normalizeHeight(12),width:normalizeWidth(12),resizeMode:"contain"}}/>
-                  <Text style={[fstyles.mediumTen,{color:'#B095E3',marginLeft:normalizeWidth(7)}]}>58 mins</Text>
-                </View>
-                </>
-
+                  <>
+                    <View style={fstyles.flexAlignJustify}>
+                      <View>
+                        <Text style={fstyles.semiTwelwe}>Course Name B</Text>
+                        <Text
+                          style={[
+                            fstyles.mediumTen,
+                            {color: '#D3C4EF', marginTop: normalizeHeight(4)},
+                          ]}>
+                          HTML | CSS | Javascript
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: '#815FC44D',
+                          paddingVertical: normalizeHeight(4),
+                          paddingHorizontal: normalizeWidth(6),
+                          borderRadius: 4,
+                        }}>
+                        <Text
+                          style={[
+                            fstyles.mediumTen,
+                            {textDecorationLine: 'underline'},
+                          ]}>
+                          View Course
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View
+                      style={{
+                        marginTop: normalizeHeight(4),
+                        marginBottom: normalizeHeight(6),
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}>
+                      <Image
+                        source={images.CLOCK}
+                        style={{
+                          height: normalizeHeight(12),
+                          width: normalizeWidth(12),
+                          resizeMode: 'contain',
+                        }}
+                      />
+                      <Text
+                        style={[
+                          fstyles.mediumTen,
+                          {color: '#B095E3', marginLeft: normalizeWidth(7)},
+                        ]}>
+                        58 mins
+                      </Text>
+                    </View>
+                  </>
                 </>
               )}
             </TouchableOpacity>
@@ -177,7 +295,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 2,
     // borderColor: 'white',
-    borderColor:"rgba(255,255,255, 0.3)",
+    borderColor: 'rgba(255,255,255, 0.3)',
     backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',

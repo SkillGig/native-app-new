@@ -1,31 +1,29 @@
 // src/context/ThemeContext.js
-import React, { createContext, useEffect, useState } from 'react';
-import { useColorScheme } from 'react-native';
-import { lightColors ,darkColors} from '../theme/color';
+import React, {createContext, useEffect, useState} from 'react';
+import {useColorScheme} from 'react-native';
+import {lightColors, darkColors} from '../theme/color';
 
 export const ThemeContext = createContext();
 
-export const ThemeProvider = ({ children }) => {
+export const ThemeProvider = ({children}) => {
   const systemScheme = useColorScheme(); // 'light' or 'dark'
-  const [isDark, setIsDark] = useState(systemScheme === 'dark');
+  // Remove isDark, always use dark theme
   const [isOverride, setIsOverride] = useState(false); // manual toggle flag
 
   useEffect(() => {
     if (!isOverride) {
-      setIsDark(systemScheme === 'dark');
+      // Always dark, no-op
     }
   }, [systemScheme, isOverride]);
 
   const toggleTheme = () => {
     setIsOverride(true);
-    setIsDark((prev) => !prev);
+    // Always dark, no-op
   };
 
-  const colors = isDark ? darkColors : lightColors;
+  const colors = darkColors;
 
   return (
-    <ThemeContext.Provider value={{ isDark, colors, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={{colors}}>{children}</ThemeContext.Provider>
   );
 };

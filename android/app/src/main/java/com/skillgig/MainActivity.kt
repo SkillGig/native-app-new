@@ -20,7 +20,18 @@ class MainActivity : ReactActivity() {
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
 
-       override fun onCreate(savedInstanceState: Bundle?) {
+  override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(null)
+    // Force disable font scaling
+    val configuration = resources.configuration
+    configuration.fontScale = 1.0f
+    resources.updateConfiguration(configuration, resources.displayMetrics)
+  }
+
+  override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+    super.onConfigurationChanged(newConfig)
+    // Prevent font scaling changes during runtime
+    newConfig.fontScale = 1.0f
+    resources.updateConfiguration(newConfig, resources.displayMetrics)
   }
 }

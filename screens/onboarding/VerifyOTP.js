@@ -1,43 +1,41 @@
-import React, { useState, useContext, useRef, useEffect } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   Vibration,
-  Platform,
   Animated,
 } from 'react-native';
-import { CodeField } from '../../components';
+import {CodeField} from '../../components';
 import {
   normalizeHeight,
   normalizeWidth,
 } from '../../components/Responsivescreen';
 import PageLayout from './PageLayout';
-import { ThemeContext } from '../../src/context/ThemeContext';
-import { resendOTP, verifyOTP } from '../../src/api/userOnboardingAPIs';
+import {resendOTP, verifyOTP} from '../../src/api/userOnboardingAPIs';
 import CommonButton from '../../components/CommonButton';
 import Loader from '../../components/Loader';
 import useUserStore from '../../src/store/useUserStore';
 
 const RESEND_OTP_TIME = 5;
 
-const VerifyOTP = ({ route, navigation }) => {
+const VerifyOTP = ({route, navigation}) => {
   const [otpval, setotpval] = useState('');
   const [otpStatus, setOtpStatus] = useState('normal');
   const [timer, setTimer] = useState(RESEND_OTP_TIME);
   const [resending, setResending] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [otpId, setOtpId] = useState('');
-  const { isDark } = useContext(ThemeContext);
+  // Removed isDark, using dark theme values directly
   const otpRef = useRef();
   const [shakeAnim] = useState(new Animated.Value(0)); // For heading nod
   const [bounceAnim] = useState(new Animated.Value(1)); // For OTP field bounce
 
-  const { orgCode, studentId, loginData } = route.params;
+  const {orgCode, studentId, loginData} = route.params;
 
   const setIsUserEnrolledToRoadmap = useUserStore(
-    state => state.setIsUserEnrolledToRoadmap
+    state => state.setIsUserEnrolledToRoadmap,
   );
 
   console.log('VerifyOTP screen params:', {
@@ -263,7 +261,9 @@ const VerifyOTP = ({ route, navigation }) => {
           marginVertical: normalizeHeight(46),
           marginLeft: normalizeWidth(4),
         }}>
-        <Text style={[styles.shared, { color: isDark ? '#EEE7F9' : '#3C0E90' }]}>
+        <Text
+          style={[styles.shared, {color: '#EEE7F9'}]}
+          allowFontScaling={false}>
           We've just shared a high security 4 digit code with you on +91
           {loginData?.data?.maskedPhone}
         </Text>
@@ -275,15 +275,16 @@ const VerifyOTP = ({ route, navigation }) => {
         ref={otpRef}
         status={otpStatus}
         value={loginData?.data.generatedOtp || ''}
-        style={{ transform: [{ scale: bounceAnim }] }}
+        style={{transform: [{scale: bounceAnim}]}}
       />
 
-      <View style={{ marginTop: normalizeHeight(24) }}>
+      <View style={{marginTop: normalizeHeight(24)}}>
         <Text
+          allowFontScaling={false}
           style={{
             fontSize: 12,
             fontWeight: '600',
-            color: isDark ? 'white' : '#300B73',
+            color: 'white',
           }}>
           Didn't Receive the code yet ?{' '}
         </Text>
@@ -298,17 +299,11 @@ const VerifyOTP = ({ route, navigation }) => {
             onPress={handleResendOtp}
             activeOpacity={timer === 0 && !resending ? 0.7 : 1}>
             <Text
+              allowFontScaling={false}
               style={{
                 fontSize: 12,
                 fontWeight: '700',
-                color:
-                  timer === 0 && !resending
-                    ? isDark
-                      ? '#EEE7F9'
-                      : '#5013C0'
-                    : isDark
-                      ? 'white'
-                      : 'rgba(0, 0, 0, 0.12)',
+                color: timer === 0 && !resending ? '#EEE7F9' : 'white',
                 textDecorationLine:
                   timer === 0 && !resending ? 'underline' : 'none',
               }}>
@@ -316,10 +311,11 @@ const VerifyOTP = ({ route, navigation }) => {
             </Text>
           </TouchableOpacity>
           <Text
+            allowFontScaling={false}
             style={{
               fontSize: 12,
               fontWeight: '700',
-              color: isDark ? 'white' : '#5013C0',
+              color: 'white',
             }}>
             {timer > 0 ? ` in 00:${timer.toString().padStart(2, '0')}` : ''}
           </Text>

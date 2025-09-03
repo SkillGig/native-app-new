@@ -1,4 +1,56 @@
 import React, {useEffect} from 'react';
+import {Text, TextInput, PixelRatio, Dimensions} from 'react-native';
+import {FONT_FAMILY} from './styles/FontStyles';
+
+// Enhanced font scaling override with Lato font family
+const originalTextRender = Text.render;
+const originalTextInputRender = TextInput.render;
+
+Text.render = function (...args) {
+  const origin = originalTextRender.call(this, ...args);
+  return React.cloneElement(origin, {
+    allowFontScaling: false,
+    maxFontSizeMultiplier: 1,
+    style: [{fontFamily: FONT_FAMILY.regular}, origin.props.style],
+    ...origin.props,
+  });
+};
+
+TextInput.render = function (...args) {
+  const origin = originalTextInputRender.call(this, ...args);
+  return React.cloneElement(origin, {
+    allowFontScaling: false,
+    maxFontSizeMultiplier: 1,
+    style: [{fontFamily: FONT_FAMILY.regular}, origin.props.style],
+    ...origin.props,
+  });
+};
+
+Text.defaultProps = {
+  ...(Text.defaultProps || {}),
+  allowFontScaling: false,
+  maxFontSizeMultiplier: 1,
+  style: {fontFamily: FONT_FAMILY.regular},
+};
+
+TextInput.defaultProps = {
+  ...(TextInput.defaultProps || {}),
+  allowFontScaling: false,
+  maxFontSizeMultiplier: 1,
+  style: {fontFamily: FONT_FAMILY.regular},
+};
+
+// Debug font scaling
+console.log('Font Scale:', PixelRatio.getFontScale());
+console.log('Screen Scale:', PixelRatio.get());
+console.log('Dimensions:', Dimensions.get('window'));
+Dimensions.addEventListener('change', ({window, screen}) => {
+  console.log('Dimensions changed:', {
+    fontScale: PixelRatio.getFontScale(),
+    window,
+    screen,
+  });
+});
 import Navigation from './Navigation';
 import {ThemeProvider} from './src/context/ThemeContext';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';

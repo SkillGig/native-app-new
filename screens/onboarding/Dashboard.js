@@ -1,58 +1,30 @@
-import React, {useContext, useEffect, useRef} from 'react';
-import {View, Switch, StyleSheet, Animated, Easing} from 'react-native';
-// import { ThemeContext } from '../../context/ThemeContext';
-// import { lightColors, darkColors } from '../../theme/colors';
+import React, {useContext} from 'react';
+import {View, Text, Switch, StyleSheet} from 'react-native';
 import {ThemeContext} from '../../src/context/ThemeContext';
-import {lightColors, darkColors} from '../../src/theme/color';
+import {darkColors} from '../../src/theme/color';
 
 const Dashboard = () => {
-  const {isDark, toggleTheme} = useContext(ThemeContext);
+  const {toggleTheme} = useContext(ThemeContext);
 
-  const animation = useRef(new Animated.Value(isDark ? 1 : 0)).current;
-
-  useEffect(() => {
-    Animated.timing(animation, {
-      toValue: isDark ? 1 : 0,
-      duration: 400,
-      useNativeDriver: false, // color interpolation needs false
-      easing: Easing.inOut(Easing.ease),
-    }).start();
-  }, [animation, isDark]);
-
-  // Interpolate background and text color
-  const backgroundColor = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [lightColors.background, darkColors.background],
-  });
-
-  const textColor = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [lightColors.text, darkColors.text],
-  });
-
-  const primaryColor = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [lightColors.primary, darkColors.primary],
-  });
+  // Use dark theme colors directly
+  const backgroundColor = darkColors.background;
+  const textColor = darkColors.text;
+  const primaryColor = darkColors.primary;
 
   return (
-    <Animated.View style={[styles.container, {backgroundColor}]}>
-      <Animated.Text style={[styles.title, {color: textColor}]}>
-        Dashboard Screen
-      </Animated.Text>
+    <View style={[styles.container, {backgroundColor}]}>
+      <Text style={[styles.title, {color: textColor}]}>Dashboard Screen</Text>
 
       <View style={styles.switchRow}>
-        <Animated.Text style={{color: textColor, marginRight: 10}}>
-          Dark Mode:
-        </Animated.Text>
+        <Text style={{color: textColor, marginRight: 10}}>Dark Mode:</Text>
         <Switch
-          value={isDark}
+          value={true}
           onValueChange={toggleTheme}
-          thumbColor={isDark ? darkColors.primary : lightColors.primary}
+          thumbColor={primaryColor}
           trackColor={{false: '#767577', true: '#81b0ff'}}
         />
       </View>
-    </Animated.View>
+    </View>
   );
 };
 

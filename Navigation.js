@@ -65,10 +65,10 @@ function BottomTabs() {
 }
 
 const Navigation = () => {
-  const {isDark} = useContext(ThemeContext);
+  // DarkTheme is always applied by default
 
   return (
-    <NavigationContainer theme={isDark ? DarkTheme : DefaultTheme}>
+    <NavigationContainer theme={DarkTheme}>
       <Stack.Navigator initialRouteName="OnBoarding">
         <Stack.Screen
           name="Login"

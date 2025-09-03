@@ -39,10 +39,14 @@ const CommonButton = ({
             size="small"
             style={{marginRight: 8}}
           />
-          <Text style={[styles.text, textStyle]}>Please wait...</Text>
+          <Text style={[styles.text, textStyle]} allowFontScaling={false}>
+            Please wait...
+          </Text>
         </View>
       ) : (
-        <Text style={[styles.text, textStyle]}>{name}</Text>
+        <Text style={[styles.text, textStyle]} allowFontScaling={false}>
+          {name}
+        </Text>
       )}
     </TouchableOpacity>
   );

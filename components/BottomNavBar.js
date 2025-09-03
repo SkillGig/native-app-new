@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, {useRef, useEffect, useMemo} from 'react';
 import {
   View,
   TouchableOpacity,
@@ -38,38 +38,81 @@ const NAV_ITEMS = [
   },
 ];
 
-const BottomNavBar = ({ state, descriptors, navigation }) => {
+const BottomNavBar = ({state, descriptors, navigation}) => {
   const userConfig = useUserStore(userState => userState.userConfig) || {};
   const activeKey = state.routes[state.index].name;
 
   // Animated values for each tab (first 3)
-  const homeOpacity = useRef(new Animated.Value(activeKey === 'MainDash' ? 1 : 0.5)).current;
-  const milestoneOpacity = useRef(new Animated.Value(activeKey === 'RoadMap' ? 1 : 0.5)).current;
-  const connectOpacity = useRef(new Animated.Value(activeKey === 'OngoingCourses' ? 1 : 0.5)).current;
-  const opacityArr = useMemo(() => [homeOpacity, milestoneOpacity, connectOpacity], [homeOpacity, milestoneOpacity, connectOpacity]);
+  const homeOpacity = useRef(
+    new Animated.Value(activeKey === 'MainDash' ? 1 : 0.5),
+  ).current;
+  const milestoneOpacity = useRef(
+    new Animated.Value(activeKey === 'RoadMap' ? 1 : 0.5),
+  ).current;
+  const connectOpacity = useRef(
+    new Animated.Value(activeKey === 'OngoingCourses' ? 1 : 0.5),
+  ).current;
+  const opacityArr = useMemo(
+    () => [homeOpacity, milestoneOpacity, connectOpacity],
+    [homeOpacity, milestoneOpacity, connectOpacity],
+  );
 
-  const homeLabelY = useRef(new Animated.Value(activeKey === 'MainDash' ? 24 : 8)).current;
-  const milestoneLabelY = useRef(new Animated.Value(activeKey === 'RoadMap' ? 24 : 8)).current;
-  const connectLabelY = useRef(new Animated.Value(activeKey === 'OngoingCourses' ? 24 : 8)).current;
-  const labelYArr = useMemo(() => [homeLabelY, milestoneLabelY, connectLabelY], [homeLabelY, milestoneLabelY, connectLabelY]);
+  const homeLabelY = useRef(
+    new Animated.Value(activeKey === 'MainDash' ? 24 : 8),
+  ).current;
+  const milestoneLabelY = useRef(
+    new Animated.Value(activeKey === 'RoadMap' ? 24 : 8),
+  ).current;
+  const connectLabelY = useRef(
+    new Animated.Value(activeKey === 'OngoingCourses' ? 24 : 8),
+  ).current;
+  const labelYArr = useMemo(
+    () => [homeLabelY, milestoneLabelY, connectLabelY],
+    [homeLabelY, milestoneLabelY, connectLabelY],
+  );
 
-  const homeGlowY = useRef(new Animated.Value(activeKey === 'MainDash' ? 0 : 16)).current;
-  const milestoneGlowY = useRef(new Animated.Value(activeKey === 'RoadMap' ? 0 : 16)).current;
-  const connectGlowY = useRef(new Animated.Value(activeKey === 'OngoingCourses' ? 0 : 16)).current;
-  const glowYArr = useMemo(() => [homeGlowY, milestoneGlowY, connectGlowY], [homeGlowY, milestoneGlowY, connectGlowY]);
+  const homeGlowY = useRef(
+    new Animated.Value(activeKey === 'MainDash' ? 0 : 16),
+  ).current;
+  const milestoneGlowY = useRef(
+    new Animated.Value(activeKey === 'RoadMap' ? 0 : 16),
+  ).current;
+  const connectGlowY = useRef(
+    new Animated.Value(activeKey === 'OngoingCourses' ? 0 : 16),
+  ).current;
+  const glowYArr = useMemo(
+    () => [homeGlowY, milestoneGlowY, connectGlowY],
+    [homeGlowY, milestoneGlowY, connectGlowY],
+  );
 
-  const homeIconWH = useRef(new Animated.Value(activeKey === 'MainDash' ? 32 : 20)).current;
-  const milestoneIconWH = useRef(new Animated.Value(activeKey === 'RoadMap' ? 32 : 20)).current;
-  const connectIconWH = useRef(new Animated.Value(activeKey === 'OngoingCourses' ? 32 : 20)).current;
-  const iconWHArr = useMemo(() => [homeIconWH, milestoneIconWH, connectIconWH], [homeIconWH, milestoneIconWH, connectIconWH]);
+  const homeIconWH = useRef(
+    new Animated.Value(activeKey === 'MainDash' ? 32 : 20),
+  ).current;
+  const milestoneIconWH = useRef(
+    new Animated.Value(activeKey === 'RoadMap' ? 32 : 20),
+  ).current;
+  const connectIconWH = useRef(
+    new Animated.Value(activeKey === 'OngoingCourses' ? 32 : 20),
+  ).current;
+  const iconWHArr = useMemo(
+    () => [homeIconWH, milestoneIconWH, connectIconWH],
+    [homeIconWH, milestoneIconWH, connectIconWH],
+  );
 
   // Animated value for mock interview icon size
-  const mockIconWH = useRef(new Animated.Value(activeKey === 'QuizzesDashboard' ? 40 : 28)).current;
+  const mockIconWH = useRef(
+    new Animated.Value(activeKey === 'QuizzesDashboard' ? 40 : 28),
+  ).current;
 
   useEffect(() => {
     ['MainDash', 'RoadMap', 'OngoingCourses'].forEach((key, idx) => {
       const isActive = activeKey === key;
-      if (opacityArr[idx] && labelYArr[idx] && glowYArr[idx] && iconWHArr[idx]) {
+      if (
+        opacityArr[idx] &&
+        labelYArr[idx] &&
+        glowYArr[idx] &&
+        iconWHArr[idx]
+      ) {
         Animated.parallel([
           Animated.timing(opacityArr[idx], {
             toValue: isActive ? 1 : 0.5,
@@ -102,7 +145,7 @@ const BottomNavBar = ({ state, descriptors, navigation }) => {
     }).start();
   }, [activeKey, opacityArr, labelYArr, glowYArr, iconWHArr, mockIconWH]);
 
-  const onTabPress = (routeName) => {
+  const onTabPress = routeName => {
     const event = navigation.emit({
       type: 'tabPress',
       target: routeName,
@@ -123,7 +166,10 @@ const BottomNavBar = ({ state, descriptors, navigation }) => {
       if (item.key === 'OngoingCourses' && userConfig.showConnect === false) {
         return false;
       }
-      if (item.key === 'QuizzesDashboard' && userConfig.showInterviewPrep === false) {
+      if (
+        item.key === 'QuizzesDashboard' &&
+        userConfig.showInterviewPrep === false
+      ) {
         return false;
       }
       return true;
@@ -131,21 +177,48 @@ const BottomNavBar = ({ state, descriptors, navigation }) => {
   };
 
   const visibleTabs = getVisibleTabs();
-  const pillTabs = visibleTabs.filter(tab => tab.key !== 'QuizzesDashboard').slice(0, 3); // First 3 tabs go in pill
+  const pillTabs = visibleTabs
+    .filter(tab => tab.key !== 'QuizzesDashboard')
+    .slice(0, 3); // First 3 tabs go in pill
   const floatingTab = visibleTabs.find(tab => tab.key === 'QuizzesDashboard');
 
   return (
     <View style={styles.outerContainer}>
+      {/* Full-width Glass Morphism Background */}
+      <LinearGradient
+        colors={[
+          'rgba(15, 4, 35, 0.12)',
+          'rgba(26, 7, 66, 0.12)',
+          'rgba(15, 4, 35, 0.12)',
+        ]}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
+        style={styles.glassMorphismBg}>
+        {/* Secondary overlay for enhanced glass effect */}
+        <LinearGradient
+          colors={[
+            'rgba(191, 163, 246, 0.05)',
+            'rgba(87, 47, 139, 0.08)',
+            'rgba(15, 4, 35, 0.12)',
+          ]}
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 1}}
+          style={styles.glassOverlay}
+        />
+      </LinearGradient>
+
       <View style={styles.rowWrap}>
         {/* Grouped pill for Home, Milestones, Connect */}
         <LinearGradient
           colors={['rgba(87, 47, 139, 0.8)', 'rgba(26, 7, 66, 0.85)']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.pillBg, { width: pillTabs.length * 90 + 16 }]}>
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 1}}
+          style={[styles.pillBg, {width: pillTabs.length * 90 + 16}]}>
           {pillTabs.map((item, idx) => {
             const isActive = activeKey === item.key;
-            const animationIndex = NAV_ITEMS.findIndex(navItem => navItem.key === item.key);
+            const animationIndex = NAV_ITEMS.findIndex(
+              navItem => navItem.key === item.key,
+            );
             return (
               <TouchableOpacity
                 key={item.key}
@@ -156,7 +229,7 @@ const BottomNavBar = ({ state, descriptors, navigation }) => {
                   style={[
                     styles.pillIconCircle,
                     isActive && styles.pillIconCircleActive,
-                    { opacity: opacityArr[animationIndex] || 0.5 },
+                    {opacity: opacityArr[animationIndex] || 0.5},
                   ]}>
                   <Animated.Image
                     source={isActive ? item.activeIcon : item.icon}
@@ -174,12 +247,13 @@ const BottomNavBar = ({ state, descriptors, navigation }) => {
                 <Animated.View
                   style={{
                     opacity: opacityArr[animationIndex] || 0.5,
-                    transform: [{ translateY: labelYArr[animationIndex] || 8 }],
+                    transform: [{translateY: labelYArr[animationIndex] || 8}],
                   }}>
-                  <Text style={[
-                    styles.pillLabel,
-                    isActive && styles.activePillLabel,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.pillLabel,
+                      isActive && styles.activePillLabel,
+                    ]}>
                     {item.label}
                   </Text>
                 </Animated.View>
@@ -190,7 +264,7 @@ const BottomNavBar = ({ state, descriptors, navigation }) => {
                     right: 0,
                     bottom: 0,
                     alignItems: 'center',
-                    transform: [{ translateY: glowYArr[animationIndex] || 16 }],
+                    transform: [{translateY: glowYArr[animationIndex] || 16}],
                     opacity: opacityArr[animationIndex] || 0.5,
                   }}>
                   {isActive && (
@@ -219,7 +293,7 @@ const BottomNavBar = ({ state, descriptors, navigation }) => {
               style={[
                 styles.mockIcon,
                 activeKey === 'QuizzesDashboard' && styles.mockIconActive,
-                { width: mockIconWH, height: mockIconWH },
+                {width: mockIconWH, height: mockIconWH},
               ]}
               resizeMode="contain"
             />
@@ -245,6 +319,31 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     backgroundColor: 'transparent',
   },
+  glassMorphismBg: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(15, 4, 35, 0.44)',
+    borderTopColor: 'rgba(191, 163, 246, 0.15)',
+    borderLeftColor: 'rgba(191, 163, 246, 0.08)',
+    borderRightColor: 'rgba(191, 163, 246, 0.08)',
+    shadowColor: 'rgba(87, 47, 139, 0.9)',
+    shadowOffset: {width: 0, height: -12},
+    shadowOpacity: 1,
+    shadowRadius: 40,
+    elevation: 30,
+  },
+  glassOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
   pillActiveGlowDot: {
     width: 24,
     height: 12,
@@ -258,6 +357,8 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: 12,
     paddingHorizontal: 16,
+    zIndex: 10,
+    position: 'relative',
   },
   pillBg: {
     flexDirection: 'row',
@@ -269,7 +370,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.2,
     borderColor: 'rgba(191,163,246,0.3)',
     shadowColor: '#BFA3F6',
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: {width: 0, height: 8},
     shadowOpacity: 0.15,
     shadowRadius: 24,
     elevation: 12,
