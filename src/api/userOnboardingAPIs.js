@@ -256,3 +256,16 @@ export const getStreakMonthlyCalendar = async (month, year) => {
     auth: true,
   });
 };
+
+export const fetchAllNotifications = async (page = 1, pageSize = 10) => {
+  return await networkAPICall({
+    url: userService.allNotifications,
+    method: 'GET',
+    params: {
+      page,
+      pageSize,
+    },
+    service: 'userService',
+    auth: true,
+  });
+};

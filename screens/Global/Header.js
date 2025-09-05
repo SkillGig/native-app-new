@@ -9,7 +9,11 @@ import images from '../../assets/images';
 import {ThemeContext} from '../../src/context/ThemeContext';
 import useUserStore from '../../src/store/useUserStore';
 
-const Header = ({activeCurrentView, setActiveCurrentView}) => {
+const Header = ({
+  activeCurrentView,
+  setActiveCurrentView,
+  unreadNotifications,
+}) => {
   const {isDark, colors} = useContext(ThemeContext);
   const fstyles = getFontStyles(isDark, colors);
   const userConfig = useUserStore(state => state.userConfig);
@@ -68,11 +72,23 @@ const Header = ({activeCurrentView, setActiveCurrentView}) => {
           </TouchableOpacity>
         )}
         <TouchableOpacity
-          style={{marginLeft: normalizeWidth(12)}}
+          style={[
+            styles.notificationContainer,
+            {marginLeft: normalizeWidth(12)},
+          ]}
           onPress={() => {
             setActiveCurrentView('notifications');
           }}>
           <Image source={images.NOTIFICATION} style={styles.icon} />
+          {unreadNotifications > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText} allowFontScaling={false}>
+                {unreadNotifications > 9
+                  ? '9+'
+                  : unreadNotifications.toString()}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -109,10 +125,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  notificationContainer: {
+    position: 'relative',
+  },
   icon: {
     height: normalizeHeight(24),
     width: normalizeWidth(24),
     resizeMode: 'contain',
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#B095E3',
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+  },
+  badgeText: {
+    color: 'white',
+    fontSize: 11,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
 

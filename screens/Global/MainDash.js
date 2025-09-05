@@ -23,17 +23,25 @@ import {
   getStreakBreakDown,
   getWeeklyStreaks,
   requestAndRegisterFcmToken,
+  fetchAllNotifications,
 } from '../../src/api/userOnboardingAPIs';
 import messaging from '@react-native-firebase/messaging';
-import Loader from '../../components/Loader';
 import {getUserConfig} from '../../src/api/userOnboardingAPIs';
 import useSnackbarStore from '../../src/store/useSnackbarStore';
 import {connectNotificationSocket} from '../../src/api/notificationSocket';
 import {StreakCalendarBottomSheet} from '../../components';
+import Loader from '../../components/Loader';
 
 const MainDash = ({navigation}) => {
   const [activeCurrentView, setActiveCurrentView] = useState(0);
   const [streakStatusResponse, setStreakStatusResponse] = useState(null);
+  const [notificationsData, setNotificationsData] = useState([]);
+  const [totalUnreadNotifications, setTotalUnreadNotifications] = useState(0);
+  const [notificationsPagination, setNotificationsPagination] = useState(null);
+  const [isLoadingMoreNotifications, setIsLoadingMoreNotifications] =
+    useState(false);
+  const [isInitialNotificationsLoading, setIsInitialNotificationsLoading] =
+    useState(false);
 
   // Refs for bottom sheets
   const streakCalendarRef = useRef(null);
@@ -50,6 +58,37 @@ const MainDash = ({navigation}) => {
   const handleStreakPress = () => {
     if (streakCalendarRef.current) {
       streakCalendarRef.current.present();
+    }
+  };
+
+  // Handle loading more notifications
+  const loadMoreNotifications = async () => {
+    if (!notificationsPagination || isLoadingMoreNotifications) {
+      return;
+    }
+
+    const {currentPage, totalPages} = notificationsPagination;
+    if (currentPage >= totalPages) {
+      return; // No more pages to load
+    }
+
+    setIsLoadingMoreNotifications(true);
+    try {
+      const nextPage = currentPage + 1;
+      const notificationsRes = await fetchAllNotifications(nextPage, 10);
+
+      if (notificationsRes?.data?.notifications) {
+        // Append new notifications to existing ones
+        setNotificationsData(prev => [
+          ...prev,
+          ...notificationsRes.data.notifications,
+        ]);
+        setNotificationsPagination(notificationsRes.data.pagination);
+      }
+    } catch (error) {
+      console.error('Error loading more notifications:', error);
+    } finally {
+      setIsLoadingMoreNotifications(false);
     }
   };
 
@@ -76,33 +115,6 @@ const MainDash = ({navigation}) => {
   const showSnackbar = useSnackbarStore(state => state.showSnackbar);
   const setFcmToken = useUserStore(state => state.setFcmToken);
   const userConfig = useUserStore(state => state.userConfig);
-
-  const notificationData = [
-    {
-      id: 'a1',
-      title: 'Lesson Unlocked',
-      text: 'Andrew Fisk has updates on Figma & it’s basics',
-      leftIcon: images.COURSEREADING,
-    },
-    {
-      id: 'a2',
-      title: 'Lesson Unlocked',
-      text: 'Andrew Fisk has updates on Figma & it’s basics',
-      leftIcon: images.FEMALEAVATAR,
-    },
-    {
-      id: '23',
-      title: 'Lesson Unlocked',
-      text: 'Andrew Fisk has updates on Figma & it’s basics',
-      leftIcon: images.COURSEVIDEO,
-    },
-    {
-      id: 'a8',
-      title: 'Lesson Unlocked',
-      text: 'Andrew Fisk has updates on Figma & it’s basics',
-      leftIcon: images.NOTIFICATION,
-    },
-  ];
 
   const profileData = [
     {
@@ -163,7 +175,7 @@ const MainDash = ({navigation}) => {
 
   const increaseHeaderHeight = useCallback(() => {
     Animated.timing(headerHeightAnim, {
-      toValue: heightFromScreenPercent(85), // Example height, adjust as needed
+      toValue: heightFromScreenPercent(80), // Reduced from 85 to 80 to avoid covering bottom sheet
       duration: 400,
       useNativeDriver: false, // Use false for height animations
     }).start();
@@ -255,6 +267,30 @@ const MainDash = ({navigation}) => {
           console.log(res, 'User Config Response');
           if (res?.data?.config) {
             setUserConfig(res.data.config);
+
+            // Fetch notifications after config is loaded
+            try {
+              setIsInitialNotificationsLoading(true);
+              const notificationsRes = await fetchAllNotifications(1, 10);
+              console.log(notificationsRes, 'Notifications Response');
+              if (notificationsRes?.data?.notifications) {
+                setNotificationsData(notificationsRes.data.notifications);
+                setTotalUnreadNotifications(
+                  notificationsRes.data.totalUnread || 0,
+                );
+                setNotificationsPagination(notificationsRes.data.pagination);
+              }
+            } catch (notificationsError) {
+              console.error(
+                'Error fetching notifications:',
+                notificationsError,
+              );
+              setNotificationsData([]);
+              setTotalUnreadNotifications(0);
+            } finally {
+              setIsInitialNotificationsLoading(false);
+            }
+
             // if user streaks flag is 1 then we need to call the user streaks API
             const streaksFlag = res.data.config.showUserStreaks;
             if (streaksFlag === 1) {
@@ -292,6 +328,9 @@ const MainDash = ({navigation}) => {
             // });
           }
         } catch (e) {
+          setTotalUnreadNotifications(0);
+          setNotificationsData([]);
+          setIsInitialNotificationsLoading(false);
           showSnackbar({
             message: 'Invalid user. Please log in again.',
             type: 'error',
@@ -306,7 +345,17 @@ const MainDash = ({navigation}) => {
       }
     }
     fetchUserConfig();
-  }, [user, setUserConfig, showSnackbar, navigation, logout]);
+  }, [
+    user,
+    setUserConfig,
+    showSnackbar,
+    navigation,
+    logout,
+    setNotificationsData,
+    setTotalUnreadNotifications,
+    setNotificationsPagination,
+    setIsInitialNotificationsLoading,
+  ]);
 
   // Connect to notification WebSocket room if userId is present and socket is not connected
   useEffect(() => {
@@ -328,46 +377,50 @@ const MainDash = ({navigation}) => {
             height: headerHeightAnim, // Adjust height based on view
           }}>
           <Header
-            activeCurrentView={activeCurrentView}
-            setActiveCurrentView={view => handleHeaderItemsPress(view)}
-          />
+                activeCurrentView={activeCurrentView}
+                unreadNotifications={totalUnreadNotifications}
+                setActiveCurrentView={view => handleHeaderItemsPress(view)}
+              />
 
-          {activeCurrentView === 'notifications' && (
-            <NotificationsPanel
-              notificationData={notificationData}
-              handleHeaderItemsCollapse={() => handleHeaderItemsCollapse()}
+              {activeCurrentView === 'notifications' && (
+                <NotificationsPanel
+                  notificationData={notificationsData}
+                  isInitialLoading={isInitialNotificationsLoading}
+                  isLoadingMore={isLoadingMoreNotifications}
+                  onLoadMore={loadMoreNotifications}
+                  handleHeaderItemsCollapse={() => handleHeaderItemsCollapse()}
+                />
+              )}
+              {activeCurrentView === 'profile' && (
+                <ProfileComponent
+                  profileData={profileData}
+                  handleHeaderItemsCollapse={() => handleHeaderItemsCollapse()}
+                />
+              )}
+            </Animated.View>
+
+            {/* Example: show/hide HomeSlider based on featureToggles.showUserRoadmap */}
+            <HomeSlider
+              courseFilter={courseFilter}
+              exploreCoursesFilter={exploreCoursesFilter}
+              recommendedCourses={courseFilter}
+              allCourses={courseFilter}
+              courseType={courseType}
+              weekStatus={streakStatusResponse}
+              statusMap={statusMap}
+              activeCurrentView={activeCurrentView}
+              onStreakPress={handleStreakPress}
+              onSheetChange={index => {
+                console.log(index, 'the current sheet index');
+                if (index === 1) {
+                  setActiveCurrentView(null);
+                }
+              }}
             />
-          )}
-          {activeCurrentView === 'profile' && (
-            <ProfileComponent
-              profileData={profileData}
-              handleHeaderItemsCollapse={() => handleHeaderItemsCollapse()}
-            />
-          )}
-        </Animated.View>
+          </PageLayout>
 
-        {/* Example: show/hide HomeSlider based on featureToggles.showUserRoadmap */}
-        <HomeSlider
-          courseFilter={courseFilter}
-          exploreCoursesFilter={exploreCoursesFilter}
-          recommendedCourses={courseFilter}
-          allCourses={courseFilter}
-          courseType={courseType}
-          weekStatus={streakStatusResponse}
-          statusMap={statusMap}
-          activeCurrentView={activeCurrentView}
-          onStreakPress={handleStreakPress}
-          onSheetChange={index => {
-            console.log(index, 'the current sheet index');
-            if (index === 1) {
-              setActiveCurrentView(null);
-            }
-          }}
-        />
-      </PageLayout>
-
-      {/* Streak Calendar Bottom Sheet */}
-      <StreakCalendarBottomSheet ref={streakCalendarRef} />
+          {/* Streak Calendar Bottom Sheet */}
+          <StreakCalendarBottomSheet ref={streakCalendarRef} />
     </View>
   );
 };

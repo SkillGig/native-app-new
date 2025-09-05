@@ -23,6 +23,7 @@ export const userService = {
   streakStatus: '/rewards/streak-status',
   markAnimationSeen: '/rewards/mark-animation-seen',
   streakMonthlyCalendar: '/rewards/monthly-summary',
+  allNotifications: '/notifications/all',
 };
 
 export const notificationsService = {
