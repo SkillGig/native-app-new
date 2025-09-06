@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: normalizeHeight(16),
+    marginHorizontal: normalizeWidth(20),
   },
   profileContainer: {
     flexDirection: 'row',

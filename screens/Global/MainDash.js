@@ -24,13 +24,14 @@ import {
   getWeeklyStreaks,
   requestAndRegisterFcmToken,
   fetchAllNotifications,
+  getUserOngoingCourses,
 } from '../../src/api/userOnboardingAPIs';
 import messaging from '@react-native-firebase/messaging';
 import {getUserConfig} from '../../src/api/userOnboardingAPIs';
 import useSnackbarStore from '../../src/store/useSnackbarStore';
 import {connectNotificationSocket} from '../../src/api/notificationSocket';
 import {StreakCalendarBottomSheet} from '../../components';
-import Loader from '../../components/Loader';
+import HeaderSkeleton from '../../components/Skeletons/HeaderSkeleton';
 
 const MainDash = ({navigation}) => {
   const [activeCurrentView, setActiveCurrentView] = useState(0);
@@ -42,6 +43,14 @@ const MainDash = ({navigation}) => {
     useState(false);
   const [isInitialNotificationsLoading, setIsInitialNotificationsLoading] =
     useState(false);
+
+  // Individual loading states for granular skeleton loading
+  const [isConfigLoading, setIsConfigLoading] = useState(true);
+  const [isStreakLoading, setIsStreakLoading] = useState(true);
+  const [isOngoingCoursesLoading, setIsOngoingCoursesLoading] = useState(true);
+
+  // Ongoing courses data
+  const [ongoingCoursesData, setOngoingCoursesData] = useState(null);
 
   // Refs for bottom sheets
   const streakCalendarRef = useRef(null);
@@ -111,7 +120,6 @@ const MainDash = ({navigation}) => {
   const fcmToken = useUserStore(state => state.fcmToken);
   const user = useUserStore(state => state.user);
   const setUserConfig = useUserStore(state => state.setUserConfig);
-  const [loading, setLoading] = useState(false);
   const showSnackbar = useSnackbarStore(state => state.showSnackbar);
   const setFcmToken = useUserStore(state => state.setFcmToken);
   const userConfig = useUserStore(state => state.userConfig);
@@ -150,17 +158,6 @@ const MainDash = ({navigation}) => {
     {id: '22', title: 'Design'},
     {id: '75', title: 'Coding'},
     {id: '18', title: 'Animation'},
-  ];
-
-  const exploreCoursesFilter = [
-    {id: '1', title: 'All'},
-    {id: '22', title: 'Design'},
-    {id: '75', title: 'Coding'},
-    {id: '18', skill: 'Animation'}, // Changed to skill for uniqueness in example
-    {id: '1', title: 'All'},
-    {id: '22', title: 'Design'},
-    {id: '75', title: 'Coding'},
-    {id: '18', skill: 'Animation'},
   ];
 
   const courseType = [
@@ -261,12 +258,13 @@ const MainDash = ({navigation}) => {
   useEffect(() => {
     async function fetchUserConfig() {
       if (user && user.authToken) {
-        setLoading(true);
+        setIsConfigLoading(true);
         try {
           const res = await getUserConfig();
           console.log(res, 'User Config Response');
           if (res?.data?.config) {
             setUserConfig(res.data.config);
+            setIsConfigLoading(false);
 
             // Fetch notifications after config is loaded
             try {
@@ -291,31 +289,58 @@ const MainDash = ({navigation}) => {
               setIsInitialNotificationsLoading(false);
             }
 
+            // Fetch ongoing courses
+            try {
+              setIsOngoingCoursesLoading(true);
+              const ongoingCoursesRes = await getUserOngoingCourses();
+              console.log(ongoingCoursesRes, 'Ongoing Courses Response');
+              if (ongoingCoursesRes?.data) {
+                setOngoingCoursesData(ongoingCoursesRes.data);
+              }
+            } catch (ongoingCoursesError) {
+              console.error(
+                'Error fetching ongoing courses:',
+                ongoingCoursesError,
+              );
+              setOngoingCoursesData(null);
+            } finally {
+              setIsOngoingCoursesLoading(false);
+            }
+
             // if user streaks flag is 1 then we need to call the user streaks API
             const streaksFlag = res.data.config.showUserStreaks;
             if (streaksFlag === 1) {
-              const todayStreakStatus = await currentDayStreakStatus();
-              console.log(todayStreakStatus, 'the todays streak status');
-              const streaksRes = await getWeeklyStreaks();
-              setStreakStatusResponse(streaksRes.data);
-              if (
-                todayStreakStatus.data.data.completedStreak &&
-                !todayStreakStatus.data.data.animationSeen
-              ) {
-                const streakDate = new Date();
-                const formattedStreakDate = `${streakDate
-                  .getDate()
-                  .toString()
-                  .padStart(2, '0')}-${(streakDate.getMonth() + 1)
-                  .toString()
-                  .padStart(2, '0')}-${streakDate.getFullYear()}`;
-                const streakBreakDown = await getStreakBreakDown(
-                  formattedStreakDate,
-                );
-                return navigation.navigate('CurrentDayStreakBreakdown', {
-                  streakBreakDownInfo: streakBreakDown.data,
-                });
+              setIsStreakLoading(true);
+              try {
+                const todayStreakStatus = await currentDayStreakStatus();
+                console.log(todayStreakStatus, 'the todays streak status');
+                const streaksRes = await getWeeklyStreaks();
+                setStreakStatusResponse(streaksRes.data);
+                if (
+                  todayStreakStatus.data.data.completedStreak &&
+                  !todayStreakStatus.data.data.animationSeen
+                ) {
+                  const streakDate = new Date();
+                  const formattedStreakDate = `${streakDate
+                    .getDate()
+                    .toString()
+                    .padStart(2, '0')}-${(streakDate.getMonth() + 1)
+                    .toString()
+                    .padStart(2, '0')}-${streakDate.getFullYear()}`;
+                  const streakBreakDown = await getStreakBreakDown(
+                    formattedStreakDate,
+                  );
+                  return navigation.navigate('CurrentDayStreakBreakdown', {
+                    streakBreakDownInfo: streakBreakDown.data,
+                  });
+                }
+              } catch (streakError) {
+                console.error('Error fetching streak data:', streakError);
+              } finally {
+                setIsStreakLoading(false);
               }
+            } else {
+              setIsStreakLoading(false);
             }
           } else {
             showSnackbar({
@@ -339,8 +364,6 @@ const MainDash = ({navigation}) => {
           //   index: 0,
           //   routes: [{name: 'OnBoarding'}],
           // });
-        } finally {
-          setLoading(false);
         }
       }
     }
@@ -368,59 +391,64 @@ const MainDash = ({navigation}) => {
 
   return (
     <View style={{flex: 1}}>
-      {loading && <Loader />}
       <PageLayout>
         <Animated.View
           style={{
-            marginHorizontal: normalizeWidth(20),
             marginTop: normalizeHeight(32),
             height: headerHeightAnim, // Adjust height based on view
           }}>
-          <Header
-                activeCurrentView={activeCurrentView}
-                unreadNotifications={totalUnreadNotifications}
-                setActiveCurrentView={view => handleHeaderItemsPress(view)}
-              />
-
-              {activeCurrentView === 'notifications' && (
-                <NotificationsPanel
-                  notificationData={notificationsData}
-                  isInitialLoading={isInitialNotificationsLoading}
-                  isLoadingMore={isLoadingMoreNotifications}
-                  onLoadMore={loadMoreNotifications}
-                  handleHeaderItemsCollapse={() => handleHeaderItemsCollapse()}
-                />
-              )}
-              {activeCurrentView === 'profile' && (
-                <ProfileComponent
-                  profileData={profileData}
-                  handleHeaderItemsCollapse={() => handleHeaderItemsCollapse()}
-                />
-              )}
-            </Animated.View>
-
-            {/* Example: show/hide HomeSlider based on featureToggles.showUserRoadmap */}
-            <HomeSlider
-              courseFilter={courseFilter}
-              exploreCoursesFilter={exploreCoursesFilter}
-              recommendedCourses={courseFilter}
-              allCourses={courseFilter}
-              courseType={courseType}
-              weekStatus={streakStatusResponse}
-              statusMap={statusMap}
+          {isConfigLoading ? (
+            <HeaderSkeleton />
+          ) : (
+            <Header
               activeCurrentView={activeCurrentView}
-              onStreakPress={handleStreakPress}
-              onSheetChange={index => {
-                console.log(index, 'the current sheet index');
-                if (index === 1) {
-                  setActiveCurrentView(null);
-                }
-              }}
+              unreadNotifications={totalUnreadNotifications}
+              setActiveCurrentView={view => handleHeaderItemsPress(view)}
             />
-          </PageLayout>
+          )}
 
-          {/* Streak Calendar Bottom Sheet */}
-          <StreakCalendarBottomSheet ref={streakCalendarRef} />
+          {activeCurrentView === 'notifications' && (
+            <NotificationsPanel
+              notificationData={notificationsData}
+              isInitialLoading={isInitialNotificationsLoading}
+              isLoadingMore={isLoadingMoreNotifications}
+              onLoadMore={loadMoreNotifications}
+              handleHeaderItemsCollapse={() => handleHeaderItemsCollapse()}
+            />
+          )}
+          {activeCurrentView === 'profile' && (
+            <ProfileComponent
+              profileData={profileData}
+              handleHeaderItemsCollapse={() => handleHeaderItemsCollapse()}
+            />
+          )}
+        </Animated.View>
+
+        {/* HomeSlider with granular skeletons */}
+        <HomeSlider
+          courseFilter={courseFilter}
+          recommendedCourses={courseFilter}
+          allCourses={courseFilter}
+          courseType={courseType}
+          weekStatus={streakStatusResponse}
+          statusMap={statusMap}
+          activeCurrentView={activeCurrentView}
+          onStreakPress={handleStreakPress}
+          onSheetChange={index => {
+            console.log(index, 'the current sheet index');
+            if (index === 1) {
+              setActiveCurrentView(null);
+            }
+          }}
+          // New props for granular loading
+          isStreakLoading={isStreakLoading}
+          isOngoingCoursesLoading={isOngoingCoursesLoading}
+          ongoingCoursesData={ongoingCoursesData}
+        />
+      </PageLayout>
+
+      {/* Streak Calendar Bottom Sheet */}
+      <StreakCalendarBottomSheet ref={streakCalendarRef} />
     </View>
   );
 };

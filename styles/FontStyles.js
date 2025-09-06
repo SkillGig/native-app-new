@@ -5,7 +5,7 @@ import {normalizeHeight} from '../components/Responsivescreen';
 const FONT_FAMILY = {
   thin: 'Lato-Thin',
   light: 'Lato-Light',
-  regular: 'Lato-Regular',
+  regular: 'Lato',
   medium: 'Lato-Medium',
   semiBold: 'Lato-SemiBold',
   bold: 'Lato-Bold',

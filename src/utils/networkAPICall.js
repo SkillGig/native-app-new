@@ -46,6 +46,9 @@ const networkAPICall = async ({
     backendKeys[service],
   );
 
+  // Add 2 second delay for testing loading states
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
   try {
     const response = await axios({
       baseURL: backendKeys[service],

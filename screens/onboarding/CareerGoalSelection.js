@@ -190,6 +190,7 @@ const CareerGoalScreen = ({navigation, route}) => {
     setSubmitting(true);
     try {
       if (selected === "I don't know yet !") {
+        setIsUserEnrolledToRoadmap(true);
         navigation.replace('RoadmapQuestionsFlow', {
           fromCareerGoal: true,
         });

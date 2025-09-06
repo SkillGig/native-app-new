@@ -100,15 +100,9 @@ const NotificationsPanel = ({
   };
 
   const handleEndReached = () => {
-    console.log('📍 handleEndReached called');
-    console.log('🔄 isLoadingMore:', isLoadingMore);
-    console.log('📋 onLoadMore exists:', !!onLoadMore);
-
     if (!isLoadingMore && onLoadMore) {
-      console.log('✅ Calling onLoadMore function');
       onLoadMore();
     } else {
-      console.log('❌ Not calling onLoadMore - conditions not met');
     }
   };
 
@@ -180,6 +174,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'transparent',
+    marginHorizontal: 20,
   },
   titleContainer: {
     marginTop: normalizeHeight(28),

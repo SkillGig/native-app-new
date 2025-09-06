@@ -269,3 +269,22 @@ export const fetchAllNotifications = async (page = 1, pageSize = 10) => {
     auth: true,
   });
 };
+
+export const getUserOngoingCourses = async () => {
+  return await networkAPICall({
+    url: userService.ongoingCourses,
+    method: 'GET',
+    service: 'userService',
+    auth: true,
+  });
+};
+
+export const getRoadmapDetails = async roadmapId => {
+  return await networkAPICall({
+    url: userService.roadmapDetails,
+    method: 'GET',
+    params: {roadmapId},
+    service: 'userService',
+    auth: true,
+  });
+};

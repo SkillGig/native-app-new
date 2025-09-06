@@ -24,6 +24,8 @@ export const userService = {
   markAnimationSeen: '/rewards/mark-animation-seen',
   streakMonthlyCalendar: '/rewards/monthly-summary',
   allNotifications: '/notifications/all',
+  ongoingCourses: '/course/ongoing-courses',
+  roadmapDetails: '/roadmap/roadmap-details',
 };
 
 export const notificationsService = {

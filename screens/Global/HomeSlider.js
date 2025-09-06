@@ -5,6 +5,7 @@ import React, {
   useContext,
   useEffect,
   useImperativeHandle,
+  useMemo,
 } from 'react';
 import {
   StyleSheet,
@@ -28,6 +29,9 @@ import {getFontStyles} from '../../styles/FontStyles';
 import {ThemeContext} from '../../src/context/ThemeContext';
 import DailyStreak from './DailyStreak';
 import useUserStore from '../../src/store/useUserStore';
+import StreakSkeleton from '../../components/Skeletons/StreakSkeleton';
+import OngoingCoursesSkeleton from '../../components/Skeletons/OngoingCoursesSkeleton';
+import FilterTabsSkeleton from '../../components/Skeletons/FilterTabsSkeleton';
 
 const {height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -44,13 +48,16 @@ const HomeSlider = forwardRef(
     {
       onSheetChange,
       courseFilter = [],
-      exploreCoursesFilter = [],
       courseType = [],
       weekStatus = [],
       currentDay = '',
       statusMap = {},
       activeCurrentView,
       onStreakPress,
+      // New props for granular loading
+      isStreakLoading = false,
+      isOngoingCoursesLoading = false,
+      ongoingCoursesData = null,
     },
     ref,
   ) => {
@@ -63,6 +70,16 @@ const HomeSlider = forwardRef(
     const [initialIndex, setInitialIndex] = React.useState(0);
 
     const userConfig = useUserStore(state => state.userConfig);
+
+    const availableRoadmaps = useUserStore(
+      state => state.userConfig.availableRoadmaps,
+    );
+
+    const [activeRoadmap, setActiveRoadmap] = React.useState(
+      availableRoadmaps?.[0] ?? null,
+    );
+
+    console.log(availableRoadmaps, 'the available roadmaps');
 
     // Expose ref methods to parent components
     useImperativeHandle(ref, () => ({
@@ -93,6 +110,8 @@ const HomeSlider = forwardRef(
       [onSheetChange, safeSnapPoints.length],
     );
 
+    const gradientColors = useMemo(() => ['#090215', '#300B73'], []);
+
     useEffect(() => {
       console.log(activeCurrentView, 'the active current view');
       if (activeCurrentView !== null) {
@@ -109,14 +128,43 @@ const HomeSlider = forwardRef(
       }
     }, [initialIndex]);
 
-    const renderCourseCard = (item, index) => {
+    const handleOnClickRoadmap = roadmap => {
+      setActiveRoadmap(roadmap);
+    };
+    const renderCourseCard = (
+      item,
+      index,
+      isRealData = false,
+      totalItems = 0,
+    ) => {
+      // Use real data if available, otherwise fallback to dummy data
+      const courseData = isRealData
+        ? {
+            title: item.courseTitle,
+            author: item.courseAuthor || 'By Anshika Gupta',
+            thumbnail: item.courseThumbnailUrl,
+            progress: item.progressPercent,
+            currentChapter: item.currentChapter?.title,
+            totalModules: item.totalModules,
+            completedModules: item.completedModules,
+            courseStatus: item.courseStatus,
+            isInProgress: item.courseStatus === 'in-progress',
+            isUpcoming: !item.courseStatus, // If no courseStatus, it's upcoming
+          }
+        : {
+            title: 'Figma Basics',
+            author: 'By Anshika Gupta',
+            thumbnail: images.TESTONGOING,
+            isInProgress: false,
+            isUpcoming: true,
+          };
+
       return (
         <View
           style={[
             styles.courseCard,
             {
-              marginRight:
-                index === courseFilter.length - 1 ? 0 : normalizeWidth(20),
+              marginRight: index === totalItems - 1 ? 0 : normalizeWidth(20),
             },
           ]}>
           <LinearGradient
@@ -128,10 +176,37 @@ const HomeSlider = forwardRef(
             ]}
             locations={[0, 0.49, 0.59, 1]}
             style={styles.courseCardInner}>
-            <Image source={images.TESTONGOING} style={styles.courseImage} />
+            <Image
+              source={
+                isRealData && courseData.thumbnail
+                  ? {uri: courseData.thumbnail}
+                  : courseData.thumbnail || images.TESTONGOING
+              }
+              style={styles.courseImage}
+            />
             <View style={styles.courseTextContainer}>
-              <Text style={fstyles.boldFourteen}>Figma Basics</Text>
-              <Text style={styles.courseAuthor}>By Anshika Gupta</Text>
+              <Text style={fstyles.boldFourteen}>{courseData.title}</Text>
+              <Text style={styles.courseAuthor}>{courseData.author}</Text>
+
+              {/* Progress section for in-progress courses */}
+              {courseData.isInProgress && courseData.progress !== undefined && (
+                <View style={styles.progressContainer}>
+                  <Text style={styles.progressText}>
+                    {courseData.completedModules}/{courseData.totalModules}{' '}
+                    modules • {courseData.progress}%
+                  </Text>
+                  <View style={styles.progressBar}>
+                    <View
+                      style={[
+                        styles.progressFill,
+                        {width: `${courseData.progress}%`},
+                      ]}
+                    />
+                  </View>
+                </View>
+              )}
+
+              {/* Course tags */}
               <View style={styles.courseTypeContainer}>
                 {courseType.map(type => (
                   <TouchableOpacity
@@ -141,6 +216,25 @@ const HomeSlider = forwardRef(
                   </TouchableOpacity>
                 ))}
               </View>
+
+              {/* Action button */}
+              <TouchableOpacity
+                style={[
+                  styles.actionButton,
+                  courseData.isInProgress
+                    ? styles.resumeButton
+                    : styles.viewDetailsButton,
+                ]}>
+                <Text
+                  style={[
+                    styles.actionButtonText,
+                    courseData.isInProgress
+                      ? styles.resumeButtonText
+                      : styles.viewDetailsButtonText,
+                  ]}>
+                  {courseData.isInProgress ? 'Resume Course' : 'View Details'}
+                </Text>
+              </TouchableOpacity>
             </View>
           </LinearGradient>
         </View>
@@ -148,83 +242,196 @@ const HomeSlider = forwardRef(
     };
 
     const renderHeader = () => (
-      <View>
+      <LinearGradient
+        colors={gradientColors}
+        locations={[0, 0.4]}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}>
         {userConfig.showUserStreaks && (
-          <DailyStreak
-            weekStatus={weekStatus}
-            currentDay={currentDay}
-            statusMap={statusMap}
-            onStreakPress={onStreakPress}
-          />
+          <>
+            {isStreakLoading ? (
+              <StreakSkeleton />
+            ) : (
+              <DailyStreak
+                weekStatus={weekStatus}
+                currentDay={currentDay}
+                statusMap={statusMap}
+                onStreakPress={onStreakPress}
+              />
+            )}
+          </>
         )}
-        {/* Ongoing Courses */}
-        <Text style={styles.sectionTitle}>Ongoing Courses</Text>
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={courseFilter}
-          keyExtractor={item => `explore_${item.id}`}
-          renderItem={({item, index}) => renderCourseCard(item, index)}
-          contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 8}}
-        />
+
+        {/* Ongoing Courses Section */}
+
+        <Text style={styles.sectionTitle}>
+          {ongoingCoursesData?.roadmapName
+            ? `${ongoingCoursesData.roadmapName} - Ongoing`
+            : 'Ongoing Courses'}
+        </Text>
+        {isOngoingCoursesLoading ? (
+          <OngoingCoursesSkeleton />
+        ) : (
+          <>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={
+                [
+                  ...(ongoingCoursesData?.currentOngoingCourses || []),
+                  ...(ongoingCoursesData?.upcomingCourses || []),
+                ].length > 0
+                  ? [
+                      ...(ongoingCoursesData?.currentOngoingCourses || []),
+                      ...(ongoingCoursesData?.upcomingCourses || []),
+                    ]
+                  : courseFilter
+              }
+              keyExtractor={(item, index) =>
+                ongoingCoursesData?.currentOngoingCourses ||
+                ongoingCoursesData?.upcomingCourses
+                  ? `course_${item.courseId || item.id}_${index}`
+                  : `explore_${item.id}`
+              }
+              renderItem={({item, index}) => {
+                const totalItems =
+                  [
+                    ...(ongoingCoursesData?.currentOngoingCourses || []),
+                    ...(ongoingCoursesData?.upcomingCourses || []),
+                  ].length > 0
+                    ? [
+                        ...(ongoingCoursesData?.currentOngoingCourses || []),
+                        ...(ongoingCoursesData?.upcomingCourses || []),
+                      ].length
+                    : courseFilter.length;
+
+                return renderCourseCard(
+                  item,
+                  index,
+                  !!(
+                    ongoingCoursesData?.currentOngoingCourses ||
+                    ongoingCoursesData?.upcomingCourses
+                  ),
+                  totalItems,
+                );
+              }}
+              contentContainerStyle={{
+                paddingHorizontal: 16,
+                paddingBottom: 8,
+                marginBottom: 20,
+              }}
+            />
+          </>
+        )}
         <View style={{backgroundColor: '#090215'}}>
           <View style={styles.sectionTitleContainer}>
             <Text style={fstyles.heavyTwenty}>Explore Courses</Text>
           </View>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={exploreCoursesFilter}
-            keyExtractor={(item, index) => `explore_${index}`}
-            contentContainerStyle={{
-              paddingHorizontal: 16,
-              paddingBottom: 8,
-              marginTop: 10,
-            }}
-            renderItem={({item}) => (
-              <TouchableOpacity style={styles.filterButton}>
-                <Text style={fstyles.thirteenMedium}>{item.title}</Text>
-              </TouchableOpacity>
-            )}
-          />
-          <Text style={styles.sectionTitle}>Ongoing Courses</Text>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={courseFilter}
-            keyExtractor={item => `explore_${item.id}`}
-            renderItem={({item, index}) => renderCourseCard(item, index)}
-            contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 8}}
-          />
-          <Text style={styles.sectionTitle}>Ongoing Courses</Text>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={courseFilter}
-            keyExtractor={item => `explore_${item.id}`}
-            renderItem={({item, index}) => renderCourseCard(item, index)}
-            contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 8}}
-          />
-          <Text style={styles.sectionTitle}>Ongoing Courses</Text>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={courseFilter}
-            keyExtractor={item => `explore_${item.id}`}
-            renderItem={({item, index}) => renderCourseCard(item, index)}
-            contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 8}}
-          />
+          {isOngoingCoursesLoading ? (
+            <FilterTabsSkeleton />
+          ) : (
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={availableRoadmaps}
+              keyExtractor={(item, index) => `explore_${index}`}
+              contentContainerStyle={{
+                paddingHorizontal: 16,
+                paddingBottom: 8,
+                marginTop: 10,
+              }}
+              renderItem={({item}) => (
+                <TouchableOpacity
+                  style={[
+                    styles.filterButton,
+                    activeRoadmap?.roadmapId === item.roadmapId &&
+                      styles.filledRoadmapButton,
+                  ]}
+                  onPress={() => handleOnClickRoadmap(item)}>
+                  <Text
+                    style={[
+                      styles.roadmapButtonText,
+                      activeRoadmap?.roadmapId === item.roadmapId &&
+                        styles.filledRoadmapButtonText,
+                    ]}>
+                    {item.roadmapName}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          )}
+          <Text style={styles.sectionTitle}>Starter Kit</Text>
+          {isOngoingCoursesLoading ? (
+            <OngoingCoursesSkeleton />
+          ) : (
+            <>
+              <FlatList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={courseFilter}
+                keyExtractor={item => `explore_${item.id}`}
+                renderItem={({item, index}) =>
+                  renderCourseCard(item, index, false, courseFilter.length)
+                }
+                contentContainerStyle={{
+                  paddingHorizontal: 16,
+                  paddingBottom: 8,
+                }}
+              />
+            </>
+          )}
+          <Text style={styles.sectionTitle}>Levels</Text>
+          {isOngoingCoursesLoading ? (
+            <OngoingCoursesSkeleton />
+          ) : (
+            <>
+              <FlatList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={courseFilter}
+                keyExtractor={item => `explore_${item.id}`}
+                renderItem={({item, index}) =>
+                  renderCourseCard(item, index, false, courseFilter.length)
+                }
+                contentContainerStyle={{
+                  paddingHorizontal: 16,
+                  paddingBottom: 8,
+                }}
+              />
+            </>
+          )}
+          <Text style={styles.sectionTitle}>Add Ons</Text>
+          {isOngoingCoursesLoading ? (
+            <OngoingCoursesSkeleton />
+          ) : (
+            <>
+              <FlatList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={courseFilter}
+                keyExtractor={item => `explore_${item.id}`}
+                renderItem={({item, index}) =>
+                  renderCourseCard(item, index, false, courseFilter.length)
+                }
+                contentContainerStyle={{
+                  paddingHorizontal: 16,
+                  paddingBottom: 8,
+                }}
+              />
+            </>
+          )}
+
           <View style={styles.footer}>
             <Text style={styles.footerTitle}>
               {userConfig.brandingTitle ?? 'Learn to UpSkill !!'}
             </Text>
-            <Text style={[fstyles.regularSixteen, {color: '#EEE7F9'}]}>
+            <Text style={[styles.footerDescription]}>
               {userConfig.brandingMessage ??
                 'Made with Passion in Tirupati, India 🇮🇳'}
             </Text>
           </View>
         </View>
-      </View>
+      </LinearGradient>
     );
 
     useEffect(() => {
@@ -264,6 +471,7 @@ const HomeSlider = forwardRef(
           contentContainerStyle={{
             minHeight: SCREEN_HEIGHT * 0.85,
             paddingBottom: 90,
+            paddingTop: -24,
           }}
         />
       </BottomSheet>
@@ -284,13 +492,15 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   sheetBackground: {
-    backgroundColor: '#1C0743',
+    backgroundColor: '#090215',
   },
   sectionTitle: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    margin: 16,
+    color: 'rgba(238, 231, 249, 0.60)',
+    fontSize: 16,
+    fontFamily: 'Lato',
+    fontWeight: 700,
+    marginHorizontal: 20,
+    marginVertical: 16,
   },
   exploreChip: {
     backgroundColor: '#4c2a85',
@@ -314,12 +524,14 @@ const styles = StyleSheet.create({
   },
   courseCard: {
     width: normalizeWidth(208),
+    height: normalizeHeight(250), // Increased height to accommodate button
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(176, 149, 227, 0.4)',
     overflow: 'hidden',
   },
   courseCardInner: {
+    flex: 1,
     paddingVertical: normalizeHeight(8),
     paddingHorizontal: normalizeWidth(8),
     borderRadius: 12,
@@ -331,6 +543,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   courseTextContainer: {
+    flex: 1,
     marginTop: normalizeHeight(12),
     marginHorizontal: normalizeWidth(4),
   },
@@ -339,6 +552,27 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     fontStyle: 'italic',
     color: 'rgba(255, 255, 255, 0.60)',
+  },
+  progressContainer: {
+    marginTop: normalizeHeight(8),
+    marginBottom: normalizeHeight(4),
+  },
+  progressText: {
+    fontSize: 10,
+    fontWeight: '400',
+    color: 'rgba(255, 255, 255, 0.80)',
+    marginBottom: normalizeHeight(4),
+  },
+  progressBar: {
+    height: normalizeHeight(4),
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: normalizeHeight(2),
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#4CAF50',
+    borderRadius: normalizeHeight(2),
   },
   courseTypeContainer: {
     flexDirection: 'row',
@@ -360,9 +594,37 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#D3C4EF',
   },
+  actionButton: {
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: normalizeWidth(16),
+    height: normalizeHeight(32),
+    marginTop: normalizeHeight(8),
+  },
+  resumeButton: {
+    backgroundColor: '#B095E3',
+  },
+  viewDetailsButton: {
+    borderWidth: 1,
+    borderColor: '#B095E3',
+    backgroundColor: 'transparent',
+  },
+  actionButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    fontFamily: 'Lato',
+  },
+  resumeButtonText: {
+    color: '#090215',
+  },
+  viewDetailsButtonText: {
+    color: '#B095E3',
+  },
   sectionTitleContainer: {
     marginHorizontal: normalizeWidth(20),
     marginTop: normalizeHeight(20),
+    marginBottom: normalizeHeight(10),
   },
   filterContainer: {
     marginHorizontal: normalizeWidth(20),
@@ -379,15 +641,36 @@ const styles = StyleSheet.create({
     height: normalizeHeight(33),
     marginRight: normalizeWidth(5),
   },
+  roadmapButtonText: {
+    color: '#B095E3',
+    fontSize: 13,
+    fontWeight: '500',
+    fontFamily: 'Lato',
+  },
   footer: {
     marginLeft: normalizeWidth(20),
     marginBottom: normalizeHeight(120),
     marginTop: normalizeHeight(24),
+    opacity: 0.6,
   },
   footerTitle: {
     fontSize: 64,
-    fontWeight: '900',
+    fontWeight: '700',
     color: '#EEE7F9',
+    letterSpacing: 1,
+  },
+  footerDescription: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#EEE7F9',
+    lineHeight: 19.2,
+  },
+  filledRoadmapButton: {
+    backgroundColor: '#B095E3',
+    borderColor: '#B095E3',
+  },
+  filledRoadmapButtonText: {
+    color: '#090215',
   },
 });
 
