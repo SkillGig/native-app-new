@@ -6,13 +6,13 @@ import {
   PermissionsAndroid,
   Alert,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import images from '../../assets/images';
 import {
   heightFromScreenPercent,
   normalizeHeight,
-  normalizeWidth,
 } from '../../components/Responsivescreen';
-import PageLayout from './PageLayout';
+import PageWrapper from '../../components/PageWrapper';
 import Header from './Header';
 import NotificationsPanel from './NotificationsPanel';
 import ProfileComponent from './Profile';
@@ -34,6 +34,7 @@ import {StreakCalendarBottomSheet} from '../../components';
 import HeaderSkeleton from '../../components/Skeletons/HeaderSkeleton';
 
 const MainDash = ({navigation}) => {
+  const insets = useSafeAreaInsets();
   const [activeCurrentView, setActiveCurrentView] = useState(0);
   const [streakStatusResponse, setStreakStatusResponse] = useState(null);
   const [notificationsData, setNotificationsData] = useState([]);
@@ -389,12 +390,15 @@ const MainDash = ({navigation}) => {
 
   // Feature toggles from userConfigData
 
+  // Calculate marginTop: 32px from screen top, minus safe area top that's already applied by HOC
+  const calculatedMarginTop = Math.max(0, normalizeHeight(32) - insets.top);
+
   return (
     <View style={{flex: 1}}>
-      <PageLayout>
+      <PageWrapper>
         <Animated.View
           style={{
-            marginTop: normalizeHeight(32),
+            marginTop: calculatedMarginTop,
             height: headerHeightAnim, // Adjust height based on view
           }}>
           {isConfigLoading ? (
@@ -445,7 +449,7 @@ const MainDash = ({navigation}) => {
           isOngoingCoursesLoading={isOngoingCoursesLoading}
           ongoingCoursesData={ongoingCoursesData}
         />
-      </PageLayout>
+      </PageWrapper>
 
       {/* Streak Calendar Bottom Sheet */}
       <StreakCalendarBottomSheet ref={streakCalendarRef} />

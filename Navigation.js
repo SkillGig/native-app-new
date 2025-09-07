@@ -24,7 +24,7 @@ import QuizQuestions from './screens/Quizzes/QuizQuestions';
 import QuizSummary from './screens/Quizzes/QuizSummary';
 import YourScreen from './screens/Quizzes/YourScreen';
 import BottomNavBar from './components/BottomNavBar';
-import {StyleSheet, View, SafeAreaView} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import CurrentDayStreakBreakdown from './screens/Global/CurrentDayStreakBreakdown';
 
@@ -36,7 +36,7 @@ const CustomTabBar = props => <BottomNavBar {...props} />;
 
 function BottomTabs() {
   return (
-    <SafeAreaView style={styles.safeContainer}>
+    <View style={styles.safeContainer}>
       <View style={styles.container}>
         <LinearGradient
           colors={['rgba(28,7,67,0)', '#0000']}
@@ -57,7 +57,7 @@ function BottomTabs() {
           <Tab.Screen name="QuizzesDashboard" component={QuizzesDashboard} />
         </Tab.Navigator>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -196,7 +196,7 @@ export default Navigation;
 const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
-    backgroundColor: '#090215', // Dark background for consistent SafeArea
+    backgroundColor: 'transparent', // Let the HOC handle background
   },
   container: {
     flex: 1,

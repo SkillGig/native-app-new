@@ -57,6 +57,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import useUserStore from './src/store/useUserStore';
 import Snackbar from './components/Snackbar';
+import withSafeAreaBackground from './components/withSafeAreaBackground';
 import {
   registerForegroundNotificationHandler,
   registerBackgroundNotificationHandler,
@@ -105,4 +106,5 @@ const App = () => {
   );
 };
 
-export default App;
+// Wrap the App component with the safe area background HOC
+export default withSafeAreaBackground(App);

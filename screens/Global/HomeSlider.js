@@ -75,8 +75,34 @@ const HomeSlider = forwardRef(
     const sheetRef = useRef(null);
     const {isDark, colors} = useContext(ThemeContext);
     const fstyles = getFontStyles(isDark, colors);
-    const snapPoints = useRef(['12%', '87%']);
-    let safeSnapPoints = snapPoints.current;
+
+    const snapPoints = useMemo(() => {
+      const screenHeight = SCREEN_HEIGHT;
+
+      const closedHeightFromBottom = normalizeHeight(100);
+      const closedPercentage = (
+        (closedHeightFromBottom / screenHeight) *
+        100
+      ).toFixed(1);
+      const headerHeight = normalizeHeight(80);
+      const spacing = normalizeHeight(32 + 16);
+
+      const totalTopContent = headerHeight + spacing;
+      const remainingHeight = screenHeight - totalTopContent;
+      const openPercentage = ((remainingHeight / screenHeight) * 100).toFixed(
+        1,
+      );
+
+      return [`${closedPercentage}%`, `${openPercentage}%`];
+    }, []);
+
+    let safeSnapPoints = snapPoints;
+
+    // Debug log for snap points
+    console.log('Calculated snap points:', safeSnapPoints, {
+      screenHeight: SCREEN_HEIGHT,
+      closedHeight: normalizeHeight(100),
+    });
 
     const [initialIndex, setInitialIndex] = React.useState(0);
 

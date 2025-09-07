@@ -184,29 +184,8 @@ const BottomNavBar = ({state, descriptors, navigation}) => {
 
   return (
     <View style={styles.outerContainer}>
-      {/* Full-width Glass Morphism Background */}
-      <LinearGradient
-        colors={[
-          'rgba(15, 4, 35, 0.12)',
-          'rgba(26, 7, 66, 0.12)',
-          'rgba(15, 4, 35, 0.12)',
-        ]}
-        start={{x: 0, y: 0}}
-        end={{x: 1, y: 1}}
-        style={styles.glassMorphismBg}>
-        {/* Secondary overlay for enhanced glass effect */}
-        <LinearGradient
-          colors={[
-            'rgba(191, 163, 246, 0.05)',
-            'rgba(87, 47, 139, 0.08)',
-            'rgba(15, 4, 35, 0.12)',
-          ]}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 1}}
-          style={styles.glassOverlay}
-        />
-      </LinearGradient>
-
+      {/* Background blur overlay */}
+      <View style={styles.blurBackground} />
       <View style={styles.rowWrap}>
         {/* Grouped pill for Home, Milestones, Connect */}
         <LinearGradient
@@ -318,6 +297,21 @@ const styles = StyleSheet.create({
     zIndex: 100,
     paddingBottom: 20,
     backgroundColor: 'transparent',
+  },
+  blurBackground: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backdropFilter: 'blur(50px)', // Stronger blur to show only ~10% of background
+    // Enhanced shadow effects to simulate heavy blur in React Native
+    shadowColor: 'rgba(0, 0, 0, 0.9)',
+    shadowOffset: {width: 0, height: -30},
+    shadowOpacity: 0.9,
+    shadowRadius: 100,
+    elevation: 50,
+    backgroundColor: 'rgba(9, 2, 21, 0.1)', // Very light tint to enhance blur effect
   },
   glassMorphismBg: {
     position: 'absolute',
