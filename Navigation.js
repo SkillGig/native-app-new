@@ -1,16 +1,11 @@
-import React, {useContext} from 'react';
-import {
-  NavigationContainer,
-  DefaultTheme,
-  DarkTheme,
-} from '@react-navigation/native';
+import React from 'react';
+import {NavigationContainer, DarkTheme} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Login from './screens/onboarding/Login';
 import Dashboard from './screens/onboarding/Dashboard';
 import OnBoarding from './screens/onboarding/OnBoarding';
 import VerifyOTP from './screens/onboarding/VerifyOTP';
-import {ThemeContext} from './src/context/ThemeContext';
 import UnlockedExp from './screens/onboarding/UnlockedExp';
 import InfoCheck from './screens/onboarding/InfoCheck';
 import RequestStatus from './screens/onboarding/RequestStatus';
@@ -29,7 +24,7 @@ import QuizQuestions from './screens/Quizzes/QuizQuestions';
 import QuizSummary from './screens/Quizzes/QuizSummary';
 import YourScreen from './screens/Quizzes/YourScreen';
 import BottomNavBar from './components/BottomNavBar';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, SafeAreaView} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import CurrentDayStreakBreakdown from './screens/Global/CurrentDayStreakBreakdown';
 
@@ -41,26 +36,28 @@ const CustomTabBar = props => <BottomNavBar {...props} />;
 
 function BottomTabs() {
   return (
-    <View style={styles.container}>
-      <LinearGradient
-        colors={['rgba(28,7,67,0)', '#0000']}
-        start={{x: 0.5, y: 0}}
-        end={{x: 0.5, y: 1}}
-        style={styles.gradient}
-      />
+    <SafeAreaView style={styles.safeContainer}>
+      <View style={styles.container}>
+        <LinearGradient
+          colors={['rgba(28,7,67,0)', '#0000']}
+          start={{x: 0.5, y: 0}}
+          end={{x: 0.5, y: 1}}
+          style={styles.gradient}
+        />
 
-      <Tab.Navigator
-        screenOptions={{
-          headerShown: false,
-          tabBarStyle: {display: 'none'}, // Hide default tab bar
-        }}
-        tabBar={CustomTabBar}>
-        <Tab.Screen name="MainDash" component={MainDash} />
-        <Tab.Screen name="RoadMap" component={RoadMap} />
-        <Tab.Screen name="OngoingCourses" component={OngoingCourses} />
-        <Tab.Screen name="QuizzesDashboard" component={QuizzesDashboard} />
-      </Tab.Navigator>
-    </View>
+        <Tab.Navigator
+          screenOptions={{
+            headerShown: false,
+            tabBarStyle: {display: 'none'}, // Hide default tab bar
+          }}
+          tabBar={CustomTabBar}>
+          <Tab.Screen name="MainDash" component={MainDash} />
+          <Tab.Screen name="RoadMap" component={RoadMap} />
+          <Tab.Screen name="OngoingCourses" component={OngoingCourses} />
+          <Tab.Screen name="QuizzesDashboard" component={QuizzesDashboard} />
+        </Tab.Navigator>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -197,6 +194,10 @@ const Navigation = () => {
 
 export default Navigation;
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: '#090215', // Dark background for consistent SafeArea
+  },
   container: {
     flex: 1,
   },

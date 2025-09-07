@@ -43,6 +43,17 @@ const customAnimationConfigs = {
   easing: Easing.bezier(0.25, 0.46, 0.45, 0.94), // iOS-like smooth curve
 };
 
+// Custom background component for the bottom sheet
+const GradientBackground = () => (
+  <LinearGradient
+    colors={['#090215', '#300B73']}
+    locations={[0, 1]}
+    start={{x: 0, y: 0}}
+    end={{x: 0, y: 1}}
+    style={StyleSheet.absoluteFillObject}
+  />
+);
+
 const HomeSlider = forwardRef(
   (
     {
@@ -64,7 +75,7 @@ const HomeSlider = forwardRef(
     const sheetRef = useRef(null);
     const {isDark, colors} = useContext(ThemeContext);
     const fstyles = getFontStyles(isDark, colors);
-    const snapPoints = useRef(['14%', '87%']);
+    const snapPoints = useRef(['12%', '87%']);
     let safeSnapPoints = snapPoints.current;
 
     const [initialIndex, setInitialIndex] = React.useState(0);
@@ -247,27 +258,29 @@ const HomeSlider = forwardRef(
         locations={[0, 0.4]}
         start={{x: 0, y: 0}}
         end={{x: 1, y: 1}}>
-        {userConfig.showUserStreaks && (
-          <>
-            {isStreakLoading ? (
-              <StreakSkeleton />
-            ) : (
-              <DailyStreak
-                weekStatus={weekStatus}
-                currentDay={currentDay}
-                statusMap={statusMap}
-                onStreakPress={onStreakPress}
-              />
-            )}
-          </>
-        )}
+        <>
+          {isStreakLoading ? (
+            <StreakSkeleton />
+          ) : (
+            <>
+              {userConfig.showUserStreaks && (
+                <DailyStreak
+                  weekStatus={weekStatus}
+                  currentDay={currentDay}
+                  statusMap={statusMap}
+                  onStreakPress={onStreakPress}
+                />
+              )}
+            </>
+          )}
+        </>
 
         {/* Ongoing Courses Section */}
 
         <Text style={styles.sectionTitle}>
           {ongoingCoursesData?.roadmapName
             ? `${ongoingCoursesData.roadmapName} - Ongoing`
-            : 'Ongoing Courses'}
+            : 'Ongoing Roadmap'}
         </Text>
         {isOngoingCoursesLoading ? (
           <OngoingCoursesSkeleton />
@@ -325,7 +338,7 @@ const HomeSlider = forwardRef(
         )}
         <View style={{backgroundColor: '#090215'}}>
           <View style={styles.sectionTitleContainer}>
-            <Text style={fstyles.heavyTwenty}>Explore Courses</Text>
+            <Text style={fstyles.heavyTwenty}>Explore Roadmaps</Text>
           </View>
           {isOngoingCoursesLoading ? (
             <FilterTabsSkeleton />
@@ -455,11 +468,24 @@ const HomeSlider = forwardRef(
         animationConfigs={customAnimationConfigs}
         onChange={handleSheetChanges}
         handleIndicatorStyle={
-          initialIndex === 1 ? {opacity: 0, height: 0} : styles.handleIndicator
+          initialIndex === 1
+            ? {opacity: 0, height: 0}
+            : {
+                ...styles.handleIndicator,
+                width: 76, // Increased width to 76px when at 14% snap point
+              }
         }
-        style={styles.bottomSheetContainer}
+        style={[
+          styles.bottomSheetContainer,
+          initialIndex === 0 && {
+            borderTopWidth: 1,
+            borderLeftWidth: 0.3,
+            borderRightWidth: 0.3,
+            borderColor: 'rgba(176, 149, 227, 0.3)',
+          },
+        ]}
         detached={false}
-        backgroundStyle={styles.sheetBackground}
+        backgroundComponent={GradientBackground}
         android_keyboardInputMode="adjustResize"
         keyboardBehavior="interactive">
         <BottomSheetFlatList
@@ -487,8 +513,8 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   bottomSheetContainer: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
     overflow: 'hidden',
   },
   sheetBackground: {

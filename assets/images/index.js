@@ -71,6 +71,10 @@ const images = {
   QUIZTROPHY: require('./QuizTrophy.png'),
   STREAKTASKTICK: require('./StreakTaskTick.png'),
   STREAKMARKTICK: require('./StreakMarkTick.png'),
+  PROFILEMEDAL: require('./ProfileMedal.png'),
+  PLAINARROWLEFT: require('./PlainArrowLeft.png'),
+  PLAINARROWRIGHT: require('./PlainArrowRight.png'),
+  FILLEDNOTIFICATION: require('./FilledNotification.png'),
 };
 
 export default images;
