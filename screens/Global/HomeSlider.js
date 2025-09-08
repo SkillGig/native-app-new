@@ -12,7 +12,6 @@ import {
   Dimensions,
   View,
   Text,
-  Image,
   TouchableOpacity,
   Vibration,
 } from 'react-native';
@@ -32,6 +31,7 @@ import useUserStore from '../../src/store/useUserStore';
 import StreakSkeleton from '../../components/Skeletons/StreakSkeleton';
 import OngoingCoursesSkeleton from '../../components/Skeletons/OngoingCoursesSkeleton';
 import FilterTabsSkeleton from '../../components/Skeletons/FilterTabsSkeleton';
+import {CourseCard} from '../../components';
 
 const {height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -168,114 +168,10 @@ const HomeSlider = forwardRef(
     const handleOnClickRoadmap = roadmap => {
       setActiveRoadmap(roadmap);
     };
-    const renderCourseCard = (
-      item,
-      index,
-      isRealData = false,
-      totalItems = 0,
-    ) => {
-      // Use real data if available, otherwise fallback to dummy data
-      const courseData = isRealData
-        ? {
-            title: item.courseTitle,
-            author: item.courseAuthor || 'By Anshika Gupta',
-            thumbnail: item.courseThumbnailUrl,
-            progress: item.progressPercent,
-            currentChapter: item.currentChapter?.title,
-            totalModules: item.totalModules,
-            completedModules: item.completedModules,
-            courseStatus: item.courseStatus,
-            isInProgress: item.courseStatus === 'in-progress',
-            isUpcoming: !item.courseStatus, // If no courseStatus, it's upcoming
-          }
-        : {
-            title: 'Figma Basics',
-            author: 'By Anshika Gupta',
-            thumbnail: images.TESTONGOING,
-            isInProgress: false,
-            isUpcoming: true,
-          };
 
-      return (
-        <View
-          style={[
-            styles.courseCard,
-            {
-              marginRight: index === totalItems - 1 ? 0 : normalizeWidth(20),
-            },
-          ]}>
-          <LinearGradient
-            colors={[
-              'rgba(70, 49, 115, 0.3)',
-              '#463173',
-              '#463173',
-              'rgba(70, 49, 115, 0.3)',
-            ]}
-            locations={[0, 0.49, 0.59, 1]}
-            style={styles.courseCardInner}>
-            <Image
-              source={
-                isRealData && courseData.thumbnail
-                  ? {uri: courseData.thumbnail}
-                  : courseData.thumbnail || images.TESTONGOING
-              }
-              style={styles.courseImage}
-            />
-            <View style={styles.courseTextContainer}>
-              <Text style={fstyles.boldFourteen}>{courseData.title}</Text>
-              <Text style={styles.courseAuthor}>{courseData.author}</Text>
-
-              {/* Progress section for in-progress courses */}
-              {courseData.isInProgress && courseData.progress !== undefined && (
-                <View style={styles.progressContainer}>
-                  <Text style={styles.progressText}>
-                    {courseData.completedModules}/{courseData.totalModules}{' '}
-                    modules • {courseData.progress}%
-                  </Text>
-                  <View style={styles.progressBar}>
-                    <View
-                      style={[
-                        styles.progressFill,
-                        {width: `${courseData.progress}%`},
-                      ]}
-                    />
-                  </View>
-                </View>
-              )}
-
-              {/* Course tags */}
-              <View style={styles.courseTypeContainer}>
-                {courseType.map(type => (
-                  <TouchableOpacity
-                    key={type.id}
-                    style={styles.courseTypeButton}>
-                    <Text style={styles.courseTypeText}>{type.title}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
-              {/* Action button */}
-              <TouchableOpacity
-                style={[
-                  styles.actionButton,
-                  courseData.isInProgress
-                    ? styles.resumeButton
-                    : styles.viewDetailsButton,
-                ]}>
-                <Text
-                  style={[
-                    styles.actionButtonText,
-                    courseData.isInProgress
-                      ? styles.resumeButtonText
-                      : styles.viewDetailsButtonText,
-                  ]}>
-                  {courseData.isInProgress ? 'Resume Course' : 'View Details'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </LinearGradient>
-        </View>
-      );
+    const handleCoursePress = courseData => {
+      // Handle course card press - navigate to course details, etc.
+      console.log('Course pressed:', courseData);
     };
 
     const renderHeader = () => (
@@ -315,44 +211,17 @@ const HomeSlider = forwardRef(
             <FlatList
               horizontal
               showsHorizontalScrollIndicator={false}
-              data={
-                [
-                  ...(ongoingCoursesData?.currentOngoingCourses || []),
-                  ...(ongoingCoursesData?.upcomingCourses || []),
-                ].length > 0
-                  ? [
-                      ...(ongoingCoursesData?.currentOngoingCourses || []),
-                      ...(ongoingCoursesData?.upcomingCourses || []),
-                    ]
-                  : courseFilter
-              }
+              data={[
+                ...ongoingCoursesData?.currentOngoingCourses,
+                ...ongoingCoursesData?.upcomingCourses,
+              ]}
               keyExtractor={(item, index) =>
-                ongoingCoursesData?.currentOngoingCourses ||
-                ongoingCoursesData?.upcomingCourses
+                ongoingCoursesData?.currentOngoingCourses
                   ? `course_${item.courseId || item.id}_${index}`
                   : `explore_${item.id}`
               }
               renderItem={({item, index}) => {
-                const totalItems =
-                  [
-                    ...(ongoingCoursesData?.currentOngoingCourses || []),
-                    ...(ongoingCoursesData?.upcomingCourses || []),
-                  ].length > 0
-                    ? [
-                        ...(ongoingCoursesData?.currentOngoingCourses || []),
-                        ...(ongoingCoursesData?.upcomingCourses || []),
-                      ].length
-                    : courseFilter.length;
-
-                return renderCourseCard(
-                  item,
-                  index,
-                  !!(
-                    ongoingCoursesData?.currentOngoingCourses ||
-                    ongoingCoursesData?.upcomingCourses
-                  ),
-                  totalItems,
-                );
+                return <CourseCard courseDetails={item} />;
               }}
               contentContainerStyle={{
                 paddingHorizontal: 16,
@@ -362,6 +231,35 @@ const HomeSlider = forwardRef(
             />
           </>
         )}
+        {/* <Text style={[styles.sectionTitle]}>
+          {ongoingCoursesData?.roadmapName
+            ? `${ongoingCoursesData.roadmapName} - Upcoming`
+            : 'Ongoing Roadmap'}
+        </Text>
+        {isOngoingCoursesLoading ? (
+          <OngoingCoursesSkeleton />
+        ) : (
+          <>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={ongoingCoursesData?.upcomingCourses}
+              keyExtractor={(item, index) =>
+                ongoingCoursesData?.upcomingCourses
+                  ? `course_${item.courseId || item.id}_${index}`
+                  : `explore_${item.id}`
+              }
+              renderItem={({item, index}) => {
+                return <CourseCard courseDetails={item} />;
+              }}
+              contentContainerStyle={{
+                paddingHorizontal: 16,
+                paddingBottom: 8,
+                marginBottom: 20,
+              }}
+            />
+          </>
+        )} */}
         <View style={{backgroundColor: '#090215'}}>
           <View style={styles.sectionTitleContainer}>
             <Text style={fstyles.heavyTwenty}>Explore Roadmaps</Text>
@@ -409,9 +307,9 @@ const HomeSlider = forwardRef(
                 showsHorizontalScrollIndicator={false}
                 data={courseFilter}
                 keyExtractor={item => `explore_${item.id}`}
-                renderItem={({item, index}) =>
-                  renderCourseCard(item, index, false, courseFilter.length)
-                }
+                renderItem={({item, index}) => (
+                  <CourseCard courseDetails={item} />
+                )}
                 contentContainerStyle={{
                   paddingHorizontal: 16,
                   paddingBottom: 8,
@@ -429,9 +327,16 @@ const HomeSlider = forwardRef(
                 showsHorizontalScrollIndicator={false}
                 data={courseFilter}
                 keyExtractor={item => `explore_${item.id}`}
-                renderItem={({item, index}) =>
-                  renderCourseCard(item, index, false, courseFilter.length)
-                }
+                renderItem={({item, index}) => (
+                  <CourseCard
+                    item={item}
+                    index={index}
+                    totalItems={courseFilter.length}
+                    courseType={courseType}
+                    version="detailed"
+                    onPress={() => handleCoursePress(item)}
+                  />
+                )}
                 contentContainerStyle={{
                   paddingHorizontal: 16,
                   paddingBottom: 8,
@@ -449,9 +354,16 @@ const HomeSlider = forwardRef(
                 showsHorizontalScrollIndicator={false}
                 data={courseFilter}
                 keyExtractor={item => `explore_${item.id}`}
-                renderItem={({item, index}) =>
-                  renderCourseCard(item, index, false, courseFilter.length)
-                }
+                renderItem={({item, index}) => (
+                  <CourseCard
+                    item={item}
+                    index={index}
+                    totalItems={courseFilter.length}
+                    courseType={courseType}
+                    version="minimal"
+                    onPress={() => handleCoursePress(item)}
+                  />
+                )}
                 contentContainerStyle={{
                   paddingHorizontal: 16,
                   paddingBottom: 8,
@@ -573,105 +485,6 @@ const styles = StyleSheet.create({
   },
   verticalItemText: {
     color: '#fff',
-  },
-  courseCard: {
-    width: normalizeWidth(208),
-    height: normalizeHeight(250), // Increased height to accommodate button
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(176, 149, 227, 0.4)',
-    overflow: 'hidden',
-  },
-  courseCardInner: {
-    flex: 1,
-    paddingVertical: normalizeHeight(8),
-    paddingHorizontal: normalizeWidth(8),
-    borderRadius: 12,
-    width: '100%',
-  },
-  courseImage: {
-    height: normalizeHeight(78),
-    width: normalizeWidth(192),
-    resizeMode: 'contain',
-  },
-  courseTextContainer: {
-    flex: 1,
-    marginTop: normalizeHeight(12),
-    marginHorizontal: normalizeWidth(4),
-  },
-  courseAuthor: {
-    fontSize: 12,
-    fontWeight: '400',
-    fontStyle: 'italic',
-    color: 'rgba(255, 255, 255, 0.60)',
-  },
-  progressContainer: {
-    marginTop: normalizeHeight(8),
-    marginBottom: normalizeHeight(4),
-  },
-  progressText: {
-    fontSize: 10,
-    fontWeight: '400',
-    color: 'rgba(255, 255, 255, 0.80)',
-    marginBottom: normalizeHeight(4),
-  },
-  progressBar: {
-    height: normalizeHeight(4),
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: normalizeHeight(2),
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#4CAF50',
-    borderRadius: normalizeHeight(2),
-  },
-  courseTypeContainer: {
-    flexDirection: 'row',
-    flexWrap: 'nowrap',
-    marginTop: normalizeHeight(8),
-  },
-  courseTypeButton: {
-    borderWidth: 1,
-    borderColor: 'rgba(176, 149, 227, 0.40)',
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: normalizeWidth(8),
-    height: normalizeHeight(19),
-    marginRight: normalizeWidth(5),
-  },
-  courseTypeText: {
-    fontSize: 10,
-    fontWeight: '500',
-    color: '#D3C4EF',
-  },
-  actionButton: {
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: normalizeWidth(16),
-    height: normalizeHeight(32),
-    marginTop: normalizeHeight(8),
-  },
-  resumeButton: {
-    backgroundColor: '#B095E3',
-  },
-  viewDetailsButton: {
-    borderWidth: 1,
-    borderColor: '#B095E3',
-    backgroundColor: 'transparent',
-  },
-  actionButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    fontFamily: 'Lato',
-  },
-  resumeButtonText: {
-    color: '#090215',
-  },
-  viewDetailsButtonText: {
-    color: '#B095E3',
   },
   sectionTitleContainer: {
     marginHorizontal: normalizeWidth(20),

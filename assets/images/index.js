@@ -75,6 +75,8 @@ const images = {
   PLAINARROWLEFT: require('./PlainArrowLeft.png'),
   PLAINARROWRIGHT: require('./PlainArrowRight.png'),
   FILLEDNOTIFICATION: require('./FilledNotification.png'),
+  CHAPTERBOOK: require('./ChapterBook.png'),
+  CHAPTERVIDEO: require('./ChapterVideo.png'),
 };
 
 export default images;
