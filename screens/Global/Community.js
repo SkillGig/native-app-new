@@ -211,7 +211,9 @@ const Community = () => {
                   <TouchableOpacity
                     style={styles.notifyButton}
                     activeOpacity={0.8}
-                    onPress={() => setCommunityNotifyClicked()}>
+                    onPress={() =>
+                      setCommunityNotifyClicked(!communityNotifyClicked)
+                    }>
                     <Text style={styles.notifyButtonText}>Notify Me →</Text>
                   </TouchableOpacity>
                 </View>

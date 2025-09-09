@@ -41,6 +41,19 @@ export function connectNotificationSocket() {
     }
     console.log('Received notification:', data);
   });
+
+  socket.on('multi-notification', data => {
+    console.log('New notification received:', data);
+    if (Array.isArray(data)) {
+      data.forEach(item => {
+        if (item && item.title) {
+          useSnackbarStore
+            .getState()
+            .showSnackbar({message: item.title, type: 'success'});
+        }
+      });
+    }
+  });
 }
 
 export function disconnectNotificationSocket() {

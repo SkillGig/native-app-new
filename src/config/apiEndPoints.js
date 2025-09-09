@@ -26,6 +26,7 @@ export const userService = {
   allNotifications: '/notifications/all',
   ongoingCourses: '/course/ongoing-courses',
   roadmapDetails: '/roadmap/roadmap-details',
+  dailyLoginForXp: '/rewards/daily-login',
 };
 
 export const notificationsService = {

@@ -26,6 +26,7 @@ import {
   fetchAllNotifications,
   getUserOngoingCourses,
   getRoadmapDetails,
+  dailyLoginForXp,
 } from '../../src/api/userOnboardingAPIs';
 import messaging from '@react-native-firebase/messaging';
 import {getUserConfig} from '../../src/api/userOnboardingAPIs';
@@ -295,6 +296,7 @@ const MainDash = ({navigation}) => {
         setIsConfigLoading(true);
         try {
           const res = await getUserConfig();
+          await dailyLoginForXp();
           console.log(res, 'User Config Response');
           if (res?.data?.config) {
             setUserConfig(res.data.config);

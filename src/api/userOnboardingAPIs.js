@@ -288,3 +288,12 @@ export const getRoadmapDetails = async roadmapId => {
     auth: true,
   });
 };
+
+export const dailyLoginForXp = async () => {
+  return await networkAPICall({
+    url: userService.dailyLoginForXp,
+    method: 'POST',
+    service: 'userService',
+    auth: true,
+  });
+};
