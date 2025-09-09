@@ -27,6 +27,7 @@ import BottomNavBar from './components/BottomNavBar';
 import {StyleSheet, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import CurrentDayStreakBreakdown from './screens/Global/CurrentDayStreakBreakdown';
+import Community from './screens/Global/Community';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -53,7 +54,7 @@ function BottomTabs() {
           tabBar={CustomTabBar}>
           <Tab.Screen name="MainDash" component={MainDash} />
           <Tab.Screen name="RoadMap" component={RoadMap} />
-          <Tab.Screen name="OngoingCourses" component={OngoingCourses} />
+          <Tab.Screen name="Community" component={Community} />
           <Tab.Screen name="QuizzesDashboard" component={QuizzesDashboard} />
         </Tab.Navigator>
       </View>
@@ -162,6 +163,12 @@ const Navigation = () => {
         <Stack.Screen
           name="OngoingCourses"
           component={OngoingCourses}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="Community"
+          component={Community}
           options={{headerShown: false}}
         />
 

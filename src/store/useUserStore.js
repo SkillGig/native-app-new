@@ -16,6 +16,7 @@ const useUserStore = create(
         availableRoadmaps: [],
         streakModal: false,
         fcmToken: '', // Store FCM token
+        communityNotifyClicked: false,
       },
       userConfig: {}, // Add userConfig to Zustand store
       setTokens: ({authToken, refreshToken}) =>
@@ -84,7 +85,7 @@ const useUserStore = create(
         })),
       setUserConfig: config => set(state => ({userConfig: config})), // Add setUserConfig
       getUserConfig: () => get().userConfig, // Add getUserConfig
-      setStreakModal: (value) => {
+      setStreakModal: value => {
         set(state => ({
           user: {
             ...state.user,
@@ -103,6 +104,13 @@ const useUserStore = create(
             orgInfo: null,
           },
         }),
+      setCommunityNotifyClicked: value =>
+        set(state => ({
+          user: {
+            ...state.user,
+            communityNotifyClicked: value,
+          },
+        })),
     }),
     {
       name: 'user-storage-v3',

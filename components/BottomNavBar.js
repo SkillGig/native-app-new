@@ -25,7 +25,7 @@ const NAV_ITEMS = [
     activeIcon: images.MILESTONEACTIVE,
   },
   {
-    key: 'OngoingCourses',
+    key: 'Community',
     label: 'Connect',
     icon: images.CONNECT,
     activeIcon: images.CONNECTACTIVE,
@@ -50,7 +50,7 @@ const BottomNavBar = ({state, descriptors, navigation}) => {
     new Animated.Value(activeKey === 'RoadMap' ? 1 : 0.5),
   ).current;
   const connectOpacity = useRef(
-    new Animated.Value(activeKey === 'OngoingCourses' ? 1 : 0.5),
+    new Animated.Value(activeKey === 'Community' ? 1 : 0.5),
   ).current;
   const opacityArr = useMemo(
     () => [homeOpacity, milestoneOpacity, connectOpacity],
@@ -64,7 +64,7 @@ const BottomNavBar = ({state, descriptors, navigation}) => {
     new Animated.Value(activeKey === 'RoadMap' ? 24 : 8),
   ).current;
   const connectLabelY = useRef(
-    new Animated.Value(activeKey === 'OngoingCourses' ? 24 : 8),
+    new Animated.Value(activeKey === 'Community' ? 24 : 8),
   ).current;
   const labelYArr = useMemo(
     () => [homeLabelY, milestoneLabelY, connectLabelY],
@@ -78,7 +78,7 @@ const BottomNavBar = ({state, descriptors, navigation}) => {
     new Animated.Value(activeKey === 'RoadMap' ? 0 : 16),
   ).current;
   const connectGlowY = useRef(
-    new Animated.Value(activeKey === 'OngoingCourses' ? 0 : 16),
+    new Animated.Value(activeKey === 'Community' ? 0 : 16),
   ).current;
   const glowYArr = useMemo(
     () => [homeGlowY, milestoneGlowY, connectGlowY],
@@ -92,7 +92,7 @@ const BottomNavBar = ({state, descriptors, navigation}) => {
     new Animated.Value(activeKey === 'RoadMap' ? 32 : 20),
   ).current;
   const connectIconWH = useRef(
-    new Animated.Value(activeKey === 'OngoingCourses' ? 32 : 20),
+    new Animated.Value(activeKey === 'Community' ? 32 : 20),
   ).current;
   const iconWHArr = useMemo(
     () => [homeIconWH, milestoneIconWH, connectIconWH],
@@ -105,7 +105,7 @@ const BottomNavBar = ({state, descriptors, navigation}) => {
   ).current;
 
   useEffect(() => {
-    ['MainDash', 'RoadMap', 'OngoingCourses'].forEach((key, idx) => {
+    ['MainDash', 'RoadMap', 'Community'].forEach((key, idx) => {
       const isActive = activeKey === key;
       if (
         opacityArr[idx] &&
@@ -163,7 +163,7 @@ const BottomNavBar = ({state, descriptors, navigation}) => {
       if (item.key === 'RoadMap' && userConfig.showMilestones === false) {
         return false;
       }
-      if (item.key === 'OngoingCourses' && userConfig.showConnect === false) {
+      if (item.key === 'Community' && userConfig.showConnect === false) {
         return false;
       }
       if (
