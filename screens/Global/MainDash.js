@@ -25,6 +25,7 @@ import {
   requestAndRegisterFcmToken,
   fetchAllNotifications,
   getUserOngoingCourses,
+  getRoadmapDetails,
 } from '../../src/api/userOnboardingAPIs';
 import messaging from '@react-native-firebase/messaging';
 import {getUserConfig} from '../../src/api/userOnboardingAPIs';
@@ -49,6 +50,9 @@ const MainDash = ({navigation}) => {
   const [isConfigLoading, setIsConfigLoading] = useState(true);
   const [isStreakLoading, setIsStreakLoading] = useState(true);
   const [isOngoingCoursesLoading, setIsOngoingCoursesLoading] = useState(true);
+  const [roadmapData, setRoadmapData] = useState(null); // Store roadmap details
+  const [isRoadmapDataLoading, setIsRoadmapDataLoading] = useState(true);
+  const [activeRoadmap, setActiveRoadmap] = React.useState(null);
 
   // Ongoing courses data
   const [ongoingCoursesData, setOngoingCoursesData] = useState(null);
@@ -255,7 +259,36 @@ const MainDash = ({navigation}) => {
     }
   }, [user]);
 
-  // Fetch userConfig on mount (or after login)
+  const fetchRoadmapData = useCallback(async () => {
+    // This function is now only used for when activeRoadmap changes after initial load
+    if (activeRoadmap && userConfig) {
+      setIsRoadmapDataLoading(true);
+      try {
+        const roadmapDetails = await getRoadmapDetails(activeRoadmap.roadmapId);
+        setRoadmapData(roadmapDetails?.data?.categories);
+      } catch (error) {
+        console.error('Error fetching roadmap data:', error);
+      } finally {
+        setIsRoadmapDataLoading(false);
+      }
+    }
+  }, [activeRoadmap, userConfig]);
+
+  useEffect(() => {
+    // Only fetch roadmap data if activeRoadmap changes AFTER initial config load
+    // The initial roadmap data is now fetched in parallel with other APIs
+    if (activeRoadmap && userConfig && !isConfigLoading) {
+      fetchRoadmapData();
+    }
+  }, [activeRoadmap, fetchRoadmapData, userConfig, isConfigLoading]);
+
+  // Fetch userConfig on mount (or after login) - Optimized with parallel API calls
+  // This optimization runs independent API calls in parallel instead of sequentially:
+  // 1. fetchAllNotifications - Get user notifications
+  // 2. getUserOngoingCourses - Get user's ongoing courses
+  // 3. getRoadmapDetails - Get initial roadmap data (if available)
+  // 4. currentDayStreakStatus + getWeeklyStreaks - Get streak data (if enabled)
+  // This reduces total loading time significantly without changing any business logic
   useEffect(() => {
     async function fetchUserConfig() {
       if (user && user.authToken) {
@@ -267,81 +300,224 @@ const MainDash = ({navigation}) => {
             setUserConfig(res.data.config);
             setIsConfigLoading(false);
 
-            // Fetch notifications after config is loaded
-            try {
-              setIsInitialNotificationsLoading(true);
-              const notificationsRes = await fetchAllNotifications(1, 10);
-              console.log(notificationsRes, 'Notifications Response');
-              if (notificationsRes?.data?.notifications) {
-                setNotificationsData(notificationsRes.data.notifications);
-                setTotalUnreadNotifications(
-                  notificationsRes.data.totalUnread || 0,
-                );
-                setNotificationsPagination(notificationsRes.data.pagination);
-              }
-            } catch (notificationsError) {
-              console.error(
-                'Error fetching notifications:',
-                notificationsError,
-              );
-              setNotificationsData([]);
-              setTotalUnreadNotifications(0);
-            } finally {
-              setIsInitialNotificationsLoading(false);
+            // fetch details about the first roadmap which is in res.data.config.availableRoadmaps[0]
+            const firstRoadmapId =
+              res.data.config.availableRoadmaps[0]?.roadmapId;
+            if (firstRoadmapId) {
+              setActiveRoadmap(res.data.config.availableRoadmaps[0]);
             }
 
-            // Fetch ongoing courses
-            try {
-              setIsOngoingCoursesLoading(true);
-              const ongoingCoursesRes = await getUserOngoingCourses();
-              console.log(ongoingCoursesRes, 'Ongoing Courses Response');
-              if (ongoingCoursesRes?.data) {
-                setOngoingCoursesData(ongoingCoursesRes.data);
-              }
-            } catch (ongoingCoursesError) {
-              console.error(
-                'Error fetching ongoing courses:',
-                ongoingCoursesError,
-              );
-              setOngoingCoursesData(null);
-            } finally {
-              setIsOngoingCoursesLoading(false);
+            // Set loading states for all parallel operations
+            setIsInitialNotificationsLoading(true);
+            setIsOngoingCoursesLoading(true);
+
+            // Set roadmap loading state if we have a roadmap to fetch
+            if (firstRoadmapId) {
+              setIsRoadmapDataLoading(true);
             }
 
-            // if user streaks flag is 1 then we need to call the user streaks API
             const streaksFlag = res.data.config.showUserStreaks;
             if (streaksFlag === 1) {
               setIsStreakLoading(true);
-              try {
-                const todayStreakStatus = await currentDayStreakStatus();
-                console.log(todayStreakStatus, 'the todays streak status');
-                const streaksRes = await getWeeklyStreaks();
-                setStreakStatusResponse(streaksRes.data);
-                if (
-                  todayStreakStatus.data.data.completedStreak &&
-                  !todayStreakStatus.data.data.animationSeen
-                ) {
-                  const streakDate = new Date();
-                  const formattedStreakDate = `${streakDate
-                    .getDate()
-                    .toString()
-                    .padStart(2, '0')}-${(streakDate.getMonth() + 1)
-                    .toString()
-                    .padStart(2, '0')}-${streakDate.getFullYear()}`;
-                  const streakBreakDown = await getStreakBreakDown(
-                    formattedStreakDate,
-                  );
-                  return navigation.navigate('CurrentDayStreakBreakdown', {
-                    streakBreakDownInfo: streakBreakDown.data,
-                  });
-                }
-              } catch (streakError) {
-                console.error('Error fetching streak data:', streakError);
-              } finally {
-                setIsStreakLoading(false);
-              }
             } else {
               setIsStreakLoading(false);
+            }
+
+            // Create array of independent API calls to run in parallel
+            const parallelApiCalls = [];
+
+            // 1. Notifications API call
+            parallelApiCalls.push(
+              fetchAllNotifications(1, 10)
+                .then(notificationsRes => ({
+                  type: 'notifications',
+                  success: true,
+                  data: notificationsRes,
+                }))
+                .catch(error => ({
+                  type: 'notifications',
+                  success: false,
+                  error,
+                })),
+            );
+
+            // 2. Ongoing courses API call
+            parallelApiCalls.push(
+              getUserOngoingCourses()
+                .then(ongoingCoursesRes => ({
+                  type: 'ongoingCourses',
+                  success: true,
+                  data: ongoingCoursesRes,
+                }))
+                .catch(error => ({
+                  type: 'ongoingCourses',
+                  success: false,
+                  error,
+                })),
+            );
+
+            // 3. Roadmap details API call (if we have a roadmap to fetch)
+            if (firstRoadmapId) {
+              parallelApiCalls.push(
+                getRoadmapDetails(firstRoadmapId)
+                  .then(roadmapDetails => ({
+                    type: 'roadmapDetails',
+                    success: true,
+                    data: roadmapDetails,
+                  }))
+                  .catch(error => ({
+                    type: 'roadmapDetails',
+                    success: false,
+                    error,
+                  })),
+              );
+            }
+
+            // 4. Streak data API calls (only if streaks are enabled)
+            if (streaksFlag === 1) {
+              parallelApiCalls.push(
+                Promise.all([currentDayStreakStatus(), getWeeklyStreaks()])
+                  .then(([todayStreakStatus, streaksRes]) => ({
+                    type: 'streaks',
+                    success: true,
+                    data: {todayStreakStatus, streaksRes},
+                  }))
+                  .catch(error => ({
+                    type: 'streaks',
+                    success: false,
+                    error,
+                  })),
+              );
+            }
+
+            // Execute all API calls in parallel
+            const results = await Promise.all(parallelApiCalls);
+
+            // Process results sequentially to maintain original logic
+            for (const result of results) {
+              try {
+                switch (result.type) {
+                  case 'notifications':
+                    if (result.success) {
+                      console.log(result.data, 'Notifications Response');
+                      if (result.data?.data?.notifications) {
+                        setNotificationsData(result.data.data.notifications);
+                        setTotalUnreadNotifications(
+                          result.data.data.totalUnread || 0,
+                        );
+                        setNotificationsPagination(result.data.data.pagination);
+                      }
+                    } else {
+                      console.error(
+                        'Error fetching notifications:',
+                        result.error,
+                      );
+                      setNotificationsData([]);
+                      setTotalUnreadNotifications(0);
+                    }
+                    setIsInitialNotificationsLoading(false);
+                    break;
+
+                  case 'ongoingCourses':
+                    if (result.success) {
+                      console.log(result.data, 'Ongoing Courses Response');
+                      if (result.data?.data) {
+                        setOngoingCoursesData(result.data.data);
+                      }
+                    } else {
+                      console.error(
+                        'Error fetching ongoing courses:',
+                        result.error,
+                      );
+                      setOngoingCoursesData(null);
+                    }
+                    setIsOngoingCoursesLoading(false);
+                    break;
+
+                  case 'roadmapDetails':
+                    if (result.success) {
+                      console.log(result.data, 'Roadmap Details Response');
+                      if (result.data?.data?.categories) {
+                        setRoadmapData(result.data.data.categories);
+                      }
+                    } else {
+                      console.error(
+                        'Error fetching roadmap details:',
+                        result.error,
+                      );
+                      setRoadmapData(null);
+                    }
+                    setIsRoadmapDataLoading(false);
+                    break;
+
+                  case 'streaks':
+                    if (result.success) {
+                      const {todayStreakStatus, streaksRes} = result.data;
+                      console.log(
+                        todayStreakStatus,
+                        'the todays streak status',
+                      );
+                      setStreakStatusResponse(streaksRes.data);
+
+                      // Check if animation should be shown
+                      if (
+                        todayStreakStatus.data.data.completedStreak &&
+                        !todayStreakStatus.data.data.animationSeen
+                      ) {
+                        const streakDate = new Date();
+                        const formattedStreakDate = `${streakDate
+                          .getDate()
+                          .toString()
+                          .padStart(2, '0')}-${(streakDate.getMonth() + 1)
+                          .toString()
+                          .padStart(2, '0')}-${streakDate.getFullYear()}`;
+
+                        // This API call depends on streak data, so it runs after parallel calls
+                        try {
+                          const streakBreakDown = await getStreakBreakDown(
+                            formattedStreakDate,
+                          );
+                          return navigation.navigate(
+                            'CurrentDayStreakBreakdown',
+                            {
+                              streakBreakDownInfo: streakBreakDown.data,
+                            },
+                          );
+                        } catch (streakBreakDownError) {
+                          console.error(
+                            'Error fetching streak breakdown:',
+                            streakBreakDownError,
+                          );
+                        }
+                      }
+                    } else {
+                      console.error(
+                        'Error fetching streak data:',
+                        result.error,
+                      );
+                    }
+                    setIsStreakLoading(false);
+                    break;
+                }
+              } catch (processingError) {
+                console.error(
+                  `Error processing ${result.type} result:`,
+                  processingError,
+                );
+                // Ensure loading states are reset even if processing fails
+                if (result.type === 'notifications') {
+                  setIsInitialNotificationsLoading(false);
+                }
+                if (result.type === 'ongoingCourses') {
+                  setIsOngoingCoursesLoading(false);
+                }
+                if (result.type === 'roadmapDetails') {
+                  setIsRoadmapDataLoading(false);
+                }
+                if (result.type === 'streaks') {
+                  setIsStreakLoading(false);
+                }
+              }
             }
           } else {
             showSnackbar({
@@ -357,6 +533,9 @@ const MainDash = ({navigation}) => {
           setTotalUnreadNotifications(0);
           setNotificationsData([]);
           setIsInitialNotificationsLoading(false);
+          setIsOngoingCoursesLoading(false);
+          setIsRoadmapDataLoading(false);
+          setIsStreakLoading(false);
           showSnackbar({
             message: 'Invalid user. Please log in again.',
             type: 'error',
@@ -428,12 +607,9 @@ const MainDash = ({navigation}) => {
           )}
         </Animated.View>
 
-        {/* HomeSlider with granular skeletons */}
         <HomeSlider
-          courseFilter={courseFilter}
-          recommendedCourses={courseFilter}
+          roadmapData={roadmapData}
           allCourses={courseFilter}
-          courseType={courseType}
           weekStatus={streakStatusResponse}
           statusMap={statusMap}
           activeCurrentView={activeCurrentView}
@@ -444,10 +620,13 @@ const MainDash = ({navigation}) => {
               setActiveCurrentView(null);
             }
           }}
-          // New props for granular loading
           isStreakLoading={isStreakLoading}
           isOngoingCoursesLoading={isOngoingCoursesLoading}
+          isRoadmapDataLoading={isRoadmapDataLoading}
           ongoingCoursesData={ongoingCoursesData}
+          activeRoadmap={activeRoadmap}
+          setActiveRoadmap={setActiveRoadmap}
+          isConfigLoading={isConfigLoading}
         />
       </PageWrapper>
 

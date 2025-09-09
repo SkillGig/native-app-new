@@ -283,7 +283,7 @@ export const getRoadmapDetails = async roadmapId => {
   return await networkAPICall({
     url: userService.roadmapDetails,
     method: 'GET',
-    params: {roadmapId},
+    params: {roadmapId: 10}, // Temporary hardcoded for testing
     service: 'userService',
     auth: true,
   });

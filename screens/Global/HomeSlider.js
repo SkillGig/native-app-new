@@ -43,7 +43,6 @@ const customAnimationConfigs = {
   easing: Easing.bezier(0.25, 0.46, 0.45, 0.94), // iOS-like smooth curve
 };
 
-// Custom background component for the bottom sheet
 const GradientBackground = () => (
   <LinearGradient
     colors={['#090215', '#300B73']}
@@ -58,17 +57,19 @@ const HomeSlider = forwardRef(
   (
     {
       onSheetChange,
-      courseFilter = [],
-      courseType = [],
+      roadmapData = null,
       weekStatus = [],
       currentDay = '',
       statusMap = {},
       activeCurrentView,
       onStreakPress,
-      // New props for granular loading
       isStreakLoading = false,
       isOngoingCoursesLoading = false,
       ongoingCoursesData = null,
+      setActiveRoadmap,
+      activeRoadmap,
+      isRoadmapDataLoading = false,
+      isConfigLoading = false,
     },
     ref,
   ) => {
@@ -111,12 +112,6 @@ const HomeSlider = forwardRef(
     const availableRoadmaps = useUserStore(
       state => state.userConfig.availableRoadmaps,
     );
-
-    const [activeRoadmap, setActiveRoadmap] = React.useState(
-      availableRoadmaps?.[0] ?? null,
-    );
-
-    console.log(availableRoadmaps, 'the available roadmaps');
 
     // Expose ref methods to parent components
     useImperativeHandle(ref, () => ({
@@ -199,7 +194,7 @@ const HomeSlider = forwardRef(
 
         {/* Ongoing Courses Section */}
 
-        <Text style={styles.sectionTitle}>
+        <Text style={[styles.sectionTitle, {marginTop: 32}]}>
           {ongoingCoursesData?.roadmapName
             ? `${ongoingCoursesData.roadmapName} - Ongoing`
             : 'Ongoing Roadmap'}
@@ -231,40 +226,11 @@ const HomeSlider = forwardRef(
             />
           </>
         )}
-        {/* <Text style={[styles.sectionTitle]}>
-          {ongoingCoursesData?.roadmapName
-            ? `${ongoingCoursesData.roadmapName} - Upcoming`
-            : 'Ongoing Roadmap'}
-        </Text>
-        {isOngoingCoursesLoading ? (
-          <OngoingCoursesSkeleton />
-        ) : (
-          <>
-            <FlatList
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              data={ongoingCoursesData?.upcomingCourses}
-              keyExtractor={(item, index) =>
-                ongoingCoursesData?.upcomingCourses
-                  ? `course_${item.courseId || item.id}_${index}`
-                  : `explore_${item.id}`
-              }
-              renderItem={({item, index}) => {
-                return <CourseCard courseDetails={item} />;
-              }}
-              contentContainerStyle={{
-                paddingHorizontal: 16,
-                paddingBottom: 8,
-                marginBottom: 20,
-              }}
-            />
-          </>
-        )} */}
         <View style={{backgroundColor: '#090215'}}>
           <View style={styles.sectionTitleContainer}>
             <Text style={fstyles.heavyTwenty}>Explore Roadmaps</Text>
           </View>
-          {isOngoingCoursesLoading ? (
+          {isConfigLoading ? (
             <FilterTabsSkeleton />
           ) : (
             <FlatList
@@ -298,14 +264,14 @@ const HomeSlider = forwardRef(
             />
           )}
           <Text style={styles.sectionTitle}>Starter Kit</Text>
-          {isOngoingCoursesLoading ? (
+          {isRoadmapDataLoading ? (
             <OngoingCoursesSkeleton />
           ) : (
             <>
               <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                data={courseFilter}
+                data={roadmapData?.starterKit || []}
                 keyExtractor={item => `explore_${item.id}`}
                 renderItem={({item, index}) => (
                   <CourseCard courseDetails={item} />
@@ -318,24 +284,17 @@ const HomeSlider = forwardRef(
             </>
           )}
           <Text style={styles.sectionTitle}>Levels</Text>
-          {isOngoingCoursesLoading ? (
+          {isRoadmapDataLoading ? (
             <OngoingCoursesSkeleton />
           ) : (
             <>
               <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                data={courseFilter}
+                data={roadmapData?.levels || []}
                 keyExtractor={item => `explore_${item.id}`}
                 renderItem={({item, index}) => (
-                  <CourseCard
-                    item={item}
-                    index={index}
-                    totalItems={courseFilter.length}
-                    courseType={courseType}
-                    version="detailed"
-                    onPress={() => handleCoursePress(item)}
-                  />
+                  <CourseCard courseDetails={item} />
                 )}
                 contentContainerStyle={{
                   paddingHorizontal: 16,
@@ -345,24 +304,17 @@ const HomeSlider = forwardRef(
             </>
           )}
           <Text style={styles.sectionTitle}>Add Ons</Text>
-          {isOngoingCoursesLoading ? (
+          {isRoadmapDataLoading ? (
             <OngoingCoursesSkeleton />
           ) : (
             <>
               <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                data={courseFilter}
+                data={roadmapData?.addOns || []}
                 keyExtractor={item => `explore_${item.id}`}
                 renderItem={({item, index}) => (
-                  <CourseCard
-                    item={item}
-                    index={index}
-                    totalItems={courseFilter.length}
-                    courseType={courseType}
-                    version="minimal"
-                    onPress={() => handleCoursePress(item)}
-                  />
+                  <CourseCard courseDetails={item} />
                 )}
                 contentContainerStyle={{
                   paddingHorizontal: 16,
