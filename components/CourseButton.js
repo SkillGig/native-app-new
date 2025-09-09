@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     marginTop: normalizeHeight(12),
   },
   customButton: {
-    paddingVertical: normalizeHeight(4),
+    paddingVertical: normalizeHeight(12),
     paddingHorizontal: normalizeWidth(16),
     borderRadius: 12,
     justifyContent: 'center',

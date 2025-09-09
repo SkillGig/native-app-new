@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -20,8 +20,16 @@ import {
 } from '../../components';
 import images from '../../assets/images';
 
-const MyAchievements = ({onBack, colors, isDark}) => {
+const MyAchievements = ({onBack, colors, isDark, showAnimation}) => {
   const fstyles = getFontStyles(isDark, colors);
+  const [animationKey, setAnimationKey] = useState(0);
+
+  // Force component remount when showAnimation becomes true
+  useEffect(() => {
+    if (showAnimation) {
+      setAnimationKey(prev => prev + 1);
+    }
+  }, [showAnimation]);
 
   return (
     <View style={styles.container}>
@@ -43,14 +51,16 @@ const MyAchievements = ({onBack, colors, isDark}) => {
         showsVerticalScrollIndicator={false}>
         {/* Main Achievement Badge */}
         <AchievementBadges
+          key={`achievement-badges-${animationKey}`}
           colors={colors}
           isDark={isDark}
           badgeTitle="Gold I"
-          animateOnMount={true}
+          animateOnMount={showAnimation}
         />
 
         {/* Progress Section */}
         <AchievementProgress
+          key={`achievement-progress-${animationKey}`}
           colors={colors}
           isDark={isDark}
           basePoints={0}
@@ -69,7 +79,7 @@ const MyAchievements = ({onBack, colors, isDark}) => {
               resizeMode="cover"
             />
           }
-          animateOnMount={true}
+          animateOnMount={showAnimation}
         />
 
         {/* My Titles Section */}

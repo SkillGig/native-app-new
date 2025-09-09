@@ -25,6 +25,7 @@ const AchievementBadges = ({
   const rightBadgeTranslateX = useRef(new Animated.Value(0)).current; // Start at center
   const rightBadgeOpacity = useRef(new Animated.Value(0)).current; // Start invisible
   const rightBadgeScale = useRef(new Animated.Value(1.5)).current; // Start larger
+  const titleOpacity = useRef(new Animated.Value(0)).current; // Title starts invisible
 
   useEffect(() => {
     if (!animateOnMount) {
@@ -38,7 +39,7 @@ const AchievementBadges = ({
         // Scale down dramatically
         Animated.timing(mainBadgeScale, {
           toValue: 1,
-          duration: 2000,
+          duration: 1000,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
@@ -52,14 +53,14 @@ const AchievementBadges = ({
         // Move down to center position
         Animated.timing(mainBadgeTranslateY, {
           toValue: 0,
-          duration: 2000,
+          duration: 1000,
           easing: Easing.out(Easing.back(1.7)),
           useNativeDriver: true,
         }),
         // Reduce shadow dramatically
         Animated.timing(mainBadgeShadow, {
           toValue: 8,
-          duration: 2000,
+          duration: 1000,
           useNativeDriver: false,
         }),
       ]).start(() => {
@@ -108,7 +109,15 @@ const AchievementBadges = ({
               }),
             ]),
           ]),
-        ]).start();
+        ]).start(() => {
+          // Phase 3: Animate the title after all badge animations complete
+          Animated.timing(titleOpacity, {
+            toValue: 1,
+            duration: 500,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+          }).start();
+        });
       });
     };
 
@@ -127,6 +136,7 @@ const AchievementBadges = ({
     rightBadgeTranslateX,
     rightBadgeOpacity,
     rightBadgeScale,
+    titleOpacity,
   ]);
 
   return (
@@ -191,10 +201,12 @@ const AchievementBadges = ({
             </View>
           </Animated.View>
         </View>
-        {/* Badge title - static */}
-        <Text style={[fstyles.heavyTwentyFour, styles.badgeTitle]}>
-          {badgeTitle}
-        </Text>
+        {/* Badge title - animated to appear after badges */}
+        <Animated.View style={[{opacity: titleOpacity}]}>
+          <Text style={[fstyles.heavyTwentyFour, styles.badgeTitle]}>
+            {badgeTitle}
+          </Text>
+        </Animated.View>
       </Animated.View>
 
       {/* Right side badge (animated container) */}
@@ -228,6 +240,7 @@ const styles = StyleSheet.create({
     height: normalizeHeight(140),
     paddingHorizontal: normalizeWidth(20),
     zIndex: 1000, // Static high zIndex for entire badge container
+    paddingTop: normalizeHeight(20),
   },
   sideBadge: {
     alignItems: 'center',

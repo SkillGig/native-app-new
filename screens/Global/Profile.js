@@ -10,6 +10,8 @@ import {ThemeContext} from '../../src/context/ThemeContext';
 import MyDetails from './MyDetails';
 import MyAchievements from './MyAchievements';
 import SlideTransition from './SlideTransition';
+import useUserStore from '../../src/store/useUserStore';
+import {useNavigation} from '@react-navigation/native';
 
 const ProfileComponent = ({handleHeaderItemsCollapse}) => {
   const {isDark, colors} = useContext(ThemeContext);
@@ -17,7 +19,17 @@ const ProfileComponent = ({handleHeaderItemsCollapse}) => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [achievementsKey, setAchievementsKey] = useState(0); // Key to force remount
   const toggleAnim = useRef(new Animated.Value(0)).current;
+  const logout = useUserStore(state => state.logout);
+  const navigation = useNavigation();
+
+  // Update achievements key when it becomes visible to force animation restart
+  useEffect(() => {
+    if (showAchievements) {
+      setAchievementsKey(prev => prev + 1);
+    }
+  }, [showAchievements]);
 
   useEffect(() => {
     Animated.timing(toggleAnim, {
@@ -107,7 +119,12 @@ const ProfileComponent = ({handleHeaderItemsCollapse}) => {
       key: 'logout',
       label: 'Log out',
       leftIcon: images.LOGOUT,
-      onPress: () => {},
+      onPress: () => {
+        // Implement logout functionality
+        logout();
+        // Optionally navigate to login screen or show a message
+        return navigation.navigate('Login');
+      },
       right: null,
     },
   ];
@@ -162,11 +179,7 @@ const ProfileComponent = ({handleHeaderItemsCollapse}) => {
                     }}
                   />
                   <View style={{marginLeft: normalizeWidth(18), flex: 0.9}}>
-                    <Text
-                      style={[
-                        fstyles.regularSixteen,
-                        {color: opt.key === 'logout' ? '#B095E3' : '#D3C4EF'},
-                      ]}>
+                    <Text style={[fstyles.regularSixteen, {color: '#D3C4EF'}]}>
                       {opt.label}
                     </Text>
                   </View>
@@ -203,6 +216,8 @@ const ProfileComponent = ({handleHeaderItemsCollapse}) => {
         visible={showAchievements}
         onClose={() => setShowAchievements(false)}>
         <MyAchievements
+          key={`achievements-${achievementsKey}`}
+          showAnimation={showAchievements}
           onBack={() => setShowAchievements(false)}
           colors={colors}
           isDark={isDark}

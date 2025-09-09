@@ -14,20 +14,12 @@ import {
 } from '../../components/Responsivescreen';
 import {getFontStyles} from '../../styles/FontStyles';
 import images from '../../assets/images';
-
-const userDetails = {
-  name: 'Shubhangi Sharma',
-  phone: '9876543210',
-  email: 'shubhangisharma@gmail.com',
-  college: 'Indian Institute of Technology, Roorkee',
-  sem: 'Sem V',
-  branch: 'B tech in computer Science',
-  startDate: 'July 2023',
-  endDate: 'July 2023',
-};
+import useUserStore from '../../src/store/useUserStore';
 
 const MyDetails = ({onBack, colors, isDark}) => {
   const fstyles = getFontStyles(isDark, colors);
+  const userConfig = useUserStore(state => state.userConfig);
+
   return (
     <ScrollView
       style={{flex: 1, backgroundColor: 'transparent'}}
@@ -45,24 +37,24 @@ const MyDetails = ({onBack, colors, isDark}) => {
         start={{x: 0, y: 0}}
         end={{x: 0, y: 1}}
         style={styles.detailsBox}>
-        <DetailRow label="Name" value={userDetails.name} />
-        <DetailRow label="Phone Number" value={userDetails.phone} />
-        <DetailRow label="Email" value={userDetails.email} />
-        <DetailRow label="College" value={userDetails.college} />
-        <DetailRow label="Ongoing Sem" value={userDetails.sem} />
-        <DetailRow label="Branch" value={userDetails.branch} />
+        <DetailRow label="Name" value={userConfig.userName} />
+        <DetailRow label="Phone Number" value={userConfig.phone} />
+        <DetailRow label="Email" value={userConfig.email} />
+        <DetailRow label="College" value={userConfig.organizationName} />
+        {/* <DetailRow label="Ongoing Sem" value={userConfig.sem} /> */}
+        <DetailRow label="Branch" value={userConfig.branchName} />
         <View style={styles.rowBetween}>
           <View style={{flex: 1, marginRight: normalizeWidth(8)}}>
             <DetailRow
               label="Start Date"
-              value={userDetails.startDate}
+              value={userConfig.userStartDate.split(' ')[0]}
               hideDivider
             />
           </View>
           <View style={{flex: 1, marginLeft: normalizeWidth(8)}}>
             <DetailRow
               label="End Date"
-              value={userDetails.endDate}
+              value={userConfig.userEndDate.split(' ')[0]}
               hideDivider
             />
           </View>
