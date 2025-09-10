@@ -10,12 +10,12 @@ import UnlockedExp from './screens/onboarding/UnlockedExp';
 import InfoCheck from './screens/onboarding/InfoCheck';
 import RequestStatus from './screens/onboarding/RequestStatus';
 import MainDash from './screens/Global/MainDash';
-import RoadMap from './screens/Milestones/RoadMap';
-import AutoScrollCarousel from './screens/Milestones/AutoScrollCarousel';
+import Milestones from './screens/AllMilestones/Milestones';
+import AutoScrollCarousel from './screens/AllMilestones/AutoScrollCarousel';
 import CareerGoalScreen from './screens/onboarding/CareerGoalSelection';
 import RoadmapQuestionsFlow from './screens/onboarding/RoadmapQuestionsFlow';
-import LeaderBoard from './screens/Milestones/LeaderBoard';
-import CourseContent from './screens/Milestones/CourseContent';
+import LeaderBoard from './screens/AllMilestones/LeaderBoard';
+import CourseContent from './screens/AllMilestones/CourseContent';
 import ExploreCourses from './screens/VideoSection/ExploreCourses';
 import CourseScreening from './screens/VideoSection/CourseScreening';
 import OngoingCourses from './screens/VideoSection/OngoingCourses';
@@ -53,7 +53,7 @@ function BottomTabs() {
           }}
           tabBar={CustomTabBar}>
           <Tab.Screen name="MainDash" component={MainDash} />
-          <Tab.Screen name="RoadMap" component={RoadMap} />
+          <Tab.Screen name="Milestones" component={Milestones} />
           <Tab.Screen name="Community" component={Community} />
           <Tab.Screen name="QuizzesDashboard" component={QuizzesDashboard} />
         </Tab.Navigator>
@@ -122,8 +122,8 @@ const Navigation = () => {
         />
 
         <Stack.Screen
-          name="RoadMap"
-          component={RoadMap}
+          name="Milestones"
+          component={Milestones}
           options={{headerShown: false}}
         />
 

@@ -297,3 +297,12 @@ export const dailyLoginForXp = async () => {
     auth: true,
   });
 };
+
+export const getMilestoneDetails = async () => {
+  return await networkAPICall({
+    url: userService.milestoneDetails,
+    method: 'GET',
+    service: 'userService',
+    auth: true,
+  });
+};

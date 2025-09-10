@@ -18,7 +18,8 @@ const CourseCard = ({courseDetails}) => {
       <View>
         <Image
           source={
-            courseDetails?.courseDetails || {
+            // courseDetails?.courseThumbnailUrl ||
+            {
               uri: 'https://placeholder.pagebee.io/api/plain/192/78?text=Some title&bg=ffffff',
             }
           }
@@ -76,6 +77,21 @@ const CourseCard = ({courseDetails}) => {
       {currentCourseStatus === 'in-progress' ? (
         <CourseButton
           name={'Resume Course'}
+          onPress={() => {}}
+          disabled={false}
+          style={{
+            width: '100%',
+            marginTop: 12,
+            alignSelf: 'center',
+          }}
+          textStyle={{
+            fontSize: 14,
+            fontWeight: '800',
+          }}
+        />
+      ) : currentCourseStatus === 'completed' ? (
+        <CourseButton
+          name={'Download Certificate'}
           onPress={() => {}}
           disabled={false}
           style={{
