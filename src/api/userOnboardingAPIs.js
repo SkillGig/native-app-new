@@ -306,3 +306,12 @@ export const getMilestoneDetails = async () => {
     auth: true,
   });
 };
+
+export const getUserAchievements = async () => {
+  return await networkAPICall({
+    url: userService.userAchievements,
+    method: 'GET',
+    service: 'userService',
+    auth: true,
+  });
+};

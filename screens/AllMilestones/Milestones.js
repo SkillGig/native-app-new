@@ -103,7 +103,7 @@ const Milestones = ({navigation}) => {
           }}>
           <LinearGradient
             colors={['#391976', '#150237']}
-            locations={[0, 0.4]}
+            locations={[0, 0.46]}
             start={{x: 0, y: 0}}
             end={{x: 1, y: 1}}>
             <View

@@ -46,8 +46,8 @@ const LeaderBoard = props => {
 
   return (
     <PageWrapper
-      gradientColors={gradientColors}
-      gradientLocations={[0, 0.46]}
+      gradientColors={['#391976', '#000000']}
+      gradientLocations={[0, 1]}
       gradientEnd={{x: 1, y: 1}}
       gradientStart={{x: 0, y: 0}}>
       <View
@@ -201,9 +201,6 @@ const styles = StyleSheet.create({
   shadowWrapper: {
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    borderBottomLeftRadius: 5,
-    borderBottomRightRadius: 5,
-    borderWidth: 2,
     borderColor: 'rgba(211, 196, 239, 0.20)',
     backgroundColor: '#000000',
     overflow: 'hidden',

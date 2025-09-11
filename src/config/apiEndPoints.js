@@ -28,6 +28,7 @@ export const userService = {
   roadmapDetails: '/roadmap/roadmap-details',
   dailyLoginForXp: '/rewards/daily-login',
   milestoneDetails: '/roadmap/ongoing-roadmap-with-analytics',
+  userAchievements: '/rewards/achievements',
 };
 
 export const notificationsService = {

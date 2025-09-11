@@ -21,4 +21,4 @@ const keys = {
 
 // Make release version behave like development for testing
 const environment = __DEV__ ? 'development' : 'development'; // Always use development config
-module.exports = keys.development;
+module.exports = keys.staging;

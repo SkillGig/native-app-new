@@ -1,38 +1,28 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {normalizeHeight, normalizeWidth} from './Responsivescreen';
 import {getFontStyles} from '../styles/FontStyles';
 import LinearGradient from 'react-native-linear-gradient';
+import KnowMoreAboutBadge from './KnowMoreAboutBadge';
 
-const MyTitles = ({colors, isDark, titles = []}) => {
+const MyTitles = ({colors, isDark, titles = [], availableBadges}) => {
   const fstyles = getFontStyles(isDark, colors);
 
-  // Default titles data if none provided
-  const defaultTitles = [
-    {
-      id: 1,
-      level: 'Lvl 1',
-      title: 'Streakster',
-      description: 'Know More',
-      iconPlaceholder: true, // Fire icon placeholder
-    },
-    {
-      id: 2,
-      level: 'Lvl 1',
-      title: 'Helper Hat',
-      description: 'Know More',
-      iconPlaceholder: true, // Hat icon placeholder
-    },
-    {
-      id: 3,
-      level: 'Lvl 1',
-      title: 'Lucky Clover',
-      description: 'Know More',
-      iconPlaceholder: true, // Clover icon placeholder
-    },
-  ];
+  const achievementTitles = titles.length > 0 ? titles : availableBadges;
 
-  const achievementTitles = titles.length > 0 ? titles : defaultTitles;
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState(null);
+
+  const openBadge = badge => {
+    console.log('Opening badge:', badge);
+    setSelectedBadge(badge);
+    setModalVisible(true);
+  };
+
+  const closeBadge = () => {
+    setModalVisible(false);
+    setSelectedBadge(null);
+  };
 
   return (
     <LinearGradient
@@ -46,15 +36,30 @@ const MyTitles = ({colors, isDark, titles = []}) => {
 
       <View style={styles.titlesGrid}>
         {achievementTitles.map((achievement, index) => (
-          <View key={achievement.id} style={styles.titleCard}>
+          <TouchableOpacity
+            key={achievement.id ?? index}
+            style={styles.titleCard}
+            activeOpacity={0.85}
+            onPress={() => {
+              // normalize badge shape to ensure required fields exist
+              const badge = {
+                id: achievement.id ?? index,
+                title: achievement.title ?? achievement.name ?? 'Title',
+                level: achievement.level ?? achievement.rank ?? 'Lv 1',
+                description:
+                  achievement.description ?? achievement.subtitle ?? '',
+                iconUrl: achievement.iconUrl ?? achievement.imageUrl ?? null,
+              };
+              openBadge(badge);
+            }}>
             <View style={styles.titleCardIcon}>
               {/* Different icon placeholders for each achievement */}
               <View
                 style={[
                   styles.titleIconPlaceholder,
-                  index === 0 && styles.fireIcon, // Fire icon
-                  index === 1 && styles.hatIcon, // Hat icon
-                  index === 2 && styles.cloverIcon, // Clover icon
+                  index === 0 && styles.fireIcon,
+                  index === 1 && styles.hatIcon,
+                  index === 2 && styles.cloverIcon,
                 ]}
               />
             </View>
@@ -65,15 +70,20 @@ const MyTitles = ({colors, isDark, titles = []}) => {
               <Text style={[fstyles.mediumFourteen, styles.titleText]}>
                 {achievement.title}
               </Text>
-              <TouchableOpacity activeOpacity={0.7}>
-                <Text style={[fstyles.regularTwelve, styles.knowMoreText]}>
-                  {achievement.description}
-                </Text>
-              </TouchableOpacity>
+              <Text style={[fstyles.regularTwelve, styles.knowMoreText]}>
+                {achievement.description}
+              </Text>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
+      <KnowMoreAboutBadge
+        visible={modalVisible}
+        onClose={closeBadge}
+        badge={selectedBadge || {}}
+        isDark={isDark}
+        colors={colors}
+      />
     </LinearGradient>
   );
 };

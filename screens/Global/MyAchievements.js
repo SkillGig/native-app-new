@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import {
   normalizeHeight,
@@ -19,10 +20,33 @@ import {
   MyTitles,
 } from '../../components';
 import images from '../../assets/images';
+import {getUserAchievements} from '../../src/api/userOnboardingAPIs';
 
 const MyAchievements = ({onBack, colors, isDark, showAnimation}) => {
   const fstyles = getFontStyles(isDark, colors);
   const [animationKey, setAnimationKey] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userAchievements, setUserAchievements] = useState([]);
+
+  const fetchUserAchievements = async () => {
+    try {
+      setIsLoading(true);
+      // Replace with actual API call to fetch user achievements
+      const response = await getUserAchievements();
+      if (response && response.data) {
+        setUserAchievements(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching user achievements:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchUserAchievements();
+  }, []);
+
+  console.log(userAchievements, 'userAchievements');
 
   // Force component remount when showAnimation becomes true
   useEffect(() => {
@@ -46,45 +70,91 @@ const MyAchievements = ({onBack, colors, isDark, showAnimation}) => {
         </Text>
       </View>
 
-      <ScrollView
-        style={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}>
-        {/* Main Achievement Badge */}
-        <AchievementBadges
-          key={`achievement-badges-${animationKey}`}
-          colors={colors}
-          isDark={isDark}
-          badgeTitle="Gold I"
-          animateOnMount={showAnimation}
-        />
+      {isLoading ? (
+        <View style={styles.loadingMore}>
+          <ActivityIndicator size="small" color="#B095E3" />
+        </View>
+      ) : (
+        <ScrollView
+          style={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}>
+          {/* Main Achievement Badge */}
+          <AchievementBadges
+            key={`achievement-badges-${animationKey}`}
+            colors={colors}
+            isDark={isDark}
+            badgeTitle={
+              userAchievements?.currentLevel?.tier +
+              ' ' +
+              userAchievements?.currentLevel?.tierLevel
+            }
+            animateOnMount={showAnimation}
+          />
 
-        {/* Progress Section */}
-        <AchievementProgress
-          key={`achievement-progress-${animationKey}`}
-          colors={colors}
-          isDark={isDark}
-          basePoints={0}
-          finalPoints={3000}
-          currentPoints={1200} // This will show "You need 1800 XP points unlock new badge"
-          userAvatar={
-            <Image
-              source={images.FEMALEAVATAR}
-              style={{
-                width: normalizeWidth(48),
-                height: normalizeHeight(48),
-                borderRadius: normalizeWidth(24),
-                borderWidth: 3,
-                borderColor: '#FFFFFF',
-              }}
-              resizeMode="cover"
-            />
-          }
-          animateOnMount={showAnimation}
-        />
+          {/* Progress Section */}
+          <AchievementProgress
+            key={`achievement-progress-${animationKey}`}
+            colors={colors}
+            isDark={isDark}
+            basePoints={userAchievements?.currentLevel?.minXpRequired || 0}
+            finalPoints={
+              userAchievements?.progressToNextLevel?.nextLevelXP || 0
+            }
+            currentPoints={
+              userAchievements?.progressToNextLevel?.currentXP || 0
+            } // This will show "You need 1800 XP points unlock new badge"
+            userAvatar={
+              <Image
+                source={images.FEMALEAVATAR}
+                style={{
+                  width: normalizeWidth(48),
+                  height: normalizeHeight(48),
+                  borderRadius: normalizeWidth(24),
+                  borderWidth: 3,
+                  borderColor: '#FFFFFF',
+                }}
+                resizeMode="cover"
+              />
+            }
+            animateOnMount={showAnimation}
+          />
 
-        {/* My Titles Section */}
-        <MyTitles colors={colors} isDark={isDark} />
-      </ScrollView>
+          {/* My Titles Section */}
+          <MyTitles
+            colors={colors}
+            isDark={isDark}
+            titles={userAchievements?.badges || []}
+            availableBadges={
+              userAchievements?.availableBadges || [
+                {
+                  id: 1,
+                  level: 'Lvl 1',
+                  title: 'Streakster',
+                  description: 'Know More',
+                  iconPlaceholder: true, // Fire icon placeholder
+                  locked: true,
+                },
+                {
+                  id: 2,
+                  level: 'Lvl 1',
+                  title: 'Helper Hat',
+                  description: 'Know More',
+                  iconPlaceholder: true, // Hat icon placeholder
+                  locked: true,
+                },
+                {
+                  id: 3,
+                  level: 'Lvl 1',
+                  title: 'Lucky Clover',
+                  description: 'Know More',
+                  iconPlaceholder: true, // Clover icon placeholder
+                  locked: true,
+                },
+              ]
+            }
+          />
+        </ScrollView>
+      )}
     </View>
   );
 };
@@ -124,6 +194,10 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
     paddingHorizontal: normalizeWidth(20),
+  },
+  loadingMore: {
+    padding: normalizeHeight(16),
+    alignItems: 'center',
   },
 });
 

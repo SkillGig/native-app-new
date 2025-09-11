@@ -11,6 +11,7 @@ const AchievementBadges = ({
   mainIcon = null, // Icon from backend
   leftIcon = null, // Icon from backend
   rightIcon = null, // Icon from backend
+  isLoading = false,
 }) => {
   const fstyles = getFontStyles(isDark, colors);
 
@@ -74,7 +75,7 @@ const AchievementBadges = ({
               useNativeDriver: true,
             }),
             Animated.timing(leftBadgeTranslateX, {
-              toValue: -30, // Move to original left position (same as margin)
+              toValue: -20, // Move to original left position (same as margin)
               duration: 600,
               easing: Easing.out(Easing.back(1.8)),
               useNativeDriver: true,
@@ -96,7 +97,7 @@ const AchievementBadges = ({
                 useNativeDriver: true,
               }),
               Animated.timing(rightBadgeTranslateX, {
-                toValue: 30, // Move to original right position (same as margin)
+                toValue: 20, // Move to original right position (same as margin)
                 duration: 600,
                 easing: Easing.out(Easing.back(1.8)),
                 useNativeDriver: true,
