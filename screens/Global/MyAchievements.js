@@ -19,6 +19,7 @@ import {
   AchievementProgress,
   MyTitles,
 } from '../../components';
+import KnowMoreAboutBadge from '../../components/KnowMoreAboutBadge';
 import images from '../../assets/images';
 import {getUserAchievements} from '../../src/api/userOnboardingAPIs';
 
@@ -27,6 +28,18 @@ const MyAchievements = ({onBack, colors, isDark, showAnimation}) => {
   const [animationKey, setAnimationKey] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [userAchievements, setUserAchievements] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState(null);
+
+  const handleOpenBadge = badge => {
+    setSelectedBadge(badge);
+    setModalVisible(true);
+  };
+
+  const handleCloseBadge = () => {
+    setModalVisible(false);
+    setSelectedBadge(null);
+  };
 
   const fetchUserAchievements = async () => {
     try {
@@ -152,9 +165,19 @@ const MyAchievements = ({onBack, colors, isDark, showAnimation}) => {
                 },
               ]
             }
+            onOpenBadge={handleOpenBadge}
           />
         </ScrollView>
       )}
+      {/* debug banner removed */}
+      <KnowMoreAboutBadge
+        visible={modalVisible}
+        onClose={handleCloseBadge}
+        badge={selectedBadge || {}}
+        isDark={isDark}
+        colors={colors}
+        inline={modalVisible}
+      />
     </View>
   );
 };

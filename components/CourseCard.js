@@ -6,9 +6,11 @@ import LinearGradient from 'react-native-linear-gradient';
 import ProgressBar from './ProgressBar';
 import CourseButton from './CourseButton';
 import CourseTag from './CourseTag';
+import {useNavigation} from '@react-navigation/native';
 
 const CourseCard = ({courseDetails}) => {
   const currentCourseStatus = courseDetails?.courseStatus;
+  const navigation = useNavigation();
 
   return (
     <LinearGradient
@@ -77,7 +79,11 @@ const CourseCard = ({courseDetails}) => {
       {currentCourseStatus === 'in-progress' ? (
         <CourseButton
           name={'Resume Course'}
-          onPress={() => {}}
+          onPress={() => {
+            navigation.navigate('CourseScreening', {
+              courseDetails: courseDetails,
+            });
+          }}
           disabled={false}
           style={{
             width: '100%',

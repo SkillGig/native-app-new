@@ -47,7 +47,7 @@ const networkAPICall = async ({
   );
 
   // Add 2 second delay for testing loading states
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  // await new Promise(resolve => setTimeout(resolve, 2000));
 
   try {
     const response = await axios({

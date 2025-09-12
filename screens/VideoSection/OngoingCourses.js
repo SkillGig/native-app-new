@@ -1,11 +1,10 @@
-import React, { use, useContext, useMemo, useState } from 'react';
+import React, {useContext, useMemo, useState, useEffect} from 'react';
 import {
   Text,
   View,
   Image,
   StyleSheet,
   TouchableOpacity,
-  ImageBackground,
   FlatList,
   ScrollView,
 } from 'react-native';
@@ -14,16 +13,28 @@ import {
   normalizeHeight,
   normalizeWidth,
 } from '../../components/Responsivescreen';
-import { getFontStyles } from '../../styles/FontStyles';
-import { ThemeContext } from '../../src/context/ThemeContext';
+import {getFontStyles} from '../../styles/FontStyles';
+import {ThemeContext} from '../../src/context/ThemeContext';
 import LinearGradient from 'react-native-linear-gradient';
-import { CircularProgress } from '../Global/DesignComponents';
+import {CircularProgress} from '../Global/DesignComponents';
 import Video from 'react-native-video';
+import OngoingCoursesSkeletonLoader from '../../components/Skeletons/OngoingCoursesSkeletonLoader';
+
 const OngoingCourses = props => {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const { isDark, colors } = useContext(ThemeContext);
+  const {isDark, colors} = useContext(ThemeContext);
   const [expandedSectionIds, setExpandedSectionIds] = useState([]);
   const [expandedMap, setExpandedMap] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   console.log(selectedIndex, 'selectedIndexssss');
   const gradientColors = useMemo(
@@ -52,7 +63,7 @@ const OngoingCourses = props => {
         <View key={i} style={styles.star}>
           <Image source={images.RATINGSTAR} style={styles.star} />
           <View
-            style={[styles.partialOverlay, { width: `${partialStar * 100}%` }]}>
+            style={[styles.partialOverlay, {width: `${partialStar * 100}%`}]}>
             <Image source={images.RATINGSTAR} style={styles.star} />
           </View>
         </View>,
@@ -63,7 +74,7 @@ const OngoingCourses = props => {
         <Image
           key={i}
           source={images.RATINGSTAR}
-          style={[styles.star, { tintColor: '#ccc' }]}
+          style={[styles.star, {tintColor: '#ccc'}]}
         />,
       );
     }
@@ -127,18 +138,10 @@ const OngoingCourses = props => {
     },
   ];
 
-  const RenderFPList = ({ item }) => {
+  const RenderFPList = ({item}) => {
     return (
-      <View
-        style={{
-          paddingVertical: normalizeHeight(8),
-          paddingHorizontal: normalizeWidth(12),
-          borderRadius: 20,
-          borderWidth: 1,
-          borderColor: 'rgba(176, 149, 227, 0.40)',
-          marginRight: normalizeWidth(25),
-        }}>
-        <Text style={[fstyles.thirteenMedium, { color: 'white' }]}>
+      <View style={styles.moduleChip}>
+        <Text style={[fstyles.thirteenMedium, styles.moduleChipText]}>
           {item.coursename}
         </Text>
       </View>
@@ -280,7 +283,7 @@ const OngoingCourses = props => {
     },
   ];
 
-  const ModulesCard = ({ item }) => {
+  const ModulesCard = ({item}) => {
     const isExpanded = expandedSectionIds.includes(item.id);
     return (
       <View
@@ -308,13 +311,13 @@ const OngoingCourses = props => {
             borderTopRightRadius: 12,
           }}>
           <View>
-            <Text style={[fstyles.mediumTen, { color: '#B095E3' }]}>
+            <Text style={[fstyles.mediumTen, {color: '#B095E3'}]}>
               Section {item.id}
             </Text>
             <Text
               style={[
                 fstyles.semiFourteen,
-                { marginVertical: normalizeHeight(4) },
+                {marginVertical: normalizeHeight(4)},
               ]}>
               {item.title}
             </Text>
@@ -361,7 +364,7 @@ const OngoingCourses = props => {
                 height: normalizeHeight(16),
                 width: normalizeWidth(16),
                 resizeMode: 'contain',
-                transform: [{ rotate: '-90deg' }],
+                transform: [{rotate: '-90deg'}],
               }}
             />
           )}
@@ -375,11 +378,11 @@ const OngoingCourses = props => {
             {item.lessons.map((lesson, index) => (
               <View
                 key={lesson.id}
-                style={[styles.lessonRow, lesson.isLocked && { opacity: 0.5 }]}>
+                style={[styles.lessonRow, lesson.isLocked && {opacity: 0.5}]}>
                 <View style={styles.lessonIndex}>
                   <Text style={styles.lessonIndexText}>{index + 1}</Text>
                 </View>
-                <View style={{ flex: 1 }}>
+                <View style={{flex: 1}}>
                   <Text
                     style={{
                       fontSize: 12,
@@ -447,7 +450,7 @@ const OngoingCourses = props => {
                   </View>
 
                   {lesson.progress > 0 && lesson.progress < 1 && (
-                    <View style={{ marginTop: normalizeHeight(6) }}>
+                    <View style={{marginTop: normalizeHeight(6)}}>
                       <View
                         style={{
                           flexDirection: 'row',
@@ -476,7 +479,7 @@ const OngoingCourses = props => {
                           <Text
                             style={[
                               fstyles.mediumTen,
-                              { color: 'rgba(238, 231, 249, 0.60)' },
+                              {color: 'rgba(238, 231, 249, 0.60)'},
                             ]}>
                             {lesson.remaining}
                           </Text>
@@ -512,7 +515,7 @@ const OngoingCourses = props => {
             <View
               style={[
                 fstyles.line,
-                { backgroundColor: 'rgba(129, 95, 196, 0.30)' },
+                {backgroundColor: 'rgba(129, 95, 196, 0.30)'},
               ]}
             />
           </View>
@@ -543,8 +546,8 @@ const OngoingCourses = props => {
                 'rgba(176, 149, 227, 0.09)',
               ]}
               locations={[0.0885, 0.739]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0.91, y: 0.41 }}
+              start={{x: 0, y: 0}}
+              end={{x: 0.91, y: 0.41}}
               style={{
                 borderRadius: 12,
                 marginHorizontal: normalizeWidth(12),
@@ -565,7 +568,7 @@ const OngoingCourses = props => {
                     <Text
                       style={[
                         fstyles.mediumTen,
-                        { color: 'rgba(238, 231, 249, 0.60)' },
+                        {color: 'rgba(238, 231, 249, 0.60)'},
                       ]}>
                       {item.test.type} |{' '}
                     </Text>
@@ -576,7 +579,7 @@ const OngoingCourses = props => {
                     <Text
                       style={[
                         fstyles.mediumTen,
-                        { color: 'rgba(238, 231, 249, 0.60)' },
+                        {color: 'rgba(238, 231, 249, 0.60)'},
                       ]}>
                       {item.test.duration} |{' '}
                     </Text>
@@ -584,14 +587,14 @@ const OngoingCourses = props => {
                     <Text
                       style={[
                         fstyles.mediumTen,
-                        { color: 'rgba(238, 231, 249, 0.60)' },
+                        {color: 'rgba(238, 231, 249, 0.60)'},
                       ]}>
                       {item.test.points}
                     </Text>
                   </View>
                 </View>
                 <TouchableOpacity style={styles.ctaButton}>
-                  <Text style={[fstyles.semiTwelwe, { color: '#A19AA9' }]}>
+                  <Text style={[fstyles.semiTwelwe, {color: '#A19AA9'}]}>
                     {item.test.buttonText}
                   </Text>
                 </TouchableOpacity>
@@ -636,7 +639,7 @@ const OngoingCourses = props => {
     },
   ];
 
-  const ResourcesCard = ({ item }) => {
+  const ResourcesCard = ({item}) => {
     return (
       <TouchableOpacity
         style={{
@@ -651,8 +654,8 @@ const OngoingCourses = props => {
         <LinearGradient
           colors={['rgba(211, 196, 239, 0.00)', 'rgba(211, 196, 239, 0.20)']}
           locations={[0.0502, 1]}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.4 }}
+          start={{x: 0, y: 0.5}}
+          end={{x: 1, y: 0.4}}
           style={{
             padding: 16,
             borderRadius: 12,
@@ -666,7 +669,7 @@ const OngoingCourses = props => {
                 resizeMode: 'contain',
               }}
             />
-            <View style={{ marginLeft: normalizeWidth(16) }}>
+            <View style={{marginLeft: normalizeWidth(16)}}>
               <Text style={fstyles.semiTwelwe}>{item.title}</Text>
               <Text
                 style={[
@@ -729,10 +732,10 @@ const OngoingCourses = props => {
       },
     }));
   };
-  const NotesCard = ({ item: section }) => {
+  const NotesCard = ({item: section}) => {
     // const isOpen = expanded[item.id];
     return (
-      <View style={{ marginBottom: 16 }}>
+      <View style={{marginBottom: 16}}>
         {/* Section Header */}
         <Text style={styles.sectionHeader}>{section.title}</Text>
 
@@ -763,13 +766,18 @@ const OngoingCourses = props => {
     );
   };
 
+  // Show skeleton while loading
+  if (isLoading) {
+    return <OngoingCoursesSkeletonLoader />;
+  }
+
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{flex: 1}}>
       <LinearGradient
         colors={gradientColors}
         locations={[0, 0.7]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
         style={StyleSheet.absoluteFillObject}
       />
       <View>
@@ -782,47 +790,36 @@ const OngoingCourses = props => {
           }}
         /> */}
 
-
-         <View style={{}}>
-     <Video
-    source={{ uri: 'https://lms-courses-uploads.s3.ap-south-1.amazonaws.com/development/4/5/59/videos/Nextjs_Full_stack_course.m3u8?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAWIJIUODFNDW4SLSP%2F20250806%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20250806T145713Z&X-Amz-Expires=10000&X-Amz-Security-Token=IQoJb3JpZ2luX2VjED4aCmFwLXNvdXRoLTEiSDBGAiEAzsmxXwBpCrummokG81hBYA8XlDk3GQx2gcKYxEdLk%2FYCIQCZRKIGmLN9WO0xadtPuFnccP%2BgqCqgPI2oYoaAdBL24Cq%2FBQh3EAAaDDQzMDExODgyNjE4NiIM%2F5Ks%2B0nkKzSvJicYKpwFVjB7Vy1c464nbsiB9TbHVH4ixR9OfxRyQqgDponUBVycBJWI7PsmMMPNxYjZAi2AZTA%2FYrWQKH1HUuqtpK%2BSlZheFlzB0RtIg7oNew0yUf4JhopN4Jz9bcfcVTE0m7YmKVEpFmvHUWkEx9S1mplnmRAw9%2FH9uH1K31sJCKX42Hmysj2Dbu1ISu5U5PZ%2BGp6qUIDk80Kl4cvdMEBVWjLyKNq3Z4HR2IWmYjYfXvuTlxggVHhGlooFN1wmVMeqXFTTvKrQWs%2BVn9tzGGwS%2Bhg3pkZuoq5GivGn80SqDDnFkS%2B1dKIHKn7TGFdAH8i351Y%2B44%2FpoL2tIzcWvhol1BXw9lxFvEXRQOR7N1zPBx4m64nXJ4DPPAPMUDOnYcdEJ%2BbuSHW%2Fm0uz4g3AiVsHpv5AXeK2muK1%2FItFn4EtQCAEY3jqLJyE6CnGO%2FmIQCTwHc7Zo3it4yqaQpdKxWKquWVbMH1Vwz%2Bb3MLb4z2kBft0ET4kSPDBOKETjBD9CeHURMecUF74SzpA7vwKs79PFHMy%2BEQXFZAQJHxLBF80J%2B1K9OSldCI7SZTjC3H0DBk98IkOToceOx2r1gjqWt8jklBIZ6ZAGuShd7jWUz6hbnkorpuVMl9WdWYP8yFKFlKL2Uc2wCBOTbOQNj41DYz3ZjPistbKQhClq1cDqD7k0Kd0Z%2FUDBqZ%2FLfIb%2Bf%2B21gcayHQu%2FAg33h74aERiaa2CtyBZdiAY6O4mYi8hYDx3jJ7lO%2B1oBuQK3nZVZJGMetAO1gmKjyIVOM0Irr%2FjIB8oz7EP9%2FyYKxWc%2BeBDbe9CatkGYHV5Iv3ktrATG%2FZl4oHWKfLYkxFkG8u57ofb7xtvTfpBY4tka38vkTuRFCDGFW8jOIm5errsCAKSPf7UGaMwir7NxAY6sAFEDkaURfx4mRjXukcz14ojd2%2F2vwTvUEhUJmUbKarysA65InT3tuXmhA%2F2WSud3dlW6AAOe4Jqvlhrc3hoX%2FPao5uGoOX4J4nmbSQ5OhXV9iWvO2DLsZNiDzJsCYbCFiUq68NZ7OmaL2NL21GFFPABN1Ae%2BaXv5bgiOJTA4jtXz8mfKyo6aCYj2vbc%2BE7K%2F8qd9%2Bd80ys%2BL3xMdMGk0OvHJ3Vkx2uG3BDabYk3p8bsxg%3D%3D&X-Amz-Signature=b74677c0f04324892a1bdbab94dface1e673820b5d73ab7609313e804c7ba624&X-Amz-SignedHeaders=host' }}
-    style={{ width: '100%', aspectRatio: 16 / 9 }}
-    controls={true}
-    fullscreen={true?console.log('fulllsrreee'):console.log('half screeennnn')}
-    fullscreenOrientation='landscape'
-    hideShutterView
-  />
-    </View>
+        <View style={{}}>
+          <Video
+            source={{
+              uri: 'https://lms-courses-uploads.s3.ap-south-1.amazonaws.com/development/4/5/59/videos/Nextjs_Full_stack_course.m3u8?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAWIJIUODFNDW4SLSP%2F20250806%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20250806T145713Z&X-Amz-Expires=10000&X-Amz-Security-Token=IQoJb3JpZ2luX2VjED4aCmFwLXNvdXRoLTEiSDBGAiEAzsmxXwBpCrummokG81hBYA8XlDk3GQx2gcKYxEdLk%2FYCIQCZRKIGmLN9WO0xadtPuFnccP%2BgqCqgPI2oYoaAdBL24Cq%2FBQh3EAAaDDQzMDExODgyNjE4NiIM%2F5Ks%2B0nkKzSvJicYKpwFVjB7Vy1c464nbsiB9TbHVH4ixR9OfxRyQqgDponUBVycBJWI7PsmMMPNxYjZAi2AZTA%2FYrWQKH1HUuqtpK%2BSlZheFlzB0RtIg7oNew0yUf4JhopN4Jz9bcfcVTE0m7YmKVEpFmvHUWkEx9S1mplnmRAw9%2FH9uH1K31sJCKX42Hmysj2Dbu1ISu5U5PZ%2BGp6qUIDk80Kl4cvdMEBVWjLyKNq3Z4HR2IWmYjYfXvuTlxggVHhGlooFN1wmVMeqXFTTvKrQWs%2BVn9tzGGwS%2Bhg3pkZuoq5GivGn80SqDDnFkS%2B1dKIHKn7TGFdAH8i351Y%2B44%2FpoL2tIzcWvhol1BXw9lxFvEXRQOR7N1zPBx4m64nXJ4DPPAPMUDOnYcdEJ%2BbuSHW%2Fm0uz4g3AiVsHpv5AXeK2muK1%2FItFn4EtQCAEY3jqLJyE6CnGO%2FmIQCTwHc7Zo3it4yqaQpdKxWKquWVbMH1Vwz%2Bb3MLb4z2kBft0ET4kSPDBOKETjBD9CeHURMecUF74SzpA7vwKs79PFHMy%2BEQXFZAQJHxLBF80J%2B1K9OSldCI7SZTjC3H0DBk98IkOToceOx2r1gjqWt8jklBIZ6ZAGuShd7jWUz6hbnkorpuVMl9WdWYP8yFKFlKL2Uc2wCBOTbOQNj41DYz3ZjPistbKQhClq1cDqD7k0Kd0Z%2FUDBqZ%2FLfIb%2Bf%2B21gcayHQu%2FAg33h74aERiaa2CtyBZdiAY6O4mYi8hYDx3jJ7lO%2B1oBuQK3nZVZJGMetAO1gmKjyIVOM0Irr%2FjIB8oz7EP9%2FyYKxWc%2BeBDbe9CatkGYHV5Iv3ktrATG%2FZl4oHWKfLYkxFkG8u57ofb7xtvTfpBY4tka38vkTuRFCDGFW8jOIm5errsCAKSPf7UGaMwir7NxAY6sAFEDkaURfx4mRjXukcz14ojd2%2F2vwTvUEhUJmUbKarysA65InT3tuXmhA%2F2WSud3dlW6AAOe4Jqvlhrc3hoX%2FPao5uGoOX4J4nmbSQ5OhXV9iWvO2DLsZNiDzJsCYbCFiUq68NZ7OmaL2NL21GFFPABN1Ae%2BaXv5bgiOJTA4jtXz8mfKyo6aCYj2vbc%2BE7K%2F8qd9%2Bd80ys%2BL3xMdMGk0OvHJ3Vkx2uG3BDabYk3p8bsxg%3D%3D&X-Amz-Signature=b74677c0f04324892a1bdbab94dface1e673820b5d73ab7609313e804c7ba624&X-Amz-SignedHeaders=host',
+            }}
+            style={{width: '100%', aspectRatio: 16 / 9}}
+            controls={true}
+            fullscreen={
+              true ? console.log('fulllsrreee') : console.log('half screeennnn')
+            }
+            fullscreenOrientation="landscape"
+            hideShutterView
+          />
+        </View>
       </View>
       <ScrollView>
         <LinearGradient
           colors={['#1C0743', '#090215']}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={{ flex: 1, borderTopLeftRadius: 32, borderTopRightRadius: 32 }}>
+          start={{x: 0.5, y: 0}}
+          end={{x: 0.5, y: 1}}
+          style={{flex: 1, borderTopLeftRadius: 32, borderTopRightRadius: 32}}>
           <View>
-            <View
-              style={{
-                marginTop: normalizeHeight(31),
-                marginHorizontal: normalizeWidth(24),
-              }}>
+            <View style={styles.headerSection}>
               <Text style={fstyles.heavyTwentyFour}>UIUX Design Course</Text>
-              <Text
-                style={[
-                  fstyles.twelweRegular,
-                  { fontStyle: 'italic', marginTop: 4, color: '#F6F3FC' },
-                ]}>
+              <Text style={[fstyles.twelweRegular, styles.courseDescription]}>
                 Master the fundamentals of UI/UX design and build stunning,
                 user-friendly digital experiences.
               </Text>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                marginHorizontal: normalizeWidth(24),
-                marginTop: normalizeHeight(28),
-                alignItems: 'center',
-              }}>
+            <View style={styles.ratingSection}>
               <View style={styles.container}>{stars}</View>
               <Text style={fstyles.semiFourteen}>4.2 (4.2k reviews)</Text>
             </View>
@@ -833,8 +830,8 @@ const OngoingCourses = props => {
               'rgba(129, 95, 196, 0.40)', // end color at 79.34%
             ]}
             locations={[0.0152, 0.7934]} // converted from 1.52%, 79.34%
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0.9744, y: 0.225 }} // 103deg ≈ (cosθ ≈ 0.9744, sinθ ≈ 0.2250)
+            start={{x: 0, y: 0}}
+            end={{x: 0.9744, y: 0.225}} // 103deg ≈ (cosθ ≈ 0.9744, sinθ ≈ 0.2250)
             style={{
               borderRadius: 12,
               borderWidth: 1,
@@ -845,7 +842,7 @@ const OngoingCourses = props => {
               marginVertical: normalizeHeight(24),
             }}>
             {/* content goes here */}
-            <Text style={[fstyles.boldFourteen, { color: '#B095E3' }]}>
+            <Text style={[fstyles.boldFourteen, {color: '#B095E3'}]}>
               My Progress
             </Text>
             <View
@@ -854,7 +851,7 @@ const OngoingCourses = props => {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
               }}>
-              <Text style={[fstyles.semiTwelwe, { color: '#F6F3FC' }]}>
+              <Text style={[fstyles.semiTwelwe, {color: '#F6F3FC'}]}>
                 2/8 modules completed
               </Text>
               <LinearGradient
@@ -863,14 +860,14 @@ const OngoingCourses = props => {
                   '#815FC4', // at 101.85%
                 ]}
                 locations={[0.4403, 1.0185]} // Converted from 44.03%, 101.85%
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0.559, y: 0.829 }} // 124deg ≈ cos(124°) = 0.559, sin(124°) = 0.829
+                start={{x: 0, y: 0}}
+                end={{x: 0.559, y: 0.829}} // 124deg ≈ cos(124°) = 0.559, sin(124°) = 0.829
                 style={{
                   borderRadius: 12,
                   paddingVertical: normalizeHeight(4),
                   paddingHorizontal: normalizeWidth(8),
                 }}>
-                <Text style={[fstyles.mediumTen, { color: '#EEE7F9' }]}>17%</Text>
+                <Text style={[fstyles.mediumTen, {color: '#EEE7F9'}]}>17%</Text>
               </LinearGradient>
             </View>
 
@@ -902,7 +899,7 @@ const OngoingCourses = props => {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
               }}>
-              <View style={{ flex: 3 }}>
+              <View style={{flex: 3}}>
                 <Text
                   style={[
                     fstyles.mediumTen,
@@ -917,13 +914,13 @@ const OngoingCourses = props => {
                 <Text
                   style={[
                     fstyles.boldTwelwe,
-                    { color: '#EEE7F9', marginTop: normalizeHeight(4) },
+                    {color: '#EEE7F9', marginTop: normalizeHeight(4)},
                   ]}>
                   4
                   <Text
                     style={[
                       fstyles.mediumTen,
-                      { color: 'rgba(238, 231, 249, 0.60)' },
+                      {color: 'rgba(238, 231, 249, 0.60)'},
                     ]}>
                     /36
                   </Text>
@@ -952,19 +949,19 @@ const OngoingCourses = props => {
                 <Text
                   style={[
                     fstyles.boldTwelwe,
-                    { color: '#EEE7F9', marginTop: normalizeHeight(4) },
+                    {color: '#EEE7F9', marginTop: normalizeHeight(4)},
                   ]}>
                   4
                   <Text
                     style={[
                       fstyles.mediumTen,
-                      { color: 'rgba(238, 231, 249, 0.60)' },
+                      {color: 'rgba(238, 231, 249, 0.60)'},
                     ]}>
                     /36
                   </Text>
                 </Text>
               </View>
-              <View style={{ alignItems: 'flex-end', flex: 3.33 }}>
+              <View style={{alignItems: 'flex-end', flex: 3.33}}>
                 <Text
                   style={[
                     fstyles.mediumTen,
@@ -989,7 +986,7 @@ const OngoingCourses = props => {
                   <Text
                     style={[
                       fstyles.mediumTen,
-                      { color: 'rgba(238, 231, 249, 0.60)' },
+                      {color: 'rgba(238, 231, 249, 0.60)'},
                     ]}>
                     /36
                   </Text>
@@ -1003,7 +1000,7 @@ const OngoingCourses = props => {
             horizontal
             contentContainerStyle={{}}
             showsHorizontalScrollIndicator={false}
-            renderItem={({ item, index }) => {
+            renderItem={({item, index}) => {
               const isSelected = selectedIndex === index;
               return (
                 <TouchableOpacity onPress={() => setSelectedIndex(index)}>
@@ -1031,18 +1028,22 @@ const OngoingCourses = props => {
             }}
           />
         </LinearGradient>
-        {selectedIndex === 0 || selectedIndex === 1 || selectedIndex === 2 && <FlatList
-          keyExtractor={(item, index) => `_${index}`}
-          horizontal
-          data={exploreCourses}
-          renderItem={RenderFPList}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingHorizontal: normalizeWidth(23),
-            marginBottom: normalizeHeight(16),
-            marginTop: normalizeHeight(24),
-          }}
-        />}
+        {selectedIndex === 0 ||
+          selectedIndex === 1 ||
+          (selectedIndex === 2 && (
+            <FlatList
+              keyExtractor={(item, index) => `_${index}`}
+              horizontal
+              data={exploreCourses}
+              renderItem={RenderFPList}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingHorizontal: normalizeWidth(23),
+                marginBottom: normalizeHeight(16),
+                marginTop: normalizeHeight(24),
+              }}
+            />
+          ))}
         {
           selectedIndex === 0 ? (
             <FlatList
@@ -1061,40 +1062,39 @@ const OngoingCourses = props => {
             <View>
               <Text style={fstyles.heavyTwentyFour}>overview section</Text>
             </View>
-          ) :
-            (
-              <>
-                <LinearGradient
-                  colors={[
-                    'rgba(211, 196, 239, 0)', // 0% transparent
-                    'rgba(211, 196, 239, 0.10)', // 100% faded light purple
-                  ]}
-                  locations={[0.0502, 1]} // 5.02%, 100%
-                  start={{ x: 0, y: 0.5 }}
-                  end={{ x: 1, y: 0.5 }} // 98deg ≈ horizontal gradient
-                  style={{
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    borderColor: 'rgba(176, 149, 227, 0.16)', // var(--Primary-Light-16)
-                    backgroundColor: 'rgba(48, 11, 115, 0.40)', // fallback background layer
-                    padding: 16,
-                    marginHorizontal: normalizeWidth(24),
-                    // your inner padding if needed
-                  }}>
-                  {/* Inner content goes here */}
-                  {/* implement fonts and check the design for notes */}
-                </LinearGradient>
-                <FlatList
-                  data={notesData}
-                  keyExtractor={item => item.id}
-                  renderItem={NotesCard}
-                  contentContainerStyle={{
-                    paddingHorizontal: normalizeWidth(16),
-                    paddingVertical: normalizeHeight(16),
-                  }}
-                />
-              </>
-            )
+          ) : (
+            <>
+              <LinearGradient
+                colors={[
+                  'rgba(211, 196, 239, 0)', // 0% transparent
+                  'rgba(211, 196, 239, 0.10)', // 100% faded light purple
+                ]}
+                locations={[0.0502, 1]} // 5.02%, 100%
+                start={{x: 0, y: 0.5}}
+                end={{x: 1, y: 0.5}} // 98deg ≈ horizontal gradient
+                style={{
+                  borderRadius: 12,
+                  borderWidth: 1,
+                  borderColor: 'rgba(176, 149, 227, 0.16)', // var(--Primary-Light-16)
+                  backgroundColor: 'rgba(48, 11, 115, 0.40)', // fallback background layer
+                  padding: 16,
+                  marginHorizontal: normalizeWidth(24),
+                  // your inner padding if needed
+                }}>
+                {/* Inner content goes here */}
+                {/* implement fonts and check the design for notes */}
+              </LinearGradient>
+              <FlatList
+                data={notesData}
+                keyExtractor={item => item.id}
+                renderItem={NotesCard}
+                contentContainerStyle={{
+                  paddingHorizontal: normalizeWidth(16),
+                  paddingVertical: normalizeHeight(16),
+                }}
+              />
+            </>
+          )
           //  implement fonts and check the design for notes
         }
       </ScrollView>
@@ -1105,6 +1105,32 @@ const OngoingCourses = props => {
 export default OngoingCourses;
 
 const styles = StyleSheet.create({
+  moduleChip: {
+    paddingVertical: normalizeHeight(8),
+    paddingHorizontal: normalizeWidth(12),
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(176, 149, 227, 0.40)',
+    marginRight: normalizeWidth(25),
+  },
+  moduleChipText: {
+    color: 'white',
+  },
+  headerSection: {
+    marginTop: normalizeHeight(31),
+    marginHorizontal: normalizeWidth(24),
+  },
+  courseDescription: {
+    fontStyle: 'italic',
+    marginTop: 4,
+    color: '#F6F3FC',
+  },
+  ratingSection: {
+    flexDirection: 'row',
+    marginHorizontal: normalizeWidth(24),
+    marginTop: normalizeHeight(28),
+    alignItems: 'center',
+  },
   container: {
     flexDirection: 'row',
     marginRight: normalizeWidth(8),
@@ -1232,7 +1258,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1F144A',
     padding: 12,
   },
-  headerRow: {
+  cardHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
